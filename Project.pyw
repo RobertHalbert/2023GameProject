@@ -88,7 +88,24 @@ class PlayerCharacter(Character,Armor,Weapon):
     def setStats(self):
         self.hp = 3 + self.level*2 + self.constitution * self.level
 
+class Flags:
+    gameStart = 0
+    startingVillageFirstVisit = 0
 
+class Locations:
+    currentLocation = ''
+    overworld = False
+    villageHome = 'Home'
+    startingVillage = 'Eris'
+    overworldPlaceholder = 'World'
+    ########## World Size is 500,500
+    currentCoordinates = [11,7]
+    startingVCoordinates = [11,7]
+
+class Dialogue:
+    gameStartDialogue = 'Game started'
+
+# Character Creation Window
 class CreationWindow(Ui_CCWindow.Ui_Form, QWidget):
     signal_function = pyqtSignal()
     points = 10
@@ -214,6 +231,7 @@ class CreationWindow(Ui_CCWindow.Ui_Form, QWidget):
         self.signal_function.emit()
         QWidget.close(self)
 
+# Main Game Window
 class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 
     def __init__(self, CCreate):
@@ -222,20 +240,161 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.CCreate = CCreate
         self.actionNew_Game.triggered.connect(self.StartGame)
         self.Text = self.mainTextBox.appendPlainText
+        self.ButtonA.clicked.connect(lambda:self.GridButtonPressed('A'))
+        self.ButtonC.clicked.connect(lambda:self.GridButtonPressed('C'))
+        self.ButtonD.clicked.connect(lambda:self.GridButtonPressed('D'))
+        self.ButtonE.clicked.connect(lambda:self.GridButtonPressed('E'))
+        self.ButtonF.clicked.connect(lambda:self.GridButtonPressed('F'))
+        self.ButtonQ.clicked.connect(lambda:self.GridButtonPressed('Q'))
+        self.ButtonR.clicked.connect(lambda:self.GridButtonPressed('R'))
+        self.ButtonS.clicked.connect(lambda:self.GridButtonPressed('S'))
+        self.ButtonV.clicked.connect(lambda:self.GridButtonPressed('V'))
+        self.ButtonW.clicked.connect(lambda:self.GridButtonPressed('W'))
+        self.ButtonZ.clicked.connect(lambda:self.GridButtonPressed('Z'))
+
 #Main Functions
+    def GridButtonPressed(self,button):
+        buttonpressed = 'self.Button' + button +'Pressed()'
+        eval(buttonpressed)
+        self.ButtonUpdate()
+
     def StartGame(self):
-        self.frame.setEnabled(False)
+        self.frameWindow.setEnabled(False)
         self.mainTextBox.clear()
         self.CharacterCreation()
 
     def GameSetup(self):
-        pcApperence = PlayerCharacter.apperenceList
-        self.frame.setEnabled(True)
-        self.Text(PlayerCharacter.name)
-        for x in range(5):
-            self.Text(pcApperence[x])
+        self.frameWindow.setEnabled(True)
+        self.DialogueFunction('gameStartDialogue')
+        self.UpdateInformation()
+        self.LocationUpdate('villageHome')
+        self.ButtonUpdate()
 
-#Helper Functions
+    def EncounterFunction(self):
+        pass
+
+    def OverworldMovementFunction(self):
+        pass
+
+##### Helper Functions #####
+    def ButtonUpdate(self):
+        locale = [Locations.currentLocation,Locations.overworld,Locations.currentCoordinates]
+        buttonList = ['Q','W','E','R','A','S','D','F','Z','X','C','V']
+        for x in range(len(buttonList)):
+            buttontoupdate = 'self.Update'+buttonList[x]+f'Button({locale})'
+            eval(buttontoupdate)
+
+    def UpdateQButton(self,locale):
+        b = self.ButtonQ
+        if locale[0] == 'Home':
+            b.setText('Rest'),b.setEnabled(True)
+
+    def UpdateWButton(self,locale):
+        b = self.ButtonW
+        if locale[0] == 'Home':
+            b.setText(''),b.setEnabled(False)
+
+    def UpdateEButton(self,locale):
+        b = self.ButtonE
+        if locale[0] == 'Home':
+            b.setText(''),b.setEnabled(False)
+
+    def UpdateRButton(self,locale):
+        b = self.ButtonR
+        if locale[0] == 'Home':
+            b.setText(''),b.setEnabled(False)
+
+    def UpdateAButton(self,locale):
+        b = self.ButtonA
+        if locale[0] == 'Home':
+            b.setText(''),b.setEnabled(False)
+
+    def UpdateSButton(self,locale):
+        b = self.ButtonS
+        if locale[0] == 'Home':
+            b.setText(''),b.setEnabled(False)
+
+    def UpdateDButton(self,locale):
+        b = self.ButtonD
+        if locale[0] == 'Home':
+            b.setText(''),b.setEnabled(False)
+
+    def UpdateFButton(self,locale):
+        b = self.ButtonF
+        if locale[0] == 'Home':
+            b.setText(''),b.setEnabled(False)
+
+    def UpdateZButton(self,locale):
+        b = self.ButtonZ
+        if locale[0] == 'Home':
+            b.setText(''),b.setEnabled(False)
+
+    def UpdateXButton(self,locale):
+        b = self.ButtonX
+        if locale[0] == 'Home':
+            b.setText(''),b.setEnabled(False)
+
+    def UpdateCButton(self,locale):
+        b = self.ButtonC
+        if locale[0] == 'Home':
+            b.setText(''),b.setEnabled(False)
+
+    def UpdateVButton(self,locale):
+        b = self.ButtonV
+        if locale[0] == 'Home':
+            b.setText(''),b.setEnabled(False)
+
+    
+    def ButtonQPressed(self):
+        b = self.ButtonQ.text()
+        if b == 'Rest':
+            self.Text('You rest for a few hours')
+    
+    def ButtonWPressed(self):
+        self.Text('W button pressed')
+    
+    def ButtonEPressed(self):
+        self.Text('E button pressed')
+    
+    def ButtonRPressed(self):
+        self.Text('R button pressed')
+    
+    def ButtonAPressed(self):
+        self.Text('A button pressed')
+    
+    def ButtonSPressed(self):
+        self.Text('S button pressed')
+    
+    def ButtonDPressed(self):
+        self.Text('D button pressed')
+    
+    def ButtonFPressed(self):
+        self.Text('F button pressed')
+    
+    def ButtonZPressed(self):
+        self.Text('Z button pressed')
+    
+    def ButtonXPressed(self):
+        self.Text('X button pressed')
+
+    def ButtonCPressed(self):
+        self.Text('C button pressed')
+
+    def ButtonVPressed(self):
+        self.Text('V button pressed')
+
+    def LocationUpdate(self,location):
+        locale = getattr(Locations,location)
+        Locations.currentLocation = locale
+        self.labelLocation.setText(Locations.currentLocation)
+
+    def UpdateInformation(self):
+        self.labelName.setText(PlayerCharacter.name)
+
+    def DialogueFunction(self,dialogue):
+        text = getattr(Dialogue,dialogue)
+        self.Text(text)
+
     def CharacterCreation(self):
         self.CCreate = CreationWindow()
         self.CCreate.signal_function.connect(self.GameSetup)
