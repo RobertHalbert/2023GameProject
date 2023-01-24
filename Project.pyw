@@ -58,12 +58,22 @@ class Weapon:
         self.wname = wname
         self.damage = damage
 
+class Attack:
+    attackdamage = 0
+    def AttackFunction():
+        pass
+
 class Armor:
     def __init__(self,aname,defence):
         self.aname = aname
         self.defence = defence
 
-class PlayerCharacter(Character,Armor,Weapon):
+class MonsterCharacter(Character,Armor,Weapon,Attack):
+    def __init__(self, name, hp, stamina,wname,damage,aname,defence):
+        super().__init__(name, hp, stamina,wname,damage,aname,defence)
+
+
+class PlayerCharacter(Character,Armor,Weapon,Attack):
     def __init__(self, name, hp, stamina, attack, defence, strength, dexterity, arcane, constitution, charisma, level):
         super().__init__(name, hp, attack, defence, stamina)
         self.strength = strength
@@ -277,6 +287,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         pass
 
 ##### Helper Functions #####
+
+    ##### BUTTONS ######
     def ButtonUpdate(self):
         locale = [Locations.currentLocation,Locations.overworld,Locations.currentCoordinates]
         buttonList = ['Q','W','E','R','A','S','D','F','Z','X','C','V']
@@ -342,47 +354,65 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def UpdateVButton(self,locale):
         b = self.ButtonV
         if locale[0] == 'Home':
-            b.setText(''),b.setEnabled(False)
-
-    
+            b.setText('Leave'),b.setEnabled(True)   
+    ###
     def ButtonQPressed(self):
         b = self.ButtonQ.text()
         if b == 'Rest':
             self.Text('You rest for a few hours')
     
     def ButtonWPressed(self):
+        b = self.ButtonW.text()
         self.Text('W button pressed')
     
     def ButtonEPressed(self):
+        b = self.ButtonE.text()
         self.Text('E button pressed')
     
     def ButtonRPressed(self):
+        b = self.ButtonR.text()
         self.Text('R button pressed')
     
     def ButtonAPressed(self):
+        b = self.ButtonA.text()
         self.Text('A button pressed')
     
     def ButtonSPressed(self):
+        b = self.ButtonS.text()
         self.Text('S button pressed')
     
     def ButtonDPressed(self):
+        b = self.ButtonD.text()
         self.Text('D button pressed')
     
     def ButtonFPressed(self):
+        b = self.ButtonF.text()
         self.Text('F button pressed')
     
     def ButtonZPressed(self):
+        b = self.ButtonZ.text()
         self.Text('Z button pressed')
     
     def ButtonXPressed(self):
+        b = self.ButtonX.text()
         self.Text('X button pressed')
 
     def ButtonCPressed(self):
+        b = self.ButtonC.text()
         self.Text('C button pressed')
 
     def ButtonVPressed(self):
-        self.Text('V button pressed')
+        b = self.ButtonV.text()
+        if b == 'Leave':
+            self.LeaveFunction(Locations.currentLocation)
 
+##### ACTION FUNCTIONS #####
+
+    def LeaveFunction(self,location):
+        pass
+
+
+##### OHER HELPER FUNCTIONS #####
     def LocationUpdate(self,location):
         locale = getattr(Locations,location)
         Locations.currentLocation = locale
