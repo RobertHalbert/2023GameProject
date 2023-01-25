@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 import Ui_Game, Ui_CCWindow
 
 class Character:
@@ -320,6 +320,21 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.ButtonV.clicked.connect(lambda:self.GridButtonPressed('V'))
         self.ButtonW.clicked.connect(lambda:self.GridButtonPressed('W'))
         self.ButtonZ.clicked.connect(lambda:self.GridButtonPressed('Z'))
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Q: self.GridButtonPressed('Q')
+        if event.key() == Qt.Key_W: self.GridButtonPressed('W')
+        if event.key() == Qt.Key_E: self.GridButtonPressed('E')
+        if event.key() == Qt.Key_R: self.GridButtonPressed('R')
+        if event.key() == Qt.Key_A: self.GridButtonPressed('A')
+        if event.key() == Qt.Key_S: self.GridButtonPressed('S')
+        if event.key() == Qt.Key_D: self.GridButtonPressed('D')
+        if event.key() == Qt.Key_F: self.GridButtonPressed('F')
+        if event.key() == Qt.Key_Z: self.GridButtonPressed('Z')
+        if event.key() == Qt.Key_X: self.GridButtonPressed('X')
+        if event.key() == Qt.Key_C: self.GridButtonPressed('C')
+        if event.key() == Qt.Key_V: self.GridButtonPressed('V')
+        if event.key() == Qt.Key_F3: self.StartGame()
+        if event.key() == Qt.Key_F4: self.EndGame()
 
 #Main Functions
     def GridButtonPressed(self,button):
@@ -356,6 +371,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         Time.SetTime(time)
         Time.SetDateName()
         self.UpdateDateTime()
+
+    def EndGame(self):
+        QMainWindow.close(self)
 
 ##### Helper Functions #####
 
