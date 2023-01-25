@@ -101,12 +101,35 @@ class Flags:
     gameStart = 0
     startingVillageFirstVisit = 0
 
+class Time:
+    daynames = {0:'Starday',1:'Secday',2:'Midday',3:'Urthday',4:'Endsday'}
+    minute = 0
+    hour = 10
+    day = 1
+    month = 6
+    def SetTime(time):
+        Time.minute += time
+        while Time.minute >= 60:
+            Time.minute -= 60
+            Time.hour +=1
+        while Time.hour >= 24:
+            Time.hour -= 23
+            Time.day += 1
+        while Time.day > 30:
+            Time.day -= 30
+            Time.month += 1
+        
+
 class Locations:
     currentLocation = ''
     overworld = False
     villageHome = 'Home'
     startingVillage = 'Eris'
     overworldPlaceholder = 'World'
+    sVillageBlacksmith = 'Blacksmiths'
+    sVillageMerchant = 'Merchants'
+    sVillageMagician = 'Magicians'
+    sVillageFarmer = 'Farmers'
     ########## World Size is 500,500
     currentCoord = [11,7]
     startingVCoord = [11,7]
@@ -126,7 +149,18 @@ class Dialogue:
             Flags.startingVillageFirstVisit = 1
         else: text = "Village"
         return text
-
+    def Merchants():
+        text = 'Merhcants place'
+        return text
+    def Blacksmiths():
+        text = 'Blacksmiths place'
+        return text
+    def Magicians():
+        text = 'Magicians place'
+        return text
+    def Farmers():
+        text = 'Farmers place'
+        return text
 class NonPlayerCharacters:
     pass
 
@@ -293,8 +327,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.UpdateInformation()
         self.LocationUpdate('villageHome')
         self.ButtonUpdate()
+        self.SetTime()
 
-    def ExploreFunction(self):
+    def ExploreFunction(self, location):
         pass
 
     def RoomChangeFunction(self,location,target):
@@ -306,6 +341,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 
     def OverworldMovementFunction(self):
         pass
+
+    def SetTime(self):
+        Time.SetTime(0)
+        self.UpdateDateTime()
 
 ##### Helper Functions #####
 
@@ -331,6 +370,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             b.setText('Rest')
         if A == 'Eris':
             b.setText('Explore')
+        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            b.setText('Talk')
 
     def UpdateWButton(self,locale):
         b = self.ButtonW
@@ -339,7 +380,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if A == 'Home':
             b.setText('')
         if A == 'Eris':
-            b.setText('')
+            b.setText('Merchant')
+        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            b.setText('Shop')
 
 
     def UpdateEButton(self,locale):
@@ -349,6 +392,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if A == 'Home':
             b.setText('')
         if A == 'Eris':
+            b.setText('Blacksmith')
+        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
             b.setText('')
 
     def UpdateRButton(self,locale):
@@ -358,6 +403,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if A == 'Home':
             b.setText('')
         if A == 'Eris':
+            b.setText('Magician')
+        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
             b.setText('')
 
     def UpdateAButton(self,locale):
@@ -368,6 +415,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             b.setText('')
         if A == 'Eris':
             b.setText('Home')
+        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            b.setText('')
         
 
     def UpdateSButton(self,locale):
@@ -377,6 +426,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if A == 'Home':
             b.setText('')
         if A == 'Eris':
+            b.setText('Farmer')
+        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
             b.setText('')
 
     def UpdateDButton(self,locale):
@@ -387,6 +438,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             b.setText('')
         if A == 'Eris':
             b.setText('')
+        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            b.setText('')
 
     def UpdateFButton(self,locale):
         b = self.ButtonF
@@ -395,6 +448,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if A == 'Home':
             b.setText('')
         if A == 'Eris':
+            b.setText('')
+        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
             b.setText('')
 
     def UpdateZButton(self,locale):
@@ -405,6 +460,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             b.setText('')
         if A == 'Eris':
             b.setText('')
+        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            b.setText('')
 
     def UpdateXButton(self,locale):
         b = self.ButtonX
@@ -413,6 +470,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if A == 'Home':
             b.setText('')
         if A == 'Eris':
+            b.setText('')
+        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
             b.setText('')
 
     def UpdateCButton(self,locale):
@@ -423,12 +482,14 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             b.setText('')
         if A == 'Eris':
             b.setText('')
+        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            b.setText('')
 
     def UpdateVButton(self,locale):
         b = self.ButtonV
         L = Locations
         A = locale[0]
-        if A == 'Home':
+        if A == 'Home' or A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
             b.setText('Leave')  
         if A == 'Eris':
             b.setText('')
@@ -446,16 +507,19 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def ButtonWPressed(self):
         b = self.ButtonW.text()
         L = Locations
-        self.Text('W button pressed')
+        if b == 'Merchant':
+            self.RoomChangeFunction(Locations.currentLocation,Locations.sVillageMerchant)
     
     def ButtonEPressed(self):
         b = self.ButtonE.text()
         L = Locations
-        self.Text('E button pressed')
-    
+        if b == 'Blacksmith':
+            self.RoomChangeFunction(Locations.currentLocation,Locations.sVillageBlacksmith)
+            
     def ButtonRPressed(self):
         b = self.ButtonR.text()
-        self.Text('R button pressed')
+        if b == 'Magician':
+            self.RoomChangeFunction(Locations.currentLocation,Locations.sVillageMagician)
     
     def ButtonAPressed(self):
         b = self.ButtonA.text()
@@ -466,32 +530,28 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def ButtonSPressed(self):
         b = self.ButtonS.text()
         L = Locations
-        self.Text('S button pressed')
+        if b == 'Farmer':
+            self.RoomChangeFunction(Locations.currentLocation,Locations.sVillageFarmer)
     
     def ButtonDPressed(self):
         b = self.ButtonD.text()
         L = Locations
-        self.Text('D button pressed')
     
     def ButtonFPressed(self):
         b = self.ButtonF.text()
         L = Locations
-        self.Text('F button pressed')
     
     def ButtonZPressed(self):
         b = self.ButtonZ.text()
         L = Locations
-        self.Text('Z button pressed')
     
     def ButtonXPressed(self):
         b = self.ButtonX.text()
         L = Locations
-        self.Text('X button pressed')
 
     def ButtonCPressed(self):
         b = self.ButtonC.text()
         L = Locations
-        self.Text('C button pressed')
 
     def ButtonVPressed(self):
         b = self.ButtonV.text()
@@ -503,16 +563,27 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 
     def LeaveFunction(self,location):
         L = Locations
-        if location == 'Home':
+        A = location
+        if A == 'Home' or A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
             L.currentLocation = L.startingVillage
-            self.labelLocation = L.startingVillage
         self.DialogueFunction(L.currentLocation)
+        self.labelLocation.setText(Locations.currentLocation)
 
     def EnterRoom(self,location,target):
         if location == Locations.startingVillage:
-            Locations.currentLocation = target
+            Locations.currentLocation = target        
+        self.labelLocation.setText(Locations.currentLocation)
 
 ##### OHER HELPER FUNCTIONS #####
+    def UpdateDateTime(self):
+        T = Time
+        mi = T.minute
+        h = T.hour
+        d = T.day
+        mo = T.month
+        self.labelTime.setText(f"Time: {h}:{mi:02}")
+        self.labelDate.setText(f"Date: {d}/{mo:0>2d}")
+
     def LocationUpdate(self,location):
         locale = getattr(Locations,location)
         Locations.currentLocation = locale
@@ -532,8 +603,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.CCreate = CreationWindow()
         self.CCreate.signal_function.connect(self.GameSetup)
         self.CCreate.show()
-
-        
+       
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     the_form = MyForm(CreationWindow)

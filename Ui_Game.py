@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'e:\Project\GameProject\Game.ui'
+# Form implementation generated from reading ui file 'c:\Progamming\Repository\GameProject\Game.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.7
 #
@@ -84,7 +84,7 @@ class Ui_MainWindow(object):
         self.ButtonV.setObjectName("ButtonV")
         self.gridLayout.addWidget(self.ButtonV, 2, 3, 1, 1)
         self.formLayoutWidget = QtWidgets.QWidget(self.frameWindow)
-        self.formLayoutWidget.setGeometry(QtCore.QRect(10, 9, 221, 181))
+        self.formLayoutWidget.setGeometry(QtCore.QRect(10, 9, 221, 184))
         self.formLayoutWidget.setObjectName("formLayoutWidget")
         self.formLayout = QtWidgets.QFormLayout(self.formLayoutWidget)
         self.formLayout.setContentsMargins(0, 0, 0, 0)
@@ -102,9 +102,15 @@ class Ui_MainWindow(object):
         self.labelLocation = QtWidgets.QLabel(self.formLayoutWidget)
         self.labelLocation.setObjectName("labelLocation")
         self.formLayout.setWidget(3, QtWidgets.QFormLayout.SpanningRole, self.labelLocation)
+        self.labelTime = QtWidgets.QLabel(self.formLayoutWidget)
+        self.labelTime.setObjectName("labelTime")
+        self.formLayout.setWidget(4, QtWidgets.QFormLayout.SpanningRole, self.labelTime)
+        self.labelDate = QtWidgets.QLabel(self.formLayoutWidget)
+        self.labelDate.setObjectName("labelDate")
+        self.formLayout.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.labelDate)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1010, 29))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1010, 26))
         self.menubar.setObjectName("menubar")
         self.menuMenu = QtWidgets.QMenu(self.menubar)
         self.menuMenu.setObjectName("menuMenu")
@@ -149,6 +155,8 @@ class Ui_MainWindow(object):
         self.labelName.setText(_translate("MainWindow", "TESTNAME"))
         self.labelPlayerHealth.setText(_translate("MainWindow", "Health"))
         self.labelLocation.setText(_translate("MainWindow", "TextLabel"))
+        self.labelTime.setText(_translate("MainWindow", "TextLabel"))
+        self.labelDate.setText(_translate("MainWindow", "TextLabel"))
         self.menuMenu.setTitle(_translate("MainWindow", "Menu"))
         self.actionNew_Game.setText(_translate("MainWindow", "New Game"))
         self.actionLoad_Game.setText(_translate("MainWindow", "Load Game"))
