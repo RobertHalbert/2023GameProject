@@ -60,7 +60,7 @@ class Weapon:
 
 class Attack:
     attackdamage = 0
-    def AttackFunction():
+    def AttackFunction(self):
         pass
 
 class Armor:
@@ -71,7 +71,6 @@ class Armor:
 class MonsterCharacter(Character,Armor,Weapon,Attack):
     def __init__(self, name, hp, stamina,wname,damage,aname,defence):
         super().__init__(name, hp, stamina,wname,damage,aname,defence)
-
 
 class PlayerCharacter(Character,Armor,Weapon,Attack):
     def __init__(self, name, hp, stamina, attack, defence, strength, dexterity, arcane, constitution, charisma, level):
@@ -109,11 +108,27 @@ class Locations:
     startingVillage = 'Eris'
     overworldPlaceholder = 'World'
     ########## World Size is 500,500
-    currentCoordinates = [11,7]
-    startingVCoordinates = [11,7]
+    currentCoord = [11,7]
+    startingVCoord = [11,7]
 
 class Dialogue:
-    gameStartDialogue = 'Game started'
+    text = ''
+    def Home():
+        if Flags.gameStart == 0:
+            text = "Game Started\n" + "Your Home"
+            Flags.gameStart = 1
+        else: text = "Your Home" 
+        return text
+        
+    def Eris():
+        if Flags.startingVillageFirstVisit == 0:
+            text = "Introduction\n" + "Village"
+            Flags.startingVillageFirstVisit = 1
+        else: text = "Village"
+        return text
+
+class NonPlayerCharacters:
+    pass
 
 # Character Creation Window
 class CreationWindow(Ui_CCWindow.Ui_Form, QWidget):
@@ -275,10 +290,16 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 
     def GameSetup(self):
         self.frameWindow.setEnabled(True)
-        self.DialogueFunction('gameStartDialogue')
         self.UpdateInformation()
         self.LocationUpdate('villageHome')
         self.ButtonUpdate()
+
+    def ExploreFunction(self):
+        pass
+
+    def RoomChangeFunction(self,location,target):
+        self.EnterRoom(location,target)
+        self.DialogueFunction(target)
 
     def EncounterFunction(self):
         pass
@@ -290,83 +311,146 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 
     ##### BUTTONS ######
     def ButtonUpdate(self):
-        locale = [Locations.currentLocation,Locations.overworld,Locations.currentCoordinates]
+        locale = [Locations.currentLocation,Locations.overworld,Locations.currentCoord]
         buttonList = ['Q','W','E','R','A','S','D','F','Z','X','C','V']
         for x in range(len(buttonList)):
             buttontoupdate = 'self.Update'+buttonList[x]+f'Button({locale})'
             eval(buttontoupdate)
+            buttonText = eval('self.Button'+buttonList[x]+".text()")
+            if buttonText == '':
+                eval('self.Button'+buttonList[x]+'.setEnabled(False)')
+            else:
+                eval('self.Button'+buttonList[x]+'.setEnabled(True)')
 
+    ### Button Updates ###
     def UpdateQButton(self,locale):
         b = self.ButtonQ
-        if locale[0] == 'Home':
-            b.setText('Rest'),b.setEnabled(True)
+        L = Locations
+        A = locale[0]
+        if A == 'Home':
+            b.setText('Rest')
+        if A == 'Eris':
+            b.setText('Explore')
 
     def UpdateWButton(self,locale):
         b = self.ButtonW
-        if locale[0] == 'Home':
-            b.setText(''),b.setEnabled(False)
+        L = Locations
+        A = locale[0]
+        if A == 'Home':
+            b.setText('')
+        if A == 'Eris':
+            b.setText('')
+
 
     def UpdateEButton(self,locale):
         b = self.ButtonE
-        if locale[0] == 'Home':
-            b.setText(''),b.setEnabled(False)
+        L = Locations
+        A = locale[0]
+        if A == 'Home':
+            b.setText('')
+        if A == 'Eris':
+            b.setText('')
 
     def UpdateRButton(self,locale):
         b = self.ButtonR
-        if locale[0] == 'Home':
-            b.setText(''),b.setEnabled(False)
+        L = Locations
+        A = locale[0]
+        if A == 'Home':
+            b.setText('')
+        if A == 'Eris':
+            b.setText('')
 
     def UpdateAButton(self,locale):
         b = self.ButtonA
-        if locale[0] == 'Home':
-            b.setText(''),b.setEnabled(False)
+        L = Locations
+        A = locale[0]
+        if A == 'Home':
+            b.setText('')
+        if A == 'Eris':
+            b.setText('Home')
+        
 
     def UpdateSButton(self,locale):
         b = self.ButtonS
-        if locale[0] == 'Home':
-            b.setText(''),b.setEnabled(False)
+        L = Locations
+        A = locale[0]
+        if A == 'Home':
+            b.setText('')
+        if A == 'Eris':
+            b.setText('')
 
     def UpdateDButton(self,locale):
         b = self.ButtonD
-        if locale[0] == 'Home':
-            b.setText(''),b.setEnabled(False)
+        L = Locations
+        A = locale[0]
+        if A == 'Home':
+            b.setText('')
+        if A == 'Eris':
+            b.setText('')
 
     def UpdateFButton(self,locale):
         b = self.ButtonF
-        if locale[0] == 'Home':
-            b.setText(''),b.setEnabled(False)
+        L = Locations
+        A = locale[0]
+        if A == 'Home':
+            b.setText('')
+        if A == 'Eris':
+            b.setText('')
 
     def UpdateZButton(self,locale):
         b = self.ButtonZ
-        if locale[0] == 'Home':
-            b.setText(''),b.setEnabled(False)
+        L = Locations
+        A = locale[0]
+        if A == 'Home':
+            b.setText('')
+        if A == 'Eris':
+            b.setText('')
 
     def UpdateXButton(self,locale):
         b = self.ButtonX
-        if locale[0] == 'Home':
-            b.setText(''),b.setEnabled(False)
+        L = Locations
+        A = locale[0]
+        if A == 'Home':
+            b.setText('')
+        if A == 'Eris':
+            b.setText('')
 
     def UpdateCButton(self,locale):
         b = self.ButtonC
-        if locale[0] == 'Home':
-            b.setText(''),b.setEnabled(False)
+        L = Locations
+        A = locale[0]
+        if A == 'Home':
+            b.setText('')
+        if A == 'Eris':
+            b.setText('')
 
     def UpdateVButton(self,locale):
         b = self.ButtonV
-        if locale[0] == 'Home':
-            b.setText('Leave'),b.setEnabled(True)   
-    ###
+        L = Locations
+        A = locale[0]
+        if A == 'Home':
+            b.setText('Leave')  
+        if A == 'Eris':
+            b.setText('')
+    
+    ### Button Pressed ### 
     def ButtonQPressed(self):
         b = self.ButtonQ.text()
+        L = Locations
         if b == 'Rest':
             self.Text('You rest for a few hours')
+        if b == 'Explore':
+            if Locations.overworld == False:
+                self.ExploreFunction(Locations.currentLocation)
     
     def ButtonWPressed(self):
         b = self.ButtonW.text()
+        L = Locations
         self.Text('W button pressed')
     
     def ButtonEPressed(self):
         b = self.ButtonE.text()
+        L = Locations
         self.Text('E button pressed')
     
     def ButtonRPressed(self):
@@ -375,54 +459,73 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     
     def ButtonAPressed(self):
         b = self.ButtonA.text()
-        self.Text('A button pressed')
+        L = Locations
+        if b == 'Home':
+            self.RoomChangeFunction(Locations.currentLocation,Locations.villageHome)
     
     def ButtonSPressed(self):
         b = self.ButtonS.text()
+        L = Locations
         self.Text('S button pressed')
     
     def ButtonDPressed(self):
         b = self.ButtonD.text()
+        L = Locations
         self.Text('D button pressed')
     
     def ButtonFPressed(self):
         b = self.ButtonF.text()
+        L = Locations
         self.Text('F button pressed')
     
     def ButtonZPressed(self):
         b = self.ButtonZ.text()
+        L = Locations
         self.Text('Z button pressed')
     
     def ButtonXPressed(self):
         b = self.ButtonX.text()
+        L = Locations
         self.Text('X button pressed')
 
     def ButtonCPressed(self):
         b = self.ButtonC.text()
+        L = Locations
         self.Text('C button pressed')
 
     def ButtonVPressed(self):
         b = self.ButtonV.text()
+        L = Locations
         if b == 'Leave':
             self.LeaveFunction(Locations.currentLocation)
 
 ##### ACTION FUNCTIONS #####
 
     def LeaveFunction(self,location):
-        pass
+        L = Locations
+        if location == 'Home':
+            L.currentLocation = L.startingVillage
+            self.labelLocation = L.startingVillage
+        self.DialogueFunction(L.currentLocation)
 
+    def EnterRoom(self,location,target):
+        if location == Locations.startingVillage:
+            Locations.currentLocation = target
 
 ##### OHER HELPER FUNCTIONS #####
     def LocationUpdate(self,location):
         locale = getattr(Locations,location)
         Locations.currentLocation = locale
         self.labelLocation.setText(Locations.currentLocation)
+        self.DialogueFunction(Locations.currentLocation)
 
     def UpdateInformation(self):
         self.labelName.setText(PlayerCharacter.name)
 
-    def DialogueFunction(self,dialogue):
-        text = getattr(Dialogue,dialogue)
+    def DialogueFunction(self,target):
+        Dialogue.text = ''
+        d = "Dialogue."
+        text = eval(d+target+"()")
         self.Text(text)
 
     def CharacterCreation(self):
