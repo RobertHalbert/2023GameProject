@@ -103,10 +103,12 @@ class Flags:
 
 class Time:
     daynames = {0:'Starday',1:'Secday',2:'Midday',3:'Urthday',4:'Endsday'}
+    currentDayName = ''
     minute = 0
     hour = 10
     day = 1
     month = 6
+    year = 1352
     def SetTime(time):
         Time.minute += time
         while Time.minute >= 60:
@@ -118,7 +120,15 @@ class Time:
         while Time.day > 30:
             Time.day -= 30
             Time.month += 1
-        
+        while Time.month > 12:
+            Time.month -= 12
+            Time.year += 1                
+    def SetDateName():
+        dateNum = Time.day
+        while dateNum > 5:
+            dateNum -= 5
+        Time.currentDayName = Time.daynames[dateNum]
+            
 
 class Locations:
     currentLocation = ''
@@ -327,7 +337,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.UpdateInformation()
         self.LocationUpdate('villageHome')
         self.ButtonUpdate()
-        self.SetTime()
+        self.SetTime(0)
 
     def ExploreFunction(self, location):
         pass
@@ -342,8 +352,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def OverworldMovementFunction(self):
         pass
 
-    def SetTime(self):
-        Time.SetTime(0)
+    def SetTime(self,time):
+        Time.SetTime(time)
+        Time.SetDateName()
         self.UpdateDateTime()
 
 ##### Helper Functions #####
@@ -581,8 +592,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         h = T.hour
         d = T.day
         mo = T.month
+        dn = T.currentDayName
         self.labelTime.setText(f"Time: {h}:{mi:02}")
-        self.labelDate.setText(f"Date: {d}/{mo:0>2d}")
+        self.labelDate.setText(f"Date: {dn}\t{d}/{mo:0>2d}")
 
     def LocationUpdate(self,location):
         locale = getattr(Locations,location)
