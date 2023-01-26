@@ -21,10 +21,10 @@
   <widget class="QLineEdit" name="lineEditName">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>330</x>
      <y>20</y>
-     <width>191</width>
-     <height>21</height>
+     <width>201</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
@@ -311,7 +311,7 @@
   <widget class="QLabel" name="labelRemaining">
    <property name="geometry">
     <rect>
-     <x>80</x>
+     <x>40</x>
      <y>40</y>
      <width>191</width>
      <height>21</height>
@@ -324,7 +324,7 @@
   <widget class="QComboBox" name="comboBoxBackground">
    <property name="geometry">
     <rect>
-     <x>430</x>
+     <x>560</x>
      <y>220</y>
      <width>151</width>
      <height>31</height>
@@ -588,7 +588,7 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>500</x>
+     <x>550</x>
      <y>10</y>
      <width>231</width>
      <height>51</height>

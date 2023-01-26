@@ -97,6 +97,11 @@ class PlayerCharacter(Character,Armor,Weapon,Attack):
     def setStats(self):
         self.hp = 3 + self.level*2 + self.constitution * self.level
 
+class Inventory:
+    openInventory = False
+    openStore = False
+    gold = 20
+    currentInventory = ['"cloth"','"stick"']
 class Flags:
     gameStart = 0
     startingVillageFirstVisit = 0
@@ -110,6 +115,7 @@ class Time:
     month = 6
     year = 1352
     def SetTime(time):
+        """Imput number of minutes to adavance time"""
         Time.minute += time
         while Time.minute >= 60:
             Time.minute -= 60
@@ -124,11 +130,11 @@ class Time:
             Time.month -= 12
             Time.year += 1                
     def SetDateName():
+        "This function applies a the name of day"
         dateNum = Time.day
         while dateNum > 5:
             dateNum -= 5
-        Time.currentDayName = Time.daynames[dateNum]
-            
+        Time.currentDayName = Time.daynames[dateNum-1]       
 
 class Locations:
     currentLocation = ''
@@ -146,30 +152,43 @@ class Locations:
 
 class Dialogue:
     text = ''
-    def Home():
-        if Flags.gameStart == 0:
+    def Home(var):
+        if var == 'start':
             text = "Game Started\n" + "Your Home"
-            Flags.gameStart = 1
         else: text = "Your Home" 
         return text
         
-    def Eris():
+    def Eris(var):
         if Flags.startingVillageFirstVisit == 0:
             text = "Introduction\n" + "Village"
             Flags.startingVillageFirstVisit = 1
         else: text = "Village"
         return text
-    def Merchants():
-        text = 'Merhcants place'
+    def Merchants(var):
+        if var == 'enter':
+           text = 'Merhcants place'
+        if var == 'Talk':
+            text = 'Hi'
+        if var == 'Shop':
+            text = 'Foodstuffs'
         return text
-    def Blacksmiths():
-        text = 'Blacksmiths place'
+    def Blacksmiths(var):
+        if var == 'enter':
+            text = 'Blacksmiths place'
+        if var == 'Talk':
+            text = 'Hey'
         return text
-    def Magicians():
-        text = 'Magicians place'
+    def Magicians(var):
+        if var == 'enter':
+            text = 'Magicians place'
+        if var == 'Talk':
+            text = 'Hello'
         return text
-    def Farmers():
-        text = 'Farmers place'
+    def Farmers(var):
+        if var == 'enter':
+            text = 'Farmers place'
+        if var == 'Talk':
+            text = 'Sup?'
         return text
 class NonPlayerCharacters:
     pass
@@ -320,6 +339,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.ButtonV.clicked.connect(lambda:self.GridButtonPressed('V'))
         self.ButtonW.clicked.connect(lambda:self.GridButtonPressed('W'))
         self.ButtonZ.clicked.connect(lambda:self.GridButtonPressed('Z'))
+        self.frameButtons.setVisible(False)
+        self.frameInfo.setVisible(False)
+        self.ButtonZ.setText('Inventory')
+        self.mainTextBox.appendPlainText("Welcome to (My Game)!\n\nStart a new game by selecting 'New game' in the Menu or by pressing 'F3'.")
+        
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Q: self.GridButtonPressed('Q')
         if event.key() == Qt.Key_W: self.GridButtonPressed('W')
@@ -340,7 +364,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def GridButtonPressed(self,button):
         buttonpressed = 'self.Button' + button +'Pressed()'
         eval(buttonpressed)
-        self.ButtonUpdate()
+        if (Inventory.openInventory == False) and (Inventory.openStore == False):
+            self.ButtonUpdate()
 
     def StartGame(self):
         self.frameWindow.setEnabled(False)
@@ -349,17 +374,20 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 
     def GameSetup(self):
         self.frameWindow.setEnabled(True)
+        self.frameButtons.setVisible(True)
+        self.frameInfo.setVisible(True)
         self.UpdateInformation()
-        self.LocationUpdate('villageHome')
+        self.LocationUpdate('villageHome','start')
         self.ButtonUpdate()
         self.SetTime(0)
 
     def ExploreFunction(self, location):
-        pass
+        self.SetTime(60)
+        self.Text("You explore a bit")
 
-    def RoomChangeFunction(self,location,target):
+    def RoomChangeFunction(self,location,target,var):
         self.EnterRoom(location,target)
-        self.DialogueFunction(target)
+        self.DialogueFunction(target,var)
 
     def EncounterFunction(self):
         pass
@@ -483,14 +511,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 
     def UpdateZButton(self,locale):
         b = self.ButtonZ
-        L = Locations
-        A = locale[0]
-        if A == 'Home':
-            b.setText('')
-        if A == 'Eris':
-            b.setText('')
-        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-            b.setText('')
+        I = Inventory
+        if I.openInventory == False or I.openStore == False:
+            b.setText('Inventory')
 
     def UpdateXButton(self,locale):
         b = self.ButtonX
@@ -527,40 +550,51 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def ButtonQPressed(self):
         b = self.ButtonQ.text()
         L = Locations
+        c = Locations.currentLocation
         if b == 'Rest':
-            self.Text('You rest for a few hours')
+            self.RestFunction()
         if b == 'Explore':
             if Locations.overworld == False:
-                self.ExploreFunction(Locations.currentLocation)
+                self.ExploreFunction(c)
+        if b == 'Talk':
+            self.DialogueFunction(c,'Talk')
     
     def ButtonWPressed(self):
         b = self.ButtonW.text()
         L = Locations
+        c = Locations.currentLocation
         if b == 'Merchant':
-            self.RoomChangeFunction(Locations.currentLocation,Locations.sVillageMerchant)
+            self.RoomChangeFunction(c,L.sVillageMerchant,'enter')
+        if b == 'Shop':
+            self.Text("Shop opens")
     
     def ButtonEPressed(self):
         b = self.ButtonE.text()
         L = Locations
+        c = Locations.currentLocation
         if b == 'Blacksmith':
-            self.RoomChangeFunction(Locations.currentLocation,Locations.sVillageBlacksmith)
+            self.RoomChangeFunction(c,L.sVillageBlacksmith,'enter')
             
     def ButtonRPressed(self):
         b = self.ButtonR.text()
+        L = Locations
+        c = Locations.currentLocation
         if b == 'Magician':
-            self.RoomChangeFunction(Locations.currentLocation,Locations.sVillageMagician)
+            self.RoomChangeFunction(c,L.sVillageMagician,'enter')
     
     def ButtonAPressed(self):
         b = self.ButtonA.text()
         L = Locations
+        c = Locations.currentLocation
         if b == 'Home':
-            self.RoomChangeFunction(Locations.currentLocation,Locations.villageHome)
+            self.RoomChangeFunction(c,Locations.villageHome,'')
     
     def ButtonSPressed(self):
         b = self.ButtonS.text()
         L = Locations
+        c = Locations.currentLocation
         if b == 'Farmer':
-            self.RoomChangeFunction(Locations.currentLocation,Locations.sVillageFarmer)
+            self.RoomChangeFunction(c,Locations.sVillageFarmer,'enter')
     
     def ButtonDPressed(self):
         b = self.ButtonD.text()
@@ -573,6 +607,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def ButtonZPressed(self):
         b = self.ButtonZ.text()
         L = Locations
+        Inventory.openInventory = True
+        self.OpenInventory()
     
     def ButtonXPressed(self):
         b = self.ButtonX.text()
@@ -584,23 +620,52 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 
     def ButtonVPressed(self):
         b = self.ButtonV.text()
+        c = Locations.currentLocation
         L = Locations
         if b == 'Leave':
-            self.LeaveFunction(Locations.currentLocation)
+            self.LeaveFunction(c,None)
 
-##### ACTION FUNCTIONS #####
+##### ACTION FUNCTIONS (called by player action)#####
+    def OpenInventory(self):
+        I = Inventory
+        b = 'self.Button'
+        buttonList = ['Q','W','E','A','S','D','Z','X','C']
+        t = '.setText'
+        I.openInventory = True
+        if len(I.currentInventory) > 10:
+            self.ButtonR.setText('')
+            self.ButtonF.setText('')
+        for i in range(len(I.currentInventory)):
+            item = I.currentInventory[i]
+            eval(b+buttonList[i]+t+f'({item})')
+        for i in range(len(I.currentInventory)):
+            buttonText = eval(b + buttonList[i] +".text()")
+            if buttonText == '':
+                eval('self.Button'+buttonList[i]+'.setEnabled(False)')
+            else:
+                eval('self.Button'+buttonList[i]+'.setEnabled(True)')
 
-    def LeaveFunction(self,location):
+
+    def RestFunction(self):
+        self.SetTime(180)
+        self.Text("Rest for 3 hours.")
+
+    def LeaveFunction(self,location,var):
         L = Locations
         A = location
-        if A == 'Home' or A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+        if Inventory.openInventory == True or Inventory.openStore == True:
+            Inventory.openInventory = False
+            Inventory.openStore = False
+        elif A == 'Home' or A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
             L.currentLocation = L.startingVillage
-        self.DialogueFunction(L.currentLocation)
+        self.DialogueFunction(L.currentLocation,var)
+        self.SetTime(5)
         self.labelLocation.setText(Locations.currentLocation)
 
     def EnterRoom(self,location,target):
         if location == Locations.startingVillage:
-            Locations.currentLocation = target        
+            Locations.currentLocation = target   
+        self.SetTime(5)     
         self.labelLocation.setText(Locations.currentLocation)
 
 ##### OHER HELPER FUNCTIONS #####
@@ -614,19 +679,22 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.labelTime.setText(f"Time: {h}:{mi:02}")
         self.labelDate.setText(f"Date: {dn}\t{d}/{mo:0>2d}")
 
-    def LocationUpdate(self,location):
+    def LocationUpdate(self,location,var):
         locale = getattr(Locations,location)
         Locations.currentLocation = locale
         self.labelLocation.setText(Locations.currentLocation)
-        self.DialogueFunction(Locations.currentLocation)
+        self.DialogueFunction(Locations.currentLocation,var)
 
     def UpdateInformation(self):
         self.labelName.setText(PlayerCharacter.name)
+        self.labelGold.setText(f"Gold: {str(Inventory.gold)}")
 
-    def DialogueFunction(self,target):
+    def DialogueFunction(self,target,var):
+        """Function to call text for given event. (target of function,variable)"""
         Dialogue.text = ''
+        v = f"('{var}')"
         d = "Dialogue."
-        text = eval(d+target+"()")
+        text = eval(d+target+v)
         self.Text(text)
 
     def CharacterCreation(self):
