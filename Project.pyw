@@ -101,7 +101,36 @@ class Inventory:
     openInventory = False
     openStore = False
     gold = 20
+    inventoryLimit = 9
     currentInventory = ['"cloth"','"stick"']
+    equipment = ['','','','']
+    itemDictionary= {
+        'cloth':['A set of cloth clothes.', 0,'defence','a'],
+        'stick':['A plain old stick.',1,'attack','w']
+    }
+    def EquipFunction(item):
+        I = Inventory
+        print (item)
+        try:
+            if I.itemDictionary[item][3] == 'a':
+                text = f'You don the {item}'
+                I.equipment[0] = item
+                return text
+            if I.itemDictionary[item][3] == 'w':
+                text = f'You equip the {item}'
+                I.equipment[1] = item
+                return text
+            if I.itemDictionary[item][3] == 'r':
+                text = f'You put the {item} on your finger'
+                I.equipment[2] = item
+                return text
+            if I.itemDictionary[item][3] == 'n':
+                text = f'You wear the {item} around your neck'
+                I.equipment[3] = item
+                return text
+        except:
+            pass
+    
 class Flags:
     gameStart = 0
     startingVillageFirstVisit = 0
@@ -170,7 +199,7 @@ class Dialogue:
         elif var == 'Talk':
             text = 'Hi'
         elif var == 'Shop':
-            text = 'Foodstuffs'
+            text = 'Tools'
         else: text =''
         return text
     def Blacksmiths(var):
@@ -178,6 +207,8 @@ class Dialogue:
             text = 'Blacksmiths place'
         elif var == 'Talk':
             text = 'Hey'
+        elif var == 'Shop':
+            text = 'Weapons'
         else: text =''
         return text
     def Magicians(var):
@@ -185,6 +216,8 @@ class Dialogue:
             text = 'Magicians place'
         elif var == 'Talk':
             text = 'Hello'
+        elif var == 'Shop':
+            text = 'Magic'
         else: text =''
         return text
     def Farmers(var):
@@ -192,10 +225,21 @@ class Dialogue:
             text = 'Farmers place'
         elif var == 'Talk':
             text = 'Sup?'
+        elif var == 'Shop':
+            text = 'Foodstuffs'
         else: text =''
         return text
+
 class NonPlayerCharacters:
     pass
+
+class NpcShops:
+    shopsDictionary = {
+        'Farmers':['"apple"','"wheat"','"meat"'],
+        'Blacksmiths':['"dagger"','"arrow"'],
+        'Merchants' : ['"potion"','"fabric"'],
+        'Magicians' : ['"magic spell"','"component"']
+    }
 
 # Character Creation Window
 class CreationWindow(Ui_CCWindow.Ui_Form, QWidget):
@@ -422,7 +466,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             else:
                 eval('self.Button'+buttonList[x]+'.setEnabled(True)')
 
-    ### Button Updates ###
+
+    ##### Button Updates #####
+    
     def UpdateQButton(self,locale):
         b = self.ButtonQ
         L = Locations
@@ -534,8 +580,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         b = self.ButtonC
         L = Locations
         A = locale[0]
-        if Inventory.openInventory == True:
-            self.InventoryFunction('C')
         if A == 'Home':
             b.setText('')
         if A == 'Eris':
@@ -552,13 +596,14 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if A == 'Eris':
             b.setText('')
     
-    ### Button Pressed ### 
+    
+    ##### Button Pressed #####
+     
     def ButtonQPressed(self):
         b = self.ButtonQ.text()
         L = Locations
         c = Locations.currentLocation
         if Inventory.openInventory == True:
-            print('test')
             self.InventoryFunction(b)
         if b == 'Rest':
             self.RestFunction()
@@ -577,7 +622,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if b == 'Merchant':
             self.RoomChangeFunction(c,L.sVillageMerchant,'enter')
         if b == 'Shop':
-            self.Text("Shop opens")
+            self.ShopFunction()
     
     def ButtonEPressed(self):
         b = self.ButtonE.text()
@@ -626,12 +671,12 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def ButtonZPressed(self):
         b = self.ButtonZ.text()
         L = Locations
+        if Inventory.openInventory == True:
+            self.InventoryFunction(b)
         if Inventory.openInventory == False:
             Inventory.openInventory = True
             self.OpenInventory()
-        if Inventory.openInventory == True:
-            self.InventoryFunction(b)
-    
+            self.InventoryText()
     def ButtonXPressed(self):
         b = self.ButtonX.text()
         L = Locations
@@ -652,8 +697,45 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.LeaveFunction(c,None)
 
 ##### ACTION FUNCTIONS (called by player action)#####
+    def ShopFunction(self):
+        shopItems = NpcShops.shopsDictionary[Locations.currentLocation]
+        b = 'self.Button'
+        buttonList = ['Q','W','E','A','S','D','Z','X','C']
+        t = '.setText'
+        self.ButtonV.setText('Leave'),self.ButtonV.setEnabled(True)
+        Inventory.openStore = True
+        self.ButtonZ.setText('')
+        self.DialogueFunction(Locations.currentLocation,'Shop')
+        if len(shopItems) < 10:
+            self.ButtonR.setText(''),self.ButtonR.setEnabled(False)
+            self.ButtonF.setText(''),self.ButtonR.setEnabled(False)
+        for i in buttonList:
+            eval(b+i+t+'("""""")')
+            eval(b+i+'.setEnabled(False)')
+        for i in range(len(shopItems)):
+            item = shopItems[i]
+            eval(b+buttonList[i]+t+f'({item})')
+        for i in range(len(shopItems)):
+            buttonText = eval(b + buttonList[i] +".text()")
+            if buttonText == '':
+                eval('self.Button'+buttonList[i]+'.setEnabled(False)')
+            else:
+                eval('self.Button'+buttonList[i]+'.setEnabled(True)')
+
     def InventoryFunction(self,item):
-        print(item +" pressed.")
+        if Inventory.openInventory == True:
+            Inventory.EquipFunction(item)
+
+    def InventoryText(self):
+        buttonList = ['Q','W','E','A','S','D','Z','X','C']
+        self.mainTextBox.clear()
+        b = 'self.Button'
+        t = '.text()'
+        I = Inventory
+        self.Text('-------------------------------------------------------------------------------')
+        for x in range(len(Inventory.currentInventory)):
+            itemT = eval(b+buttonList[x]+t)
+            self.Text(f'{itemT}\t{I.itemDictionary[itemT][0]}\t\t{I.itemDictionary[itemT][2]}: {I.itemDictionary[itemT][1]}')
 
     def OpenInventory(self):
         I = Inventory
@@ -690,6 +772,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if Inventory.openInventory == True or Inventory.openStore == True:
             Inventory.openInventory = False
             Inventory.openStore = False
+            self.mainTextBox.clear()
+            self.DialogueFunction(Locations.currentLocation,'enter')
+        
         else:
             if A == 'Home' or A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
                 L.currentLocation = L.startingVillage
