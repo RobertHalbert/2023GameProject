@@ -104,27 +104,43 @@ class Inventory:
     inventoryLimit = 9
     currentInventory = ['"cloth"','"stick"']
     equipment = ['','','','']
-    itemDictionary= {
-        'cloth':['A set of cloth clothes.', 0,'defence','a'],
-        'stick':['A plain old stick.',1,'attack','w']
+    eDictionary= {
+        # ITEM : ['Description',Variable,Application,Type,Value]
+        # Equipment
+        'cloth':['A set of cloth clothes.', 0,'defence:','a',2],
+        'stick':['A plain old stick.',1,'attack:','w',1],
+        'dagger':['A simple iron dagger.',2,'attack:','w',10],
+        # Raw 
+        'apple':['a red apple','','','i',2],
+        'wheat':['a buchel of golden wheat','','','i',12],
+        'meat': ['some cow meat','','','i',5],
+        'iron ingot': ['an ingot of iron','','','i',15],
+        'fabric':['some fabric for crafting','','','i',14],
+        'component':['a magical material','','','i',18],
+        # Potions
+        'potion':['a mysterious red liquid','','','i',22],
+        # Arrow
+        'arrow':['a simple wooden arrow','','','i',2],
+        # Spells
+        'magic spell':['a magic spell','','','i',30]
     }
     def EquipFunction(item):
         I = Inventory
         print (item)
         try:
-            if I.itemDictionary[item][3] == 'a':
+            if I.eDictionary[item][3] == 'a':
                 text = f'You don the {item}'
                 I.equipment[0] = item
                 return text
-            if I.itemDictionary[item][3] == 'w':
+            if I.eDictionary[item][3] == 'w':
                 text = f'You equip the {item}'
                 I.equipment[1] = item
                 return text
-            if I.itemDictionary[item][3] == 'r':
+            if I.eDictionary[item][3] == 'r':
                 text = f'You put the {item} on your finger'
                 I.equipment[2] = item
                 return text
-            if I.itemDictionary[item][3] == 'n':
+            if I.eDictionary[item][3] == 'n':
                 text = f'You wear the {item} around your neck'
                 I.equipment[3] = item
                 return text
@@ -198,7 +214,7 @@ class Dialogue:
            text = 'Merhcants place'
         elif var == 'Talk':
             text = 'Hi'
-        elif var == 'Shop':
+        elif var == 'Buy Items':
             text = 'Tools'
         else: text =''
         return text
@@ -207,7 +223,7 @@ class Dialogue:
             text = 'Blacksmiths place'
         elif var == 'Talk':
             text = 'Hey'
-        elif var == 'Shop':
+        elif var == 'Buy Items':
             text = 'Weapons'
         else: text =''
         return text
@@ -216,7 +232,7 @@ class Dialogue:
             text = 'Magicians place'
         elif var == 'Talk':
             text = 'Hello'
-        elif var == 'Shop':
+        elif var == 'Buy Items':
             text = 'Magic'
         else: text =''
         return text
@@ -225,7 +241,7 @@ class Dialogue:
             text = 'Farmers place'
         elif var == 'Talk':
             text = 'Sup?'
-        elif var == 'Shop':
+        elif var == 'Buy Items':
             text = 'Foodstuffs'
         else: text =''
         return text
@@ -236,7 +252,7 @@ class NonPlayerCharacters:
 class NpcShops:
     shopsDictionary = {
         'Farmers':['"apple"','"wheat"','"meat"'],
-        'Blacksmiths':['"dagger"','"arrow"'],
+        'Blacksmiths':['"iron ingot"','"dagger"','"arrow"'],
         'Merchants' : ['"potion"','"fabric"'],
         'Magicians' : ['"magic spell"','"component"']
     }
@@ -489,7 +505,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if A == 'Eris':
             b.setText('Merchant')
         if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-            b.setText('Shop')
+            b.setText('Buy Items')
 
 
     def UpdateEButton(self,locale):
@@ -501,7 +517,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if A == 'Eris':
             b.setText('Blacksmith')
         if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-            b.setText('')
+            b.setText('Sell Items')
 
     def UpdateRButton(self,locale):
         b = self.ButtonR
@@ -621,8 +637,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.InventoryFunction(b)
         if b == 'Merchant':
             self.RoomChangeFunction(c,L.sVillageMerchant,'enter')
-        if b == 'Shop':
+        if b == 'Buy Items':
             self.ShopFunction()
+            self.ShopText()
     
     def ButtonEPressed(self):
         b = self.ButtonE.text()
@@ -705,7 +722,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.ButtonV.setText('Leave'),self.ButtonV.setEnabled(True)
         Inventory.openStore = True
         self.ButtonZ.setText('')
-        self.DialogueFunction(Locations.currentLocation,'Shop')
         if len(shopItems) < 10:
             self.ButtonR.setText(''),self.ButtonR.setEnabled(False)
             self.ButtonF.setText(''),self.ButtonR.setEnabled(False)
@@ -721,6 +737,17 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 eval('self.Button'+buttonList[i]+'.setEnabled(False)')
             else:
                 eval('self.Button'+buttonList[i]+'.setEnabled(True)')
+     
+    def ShopText(self):
+        buttonList = ['Q','W','E','A','S','D','Z','X','C']
+        self.mainTextBox.clear()
+        b = 'self.Button'
+        t = '.text()'
+        I = Inventory
+        self.Text('-------------------------------------------------------------------------------')
+        for x in range(len(NpcShops.shopsDictionary[Locations.currentLocation])):
+            itemT = eval(b+buttonList[x]+t)
+            self.Text(f'{itemT}\t\t{I.eDictionary[itemT][0]}\t\t{I.eDictionary[itemT][2]} {I.eDictionary[itemT][1]}')
 
     def InventoryFunction(self,item):
         if Inventory.openInventory == True:
@@ -735,7 +762,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.Text('-------------------------------------------------------------------------------')
         for x in range(len(Inventory.currentInventory)):
             itemT = eval(b+buttonList[x]+t)
-            self.Text(f'{itemT}\t{I.itemDictionary[itemT][0]}\t\t{I.itemDictionary[itemT][2]}: {I.itemDictionary[itemT][1]}')
+            self.Text(f'{itemT}\t{I.eDictionary[itemT][0]}\t\t{I.eDictionary[itemT][2]} {I.eDictionary[itemT][1]}')
 
     def OpenInventory(self):
         I = Inventory
