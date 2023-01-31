@@ -37,9 +37,9 @@
     <widget class="QPlainTextEdit" name="mainTextBox">
      <property name="geometry">
       <rect>
-       <x>250</x>
+       <x>230</x>
        <y>10</y>
-       <width>541</width>
+       <width>581</width>
        <height>381</height>
       </rect>
      </property>
@@ -52,8 +52,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>391</height>
+       <width>231</width>
+       <height>471</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -68,7 +68,7 @@
         <x>10</x>
         <y>10</y>
         <width>221</width>
-        <height>221</height>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QFormLayout" name="formLayoutInfo">
@@ -114,13 +114,6 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="labelGold">
-         <property name="text">
-          <string>TextLabel</string>
-         </property>
-        </widget>
-       </item>
        <item row="6" column="0" colspan="2">
         <spacer name="verticalSpacer">
          <property name="orientation">
@@ -136,6 +129,41 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="7" column="0" colspan="2">
+        <widget class="QLabel" name="labelGold">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="labelWeapon">
+         <property name="text">
+          <string>Weapon:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <widget class="QLabel" name="labelWEquippped">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="labelArmor">
+         <property name="text">
+          <string>Armor:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="1">
+        <widget class="QLabel" name="labelAEquipped">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

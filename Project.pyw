@@ -100,16 +100,17 @@ class PlayerCharacter(Character,Armor,Weapon,Attack):
 class Inventory:
     openInventory = False
     openStore = False
+    openSell = False
     gold = 20
     inventoryLimit = 9
-    currentInventory = ['"cloth"','"stick"']
+    currentInventory = ['cloth','stick']
     equipment = ['','','','']
     eDictionary= {
         # ITEM : ['Description',Variable,Application,Type,Value]
         # Equipment
         'cloth':['A set of cloth clothes.', 0,'defence:','a',2],
         'stick':['A plain old stick.',1,'attack:','w',1],
-        'dagger':['A simple iron dagger.',2,'attack:','w',10],
+        'dagger':['An iron dagger.',2,'attack:','w',10],
         # Raw 
         'apple':['a red apple','','','i',2],
         'wheat':['a buchel of golden wheat','','','i',12],
@@ -120,14 +121,18 @@ class Inventory:
         # Potions
         'potion':['a mysterious red liquid','','','i',22],
         # Arrow
-        'arrow':['a simple wooden arrow','','','i',2],
+        'arrow':['a wooden arrow','','','i',2],
         # Spells
         'magic spell':['a magic spell','','','i',30]
     }
     def EquipFunction(item):
         I = Inventory
-        print (item)
         try:
+            for x in range(len(I.equipment)):
+                if item in I.equipment[x]:
+                    I.equipment[x] = ''
+                    text = f'You remove the {item}'
+                    return text 
             if I.eDictionary[item][3] == 'a':
                 text = f'You don the {item}'
                 I.equipment[0] = item
@@ -427,8 +432,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 #Main Functions
     def GridButtonPressed(self,button):
         buttonpressed = 'self.Button' + button +'Pressed()'
+        I = Inventory
         eval(buttonpressed)
-        if (Inventory.openInventory == False) and (Inventory.openStore == False):
+        if (I.openInventory == False) and (I.openStore == False) and (I.openSell == False):
             self.ButtonUpdate()
 
     def StartGame(self):
@@ -621,6 +627,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         c = Locations.currentLocation
         if Inventory.openInventory == True:
             self.InventoryFunction(b)
+        if Inventory.openSell == True:
+            self.InventoryFunction(b)
+        if Inventory.openStore == True:
+            self.BuyItemFunction(b)
         if b == 'Rest':
             self.RestFunction()
         if b == 'Explore':
@@ -635,6 +645,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         c = Locations.currentLocation
         if Inventory.openInventory == True:
             self.InventoryFunction(b)
+        if Inventory.openSell == True:
+            self.InventoryFunction(b)
+        if Inventory.openStore == True:
+            self.BuyItemFunction(b)
         if b == 'Merchant':
             self.RoomChangeFunction(c,L.sVillageMerchant,'enter')
         if b == 'Buy Items':
@@ -647,8 +661,14 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         c = Locations.currentLocation
         if Inventory.openInventory == True:
             self.InventoryFunction(b)
+        if Inventory.openSell == True:
+            self.InventoryFunction(b)
+        if Inventory.openStore == True:
+            self.BuyItemFunction(b)
         if b == 'Blacksmith':
             self.RoomChangeFunction(c,L.sVillageBlacksmith,'enter')
+        if b == 'Sell Items':
+            self.SellItemsInventory()
             
     def ButtonRPressed(self):
         b = self.ButtonR.text()
@@ -663,6 +683,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         c = Locations.currentLocation
         if Inventory.openInventory == True:
             self.InventoryFunction(b)
+        if Inventory.openSell == True:
+            self.InventoryFunction(b)
+        if Inventory.openStore == True:
+            self.BuyItemFunction(b)
         if b == 'Home':
             self.RoomChangeFunction(c,Locations.villageHome,'')
     
@@ -672,6 +696,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         c = Locations.currentLocation
         if Inventory.openInventory == True:
             self.InventoryFunction(b)
+        if Inventory.openSell == True:
+            self.InventoryFunction(b)
+        if Inventory.openStore == True:
+            self.BuyItemFunction(b)
         if b == 'Farmer':
             self.RoomChangeFunction(c,Locations.sVillageFarmer,'enter')
     
@@ -680,6 +708,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         L = Locations
         if Inventory.openInventory == True:
             self.InventoryFunction(b)
+        if Inventory.openSell == True:
+            self.InventoryFunction(b)
+        if Inventory.openStore == True:
+            self.BuyItemFunction(b)
     
     def ButtonFPressed(self):
         b = self.ButtonF.text()
@@ -690,21 +722,35 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         L = Locations
         if Inventory.openInventory == True:
             self.InventoryFunction(b)
+        if Inventory.openSell == True:
+            self.InventoryFunction(b)
+        if Inventory.openStore == True:
+            self.BuyItemFunction(b)
         if Inventory.openInventory == False:
             Inventory.openInventory = True
             self.OpenInventory()
             self.InventoryText()
+        
+            
     def ButtonXPressed(self):
         b = self.ButtonX.text()
         L = Locations
         if Inventory.openInventory == True:
             self.InventoryFunction(b)
+        if Inventory.openSell == True:
+            self.InventoryFunction(b)
+        if Inventory.openStore == True:
+            self.BuyItemFunction(b)
 
     def ButtonCPressed(self):
         b = self.ButtonC.text()
         L = Locations
         if Inventory.openInventory == True:
             self.InventoryFunction(b)
+        if Inventory.openSell == True:
+            self.InventoryFunction(b)
+        if Inventory.openStore == True:
+            self.BuyItemFunction(b)
 
     def ButtonVPressed(self):
         b = self.ButtonV.text()
@@ -747,11 +793,46 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.Text('-------------------------------------------------------------------------------')
         for x in range(len(NpcShops.shopsDictionary[Locations.currentLocation])):
             itemT = eval(b+buttonList[x]+t)
-            self.Text(f'{itemT}\t\t{I.eDictionary[itemT][0]}\t\t{I.eDictionary[itemT][2]} {I.eDictionary[itemT][1]}')
+            theItem = I.eDictionary[itemT]
+            self.Text(f'{itemT}\t {theItem[0]}\t\t{theItem[2]} {theItem[1]}\tPrice: {theItem[4]}')
+
+    def SellItemsInventory(self):
+        Inventory.openSell = True
+        self.OpenInventory()
+
+    def SellItemFunction(self,item):
+        I = Inventory
+        for x in I.currentInventory:
+            if item in I.equipment:
+                self.Text('You cannot sell equipped items.')
+                break
+        else:
+            self.Text(f"You sell the item for {I.eDictionary[item][4]} gold.")
+            I.gold += I.eDictionary[f'{item}'][4]
+            self.UpdateInformation()
+            I.currentInventory.remove(item)
+            self.OpenInventory()
+
+    def BuyItemFunction(self,item):
+        I = Inventory
+        itemCost = I.eDictionary[item][4]
+        if itemCost > I.gold:
+            self.Text('You do not have enough gold!')
+        else:
+            self.Text(f'You bought a {item}')
+            I.gold -= itemCost
+            I.currentInventory.append(item)
+            self.UpdateInformation()
+        
+        
 
     def InventoryFunction(self,item):
         if Inventory.openInventory == True:
-            Inventory.EquipFunction(item)
+            text = Inventory.EquipFunction(item)
+            self.Text(text)
+        if Inventory.openSell == True:
+            self.SellItemFunction(item)
+        self.UpdateInformation()
 
     def InventoryText(self):
         buttonList = ['Q','W','E','A','S','D','Z','X','C']
@@ -770,7 +851,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         buttonList = ['Q','W','E','A','S','D','Z','X','C']
         t = '.setText'
         self.ButtonV.setText('Leave'),self.ButtonV.setEnabled(True)
-        I.openInventory = True
         self.ButtonZ.setText('')
         if len(I.currentInventory) < 10:
             self.ButtonR.setText(''),self.ButtonR.setEnabled(False)
@@ -780,14 +860,13 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             eval(b+i+'.setEnabled(False)')
         for i in range(len(I.currentInventory)):
             item = I.currentInventory[i]
-            eval(b+buttonList[i]+t+f'({item})')
+            eval(b+buttonList[i]+t+f'("{item}")')
         for i in range(len(I.currentInventory)):
             buttonText = eval(b + buttonList[i] +".text()")
             if buttonText == '':
                 eval('self.Button'+buttonList[i]+'.setEnabled(False)')
             else:
                 eval('self.Button'+buttonList[i]+'.setEnabled(True)')
-
 
     def RestFunction(self):
         self.SetTime(180)
@@ -796,9 +875,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def LeaveFunction(self,location,var):
         L = Locations
         A = location
-        if Inventory.openInventory == True or Inventory.openStore == True:
+        if Inventory.openInventory == True or Inventory.openStore == True or Inventory.openSell == True:
             Inventory.openInventory = False
             Inventory.openStore = False
+            Inventory.openSell = False
             self.mainTextBox.clear()
             self.DialogueFunction(Locations.currentLocation,'enter')
         
@@ -816,6 +896,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.labelLocation.setText(Locations.currentLocation)
 
 ##### OHER HELPER FUNCTIONS #####
+
     def UpdateDateTime(self):
         T = Time
         mi = T.minute
@@ -834,6 +915,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 
     def UpdateInformation(self):
         self.labelName.setText(PlayerCharacter.name)
+        self.labelAEquipped.setText(Inventory.equipment[0].capitalize())
+        self.labelWEquippped.setText(Inventory.equipment[1].capitalize())
         self.labelGold.setText(f"Gold: {str(Inventory.gold)}")
 
     def DialogueFunction(self,target,var):
