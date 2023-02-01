@@ -190,15 +190,15 @@ class Locations:
     currentLocation = ''
     overworld = False
     villageHome = 'Home'
-    startingVillage = 'Eris'
+    startingVillage = 'Westcliff'
     overworldPlaceholder = 'World'
+    startingForest = 'Forest'
     sVillageBlacksmith = 'Blacksmiths'
     sVillageMerchant = 'Merchants'
     sVillageMagician = 'Magicians'
     sVillageFarmer = 'Farmers'
-    ########## World Size is 500,500
+    ########## Default World Size is 500,500
     currentCoord = [11,7]
-    startingVCoord = [11,7]
 
 class Dialogue:
     text = ''
@@ -208,10 +208,12 @@ class Dialogue:
         else: text = "Your Home" 
         return text
         
-    def Eris(var):
+    def Westcliff(var):
         if Flags.startingVillageFirstVisit == 0:
             text = "Introduction\n" + "Village"
             Flags.startingVillageFirstVisit = 1
+        elif Locations.overworld == True:
+            text = "Outside of Village"
         else: text = "Village"
         return text
     def Merchants(var):
@@ -249,6 +251,38 @@ class Dialogue:
         elif var == 'Buy Items':
             text = 'Foodstuffs'
         else: text =''
+        return text
+    def Forest(var):
+        if var == 'enter':
+            text = 'Forest'
+        else: text = ''
+        return(text)
+    def LighthouseRoad(var):
+        text = 'Lighthouse Road'
+        return text
+    def Lighthouse(var):
+        text = 'Lighthouse'
+        return text
+    def CliffsidePlains(var):
+        text = 'Cliffside Plains'
+        return text
+    def CliffsideFarms(var):
+        text = 'Cliffside Farms'
+        return text
+    def WestcliffRoad(var):
+        text = 'Westcliff Road'
+        return text
+    def WestcliffPlains(var):
+        text = 'Westcliff Plains'
+        return text
+    def WestcliffShallows(var):
+        text = 'Westcliff Shallows'
+        return text    
+    def WestcliffBeach(var):
+        text = 'Westcliff Beach'
+        return text
+    def WestcliffDocks(var):
+        text = 'Westcliff Docks'
         return text
 
 class NonPlayerCharacters:
@@ -407,6 +441,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.ButtonS.clicked.connect(lambda:self.GridButtonPressed('S'))
         self.ButtonV.clicked.connect(lambda:self.GridButtonPressed('V'))
         self.ButtonW.clicked.connect(lambda:self.GridButtonPressed('W'))
+        self.ButtonX.clicked.connect(lambda:self.GridButtonPressed('X'))
         self.ButtonZ.clicked.connect(lambda:self.GridButtonPressed('Z'))
         self.frameButtons.setVisible(False)
         self.frameInfo.setVisible(False)
@@ -462,9 +497,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def EncounterFunction(self):
         pass
 
-    def OverworldMovementFunction(self):
-        pass
-
     def SetTime(self,time):
         Time.SetTime(time)
         Time.SetDateName()
@@ -495,90 +527,123 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         b = self.ButtonQ
         L = Locations
         A = locale[0]
-        if A == 'Home':
-            b.setText('Rest')
-        if A == 'Eris':
-            b.setText('Explore')
-        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-            b.setText('Talk')
+        if L.overworld == False:
+            if A == 'Home':
+                b.setText('Rest')
+            if A == 'Westcliff':
+                b.setText('Explore')
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+                b.setText('Talk')
+        else:
+            b.setText('')
 
     def UpdateWButton(self,locale):
         b = self.ButtonW
         L = Locations
         A = locale[0]
-        if A == 'Home':
-            b.setText('')
-        if A == 'Eris':
-            b.setText('Merchant')
-        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-            b.setText('Buy Items')
-
+        Lc = L.currentCoord
+        if L.overworld == False:
+            if A == 'Home':
+                b.setText('')
+            if A == 'Westcliff':
+                b.setText('Merchant')
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+                b.setText('Buy Items')
+        elif L.overworld == True:
+            if (Lc[0] >= 3  and Lc[0] <= 14) and Lc[1] == 11:
+                b.setText('')
+            else:
+                b.setText('North')
 
     def UpdateEButton(self,locale):
         b = self.ButtonE
         L = Locations
         A = locale[0]
-        if A == 'Home':
+        if L.overworld == False:
+            if A == 'Home':
+                b.setText('')
+            if A == 'Westcliff':
+                b.setText('Blacksmith')
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+                b.setText('Sell Items')
+        else:
             b.setText('')
-        if A == 'Eris':
-            b.setText('Blacksmith')
-        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-            b.setText('Sell Items')
 
     def UpdateRButton(self,locale):
         b = self.ButtonR
         L = Locations
         A = locale[0]
-        if A == 'Home':
-            b.setText('')
-        if A == 'Eris':
-            b.setText('Magician')
-        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-            b.setText('')
+        if L.overworld == False:
+            if A == 'Home':
+                b.setText('')
+            if A == 'Westcliff':
+                b.setText('Magician')
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+                b.setText('')
+        elif L.overworld == True:
+            if A == 'Westcliff':
+                b.setText('Westcliff')
+            else :
+                b.setText('')
 
     def UpdateAButton(self,locale):
         b = self.ButtonA
         L = Locations
         A = locale[0]
-        if A == 'Home':
-            b.setText('')
-        if A == 'Eris':
-            b.setText('Home')
-        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-            b.setText('')
-        
+        Lc = Locations.currentCoord
+        if L.overworld == False:
+            if A == 'Home':
+                b.setText('')
+            if A == 'Westcliff':
+                b.setText('Home')
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+                b.setText('')
+        else:
+            if Lc[0] == 3 and Lc[1] >=1 and Lc[1] <=11:
+                b.setText('')
+            else:
+                b.setText('West')
 
     def UpdateSButton(self,locale):
         b = self.ButtonS
         L = Locations
         A = locale[0]
-        if A == 'Home':
-            b.setText('')
-        if A == 'Eris':
-            b.setText('Farmer')
-        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-            b.setText('')
+        if L.overworld == False:
+            if A == 'Home':
+                b.setText('')
+            if A == 'Westcliff':
+                b.setText('Farmer')
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+                b.setText('')
+        else:
+            b.setText('Explore')
 
     def UpdateDButton(self,locale):
         b = self.ButtonD
         L = Locations
         A = locale[0]
-        if A == 'Home':
-            b.setText('')
-        if A == 'Eris':
-            b.setText('')
-        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-            b.setText('')
+        if L.overworld == False:
+            if A == 'Home':
+                b.setText('')
+            if A == 'Westcliff':
+                b.setText('')
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+                b.setText('')
+        else:
+            b.setText('East')
 
     def UpdateFButton(self,locale):
         b = self.ButtonF
         L = Locations
         A = locale[0]
-        if A == 'Home':
-            b.setText('')
-        if A == 'Eris':
-            b.setText('')
-        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+        if L.overworld == False:
+            if A == 'Home':
+                b.setText('')
+            if A == 'Westcliff':
+                b.setText('')
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+                b.setText('')
+        else:
             b.setText('')
 
     def UpdateZButton(self,locale):
@@ -591,33 +656,42 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         b = self.ButtonX
         L = Locations
         A = locale[0]
-        if A == 'Home':
-            b.setText('')
-        if A == 'Eris':
-            b.setText('')
-        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-            b.setText('')
+        Lc = L.currentCoord
+        if L.overworld == False:
+            if A == 'Home':
+                b.setText('')
+            if A == 'Westcliff':
+                b.setText('')
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+                b.setText('')
+        if L.overworld == True:
+            if (Lc[0] >= 3 and Lc[0] <= 20) and Lc[1] == 1:
+                b.setText('')
+            else:
+                b.setText('South')
 
     def UpdateCButton(self,locale):
         b = self.ButtonC
         L = Locations
         A = locale[0]
-        if A == 'Home':
-            b.setText('')
-        if A == 'Eris':
-            b.setText('')
-        if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+        if L.overworld == False:
+            if A == 'Home':
+                b.setText('')
+            if A == 'Westcliff':
+                b.setText('')
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+                b.setText('')
+        else:
             b.setText('')
 
     def UpdateVButton(self,locale):
         b = self.ButtonV
         L = Locations
         A = locale[0]
-        if A == 'Home' or A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-            b.setText('Leave')  
-        if A == 'Eris':
+        if L.overworld == True:
             b.setText('')
-    
+        else:
+            b.setText('Leave')  
     
     ##### Button Pressed #####
      
@@ -654,7 +728,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if b == 'Buy Items':
             self.ShopFunction()
             self.ShopText()
-    
+        if  b == 'North':
+            self.OverWorldMovement('w')
+
     def ButtonEPressed(self):
         b = self.ButtonE.text()
         L = Locations
@@ -676,7 +752,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         c = Locations.currentLocation
         if b == 'Magician':
             self.RoomChangeFunction(c,L.sVillageMagician,'enter')
-    
+        if b == 'Westcliff':
+            self.RoomChangeFunction(c,L.startingVillage,'enter')
+
     def ButtonAPressed(self):
         b = self.ButtonA.text()
         L = Locations
@@ -689,6 +767,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.BuyItemFunction(b)
         if b == 'Home':
             self.RoomChangeFunction(c,Locations.villageHome,'')
+        if  b == 'West':
+            self.OverWorldMovement('a')
     
     def ButtonSPressed(self):
         b = self.ButtonS.text()
@@ -712,6 +792,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.InventoryFunction(b)
         if Inventory.openStore == True:
             self.BuyItemFunction(b)
+        if  b == 'East':
+            self.OverWorldMovement('d')
     
     def ButtonFPressed(self):
         b = self.ButtonF.text()
@@ -741,6 +823,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.InventoryFunction(b)
         if Inventory.openStore == True:
             self.BuyItemFunction(b)
+        if  b == 'South':
+            self.OverWorldMovement('x')
 
     def ButtonCPressed(self):
         b = self.ButtonC.text()
@@ -823,8 +907,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             I.gold -= itemCost
             I.currentInventory.append(item)
             self.UpdateInformation()
-        
-        
 
     def InventoryFunction(self,item):
         if Inventory.openInventory == True:
@@ -881,19 +963,69 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             Inventory.openSell = False
             self.mainTextBox.clear()
             self.DialogueFunction(Locations.currentLocation,'enter')
-        
         else:
             if A == 'Home' or A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
                 L.currentLocation = L.startingVillage
+            if A == 'Westcliff':
+                L.overworld = True
             self.DialogueFunction(L.currentLocation,var)
             self.SetTime(5)
             self.labelLocation.setText(Locations.currentLocation)
 
     def EnterRoom(self,location,target):
         if location == Locations.startingVillage:
-            Locations.currentLocation = target   
+            Locations.currentLocation = target
+            Locations.overworld = False   
         self.SetTime(5)     
         self.labelLocation.setText(Locations.currentLocation)
+
+    def CheckCoords(self):
+        Lc = Locations.currentCoord
+        Ll = Locations.currentLocation
+        if Lc[0] == 11 and Lc[1] == 7:
+            Ll = Locations.startingVillage
+            self.SetTime(30)
+        if (Lc[0] >= 3 and Lc[0] <= 12) and (Lc[1] >= 1 and Lc[1] <= 6):
+            Ll = Locations.startingForest
+            self.SetTime(60)
+        if (Lc[0] >= 4 and Lc[0] <= 10) and Lc[1] == 7:
+            Ll = 'Lighthouse Road'
+            self.SetTime(30)
+        if Lc[0] == 3 and Lc[1] == 7:
+            Ll = 'Lighthouse'
+            self.SetTime(30)
+        if (Lc[0] >= 3 and Lc[0] <= 7) and (Lc[1] >= 8 and Lc[1] <= 11):
+            Ll = 'Cliffside Plains'
+            self.SetTime(30)
+        if (Lc[0] >= 8 and Lc[0] <= 14) and (Lc[1] >= 8 and Lc[1] <= 11):
+            Ll = 'Cliffside Farms'
+            self.SetTime(30)
+        if (Lc[0] >= 12 and Lc[0] <= 24) and Lc[1] == 7:
+            Ll = 'Westcliff Road'
+        if (Lc[0] >= 15 and Lc[0] <= 24) and (Lc[1] >= 8 and Lc[1] <= 18):
+            Ll = 'Westcliff Plains'
+        if (Lc[0] >= 13 and Lc[0] <= 15) or (Lc[0] >= 17 and Lc[0] <= 20) and Lc[1] == 6:
+            Ll = 'Westcliff Beach'
+        if Lc[0] == 16 and Lc[1] == 6:
+            Ll = 'Westcliff Docks'
+        if (Lc[0] >= 13 and Lc[0] <= 20) and (Lc[1] >= 1 and Lc[1] <= 5):
+            Ll = 'Westcliff Shallows'
+        Locations.currentLocation = Ll
+        self.UpdateInformation()
+        
+    def OverWorldMovement(self,button):
+        Lc = Locations.currentCoord
+        if button == 'w':
+            Lc[1] += 1
+        if button == 'x':
+            Lc[1] -= 1
+        if button == 'd':
+            Lc[0] += 1
+        if button == 'a':
+            Lc[0] -= 1
+        Locations.currentCoord = Lc
+        print(Locations.currentCoord)
+        self.CheckCoords()
 
 ##### OHER HELPER FUNCTIONS #####
 
@@ -918,13 +1050,15 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.labelAEquipped.setText(Inventory.equipment[0].capitalize())
         self.labelWEquippped.setText(Inventory.equipment[1].capitalize())
         self.labelGold.setText(f"Gold: {str(Inventory.gold)}")
+        self.labelLocation.setText(Locations.currentLocation)
 
     def DialogueFunction(self,target,var):
         """Function to call text for given event. (target of function,variable)"""
         Dialogue.text = ''
         v = f"('{var}')"
         d = "Dialogue."
-        text = eval(d+target+v)
+        concat = (d+target+v).replace(' ','')
+        text = eval(concat)
         self.Text(text)
 
     def CharacterCreation(self):

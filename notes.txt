@@ -1,0 +1,13 @@
+Mostly here to keep track of location coodinates 
+    # WestCliffVCoord = [11,7]          DONE
+    # westCliffForest = [[3,1],[12,6]]  DONE 
+    # westCliffRoad = [[4,7],[10,7],    DONE
+                    [12,7],[24,7]]      DONE
+    # westCliffLighthouse = [3,7]       DONE
+    # westCliffFarms = [[8,8],[14,11]]  DONE
+    # westCliffPlains = [[3,8],[7,11],  DONE
+                        [15,8],[24,18]] DONE
+    # westcliff shallows [13,1],[20,5]  DONE
+    # westCliffBeach = [[13,6],[15,6],  DONE
+                        [17,6],[24,6]]  DONE
+    # westcliffdocks = [16,6]
