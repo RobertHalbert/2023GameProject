@@ -257,6 +257,11 @@ class Dialogue:
             text = 'Forest'
         else: text = ''
         return(text)
+    def Tavern(var):
+        if var == 'Enter':
+            text = 'Tavern'
+        else: text = ''
+        return text
     def LighthouseRoad(var):
         text = 'Lighthouse Road'
         return text
@@ -532,7 +537,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 b.setText('Rest')
             if A == 'Westcliff':
                 b.setText('Explore')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                 b.setText('Talk')
         else:
             b.setText('')
@@ -549,6 +554,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 b.setText('Merchant')
             if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
                 b.setText('Buy Items')
+            if A == 'Tavern':
+                b.setText('')
         elif L.overworld == True:
             if (Lc[0] >= 3  and Lc[0] <= 14) and Lc[1] == 11:
                 b.setText('')
@@ -566,6 +573,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 b.setText('Blacksmith')
             if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
                 b.setText('Sell Items')
+            if A == 'Tavern':
+                b.setText('')
         else:
             b.setText('')
 
@@ -578,7 +587,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 b.setText('')
             if A == 'Westcliff':
                 b.setText('Magician')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                 b.setText('')
         elif L.overworld == True:
             if A == 'Westcliff':
@@ -596,7 +605,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 b.setText('')
             if A == 'Westcliff':
                 b.setText('Home')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                 b.setText('')
         else:
             if Lc[0] == 3 and Lc[1] >=1 and Lc[1] <=11:
@@ -613,7 +622,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 b.setText('')
             if A == 'Westcliff':
                 b.setText('Farmer')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                 b.setText('')
         else:
             b.setText('Explore')
@@ -626,8 +635,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             if A == 'Home':
                 b.setText('')
             if A == 'Westcliff':
-                b.setText('')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+                b.setText('Tavern')
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                 b.setText('')
         else:
             b.setText('East')
@@ -641,7 +650,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 b.setText('')
             if A == 'Westcliff':
                 b.setText('')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                 b.setText('')
         else:
             b.setText('')
@@ -662,7 +671,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 b.setText('')
             if A == 'Westcliff':
                 b.setText('')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                 b.setText('')
         if L.overworld == True:
             if (Lc[0] >= 3 and Lc[0] <= 20) and Lc[1] == 1:
@@ -679,7 +688,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 b.setText('')
             if A == 'Westcliff':
                 b.setText('')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                 b.setText('')
         else:
             b.setText('')
@@ -786,13 +795,16 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def ButtonDPressed(self):
         b = self.ButtonD.text()
         L = Locations
+        c = L.currentLocation
         if Inventory.openInventory == True:
             self.InventoryFunction(b)
         if Inventory.openSell == True:
             self.InventoryFunction(b)
         if Inventory.openStore == True:
             self.BuyItemFunction(b)
-        if  b == 'East':
+        if b == 'Tavern':
+            self.RoomChangeFunction(c,'Tavern','enter')
+        if b == 'East':
             self.OverWorldMovement('d')
     
     def ButtonFPressed(self):
@@ -964,7 +976,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.mainTextBox.clear()
             self.DialogueFunction(Locations.currentLocation,'enter')
         else:
-            if A == 'Home' or A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+            if A == 'Home' or A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                 L.currentLocation = L.startingVillage
             if A == 'Westcliff':
                 L.overworld = True
@@ -1004,7 +1016,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             Ll = 'Westcliff Road'
         if (Lc[0] >= 15 and Lc[0] <= 24) and (Lc[1] >= 8 and Lc[1] <= 18):
             Ll = 'Westcliff Plains'
-        if (Lc[0] >= 13 and Lc[0] <= 15) or (Lc[0] >= 17 and Lc[0] <= 20) and Lc[1] == 6:
+        if ((Lc[0] >= 13 and Lc[0] <= 15) or (Lc[0] >= 17 and Lc[0] <= 20)) and Lc[1] == 6:
             Ll = 'Westcliff Beach'
         if Lc[0] == 16 and Lc[1] == 6:
             Ll = 'Westcliff Docks'
