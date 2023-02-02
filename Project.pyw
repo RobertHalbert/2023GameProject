@@ -1,4 +1,4 @@
-import sys
+import sys, random
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget
 from PyQt5.QtCore import pyqtSignal, Qt
@@ -71,6 +71,10 @@ class Armor:
 class MonsterCharacter(Character,Armor,Weapon,Attack):
     def __init__(self, name, hp, stamina,wname,damage,aname,defence):
         super().__init__(name, hp, stamina,wname,damage,aname,defence)
+    monster = ''
+    rat = ['rat',2,2,'claws',1,'fur',0]
+    slime = ['slime',2,2,'slime',1,'slime',0]
+
 
 class PlayerCharacter(Character,Armor,Weapon,Attack):
     def __init__(self, name, hp, stamina, attack, defence, strength, dexterity, arcane, constitution, charisma, level):
@@ -103,13 +107,14 @@ class Inventory:
     openSell = False
     gold = 20
     inventoryLimit = 9
-    currentInventory = ['cloth','stick']
-    equipment = ['','','','']
+    currentInventory = ['cloth','club']
+    equipment = ['','hands','','']
     eDictionary= {
         # ITEM : ['Description',Variable,Application,Type,Value]
+        'hands':['hands',0,''],
         # Equipment
         'cloth':['A set of cloth clothes.', 0,'defence:','a',2],
-        'stick':['A plain old stick.',1,'attack:','w',1],
+        'club':['A plain old club.',1,'attack:','w',1],
         'dagger':['An iron dagger.',2,'attack:','w',10],
         # Raw 
         'apple':['a red apple','','','i',2],
@@ -121,9 +126,11 @@ class Inventory:
         # Potions
         'potion':['a mysterious red liquid','','','i',22],
         # Arrow
-        'arrow':['a wooden arrow','','','i',2],
+        'arrow':['a wooden arrow','','','i',2,0],
         # Spells
-        'magic spell':['a magic spell','','','i',30]
+        'magic spell':['a magic spell','','','i',30],
+        # Upgrades
+        'Backpack':['A bag for carrying','','','u',100]
     }
     def EquipFunction(item):
         I = Inventory
@@ -153,6 +160,7 @@ class Inventory:
             pass
     
 class Flags:
+    battle = False
     gameStart = 0
     startingVillageFirstVisit = 0
 
@@ -466,7 +474,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if event.key() == Qt.Key_X: self.GridButtonPressed('X')
         if event.key() == Qt.Key_C: self.GridButtonPressed('C')
         if event.key() == Qt.Key_V: self.GridButtonPressed('V')
-        if event.key() == Qt.Key_F3: self.StartGame()
+        if event.key() == Qt.Key_F3 and self.actionNew_Game.isEnabled(): self.StartGame()
         if event.key() == Qt.Key_F4: self.EndGame()
 
 #Main Functions
@@ -490,6 +498,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.LocationUpdate('villageHome','start')
         self.ButtonUpdate()
         self.SetTime(0)
+        self.actionNew_Game.setEnabled(False)
 
     def ExploreFunction(self, location):
         self.SetTime(60)
@@ -498,9 +507,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def RoomChangeFunction(self,location,target,var):
         self.EnterRoom(location,target)
         self.DialogueFunction(target,var)
-
-    def EncounterFunction(self):
-        pass
 
     def SetTime(self,time):
         Time.SetTime(time)
@@ -532,127 +538,151 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         b = self.ButtonQ
         L = Locations
         A = locale[0]
-        if L.overworld == False:
-            if A == 'Home':
-                b.setText('Rest')
-            if A == 'Westcliff':
-                b.setText('Explore')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
-                b.setText('Talk')
-        else:
-            b.setText('')
+        if Flags.battle == False:
+            if L.overworld == False:
+                if A == 'Home':
+                    b.setText('Rest')
+                if A == 'Westcliff':
+                    b.setText('Explore')
+                if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
+                    b.setText('Talk')          
+            else:
+                b.setText('')
+        if Flags.battle == True and Inventory.openInventory == False:
+            b.setText('Attack')  
 
     def UpdateWButton(self,locale):
         b = self.ButtonW
         L = Locations
         A = locale[0]
         Lc = L.currentCoord
-        if L.overworld == False:
-            if A == 'Home':
-                b.setText('')
-            if A == 'Westcliff':
-                b.setText('Merchant')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-                b.setText('Buy Items')
-            if A == 'Tavern':
-                b.setText('')
-        elif L.overworld == True:
-            if (Lc[0] >= 3  and Lc[0] <= 14) and Lc[1] == 11:
-                b.setText('')
-            else:
-                b.setText('North')
+        if Flags.battle == False:
+            if L.overworld == False:
+                if A == 'Home':
+                    b.setText('')
+                if A == 'Westcliff':
+                    b.setText('Merchant')
+                if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+                    b.setText('Buy Items')
+                if A == 'Tavern':
+                    b.setText('')
+            elif L.overworld == True:
+                if (Lc[0] >= 3  and Lc[0] <= 14) and Lc[1] == 11:
+                    b.setText('')
+                else:
+                    b.setText('North')
+        if Flags.battle == True and Inventory.openInventory == False:
+            b.setText('Defend')
 
     def UpdateEButton(self,locale):
         b = self.ButtonE
         L = Locations
         A = locale[0]
-        if L.overworld == False:
-            if A == 'Home':
+        if Flags.battle == False:
+            if L.overworld == False:
+                if A == 'Home':
+                    b.setText('')
+                if A == 'Westcliff':
+                    b.setText('Blacksmith')
+                if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
+                    b.setText('Sell Items')
+                if A == 'Tavern':
+                    b.setText('')
+            else:
                 b.setText('')
-            if A == 'Westcliff':
-                b.setText('Blacksmith')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians':
-                b.setText('Sell Items')
-            if A == 'Tavern':
-                b.setText('')
-        else:
-            b.setText('')
+        if Flags.battle == True and Inventory.openInventory == False:
+            b.setText('Run')
 
     def UpdateRButton(self,locale):
         b = self.ButtonR
         L = Locations
         A = locale[0]
-        if L.overworld == False:
-            if A == 'Home':
-                b.setText('')
-            if A == 'Westcliff':
-                b.setText('Magician')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
-                b.setText('')
-        elif L.overworld == True:
-            if A == 'Westcliff':
-                b.setText('Westcliff')
-            else :
-                b.setText('')
+        if Flags.battle == False:
+            if L.overworld == False:
+                if A == 'Home':
+                    b.setText('')
+                if A == 'Westcliff':
+                    b.setText('Magician')
+                if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
+                    b.setText('')
+            elif L.overworld == True:
+                if A == 'Westcliff':
+                    b.setText('Westcliff')
+                else :
+                    b.setText('')
+        if Flags.battle == True and Inventory.openInventory == False:
+            b.setText('Wait')
 
     def UpdateAButton(self,locale):
         b = self.ButtonA
         L = Locations
         A = locale[0]
         Lc = Locations.currentCoord
-        if L.overworld == False:
-            if A == 'Home':
-                b.setText('')
-            if A == 'Westcliff':
-                b.setText('Home')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
-                b.setText('')
-        else:
-            if Lc[0] == 3 and Lc[1] >=1 and Lc[1] <=11:
-                b.setText('')
+        if Flags.battle == False:
+            if L.overworld == False:
+                if A == 'Home':
+                    b.setText('')
+                if A == 'Westcliff':
+                    b.setText('Home')
+                if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
+                    b.setText('')
             else:
-                b.setText('West')
+                if Lc[0] == 3 and Lc[1] >=1 and Lc[1] <=11:
+                    b.setText('')
+                else:
+                    b.setText('West')
+        if Flags.battle == True and Inventory.openInventory == False:
+            b.setText('')
 
     def UpdateSButton(self,locale):
         b = self.ButtonS
         L = Locations
         A = locale[0]
-        if L.overworld == False:
-            if A == 'Home':
-                b.setText('')
-            if A == 'Westcliff':
-                b.setText('Farmer')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
-                b.setText('')
-        else:
-            b.setText('Explore')
+        if Flags.battle == False:
+            if L.overworld == False:
+                if A == 'Home':
+                    b.setText('')
+                if A == 'Westcliff':
+                    b.setText('Farmer')
+                if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
+                    b.setText('')
+            else:
+                b.setText('Explore')
+        if Flags.battle == True and Inventory.openInventory == False:
+            b.setText('')
 
     def UpdateDButton(self,locale):
         b = self.ButtonD
         L = Locations
         A = locale[0]
-        if L.overworld == False:
-            if A == 'Home':
-                b.setText('')
-            if A == 'Westcliff':
-                b.setText('Tavern')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
-                b.setText('')
-        else:
-            b.setText('East')
+        if Flags.battle == False:
+            if L.overworld == False:
+                if A == 'Home':
+                    b.setText('')
+                if A == 'Westcliff':
+                    b.setText('Tavern')
+                if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
+                    b.setText('')
+            else:
+                b.setText('East')
+        if Flags.battle == True and Inventory.openInventory == False:
+            b.setText('')
 
     def UpdateFButton(self,locale):
         b = self.ButtonF
         L = Locations
         A = locale[0]
-        if L.overworld == False:
-            if A == 'Home':
+        if Flags.battle == False:
+            if L.overworld == False:
+                if A == 'Home':
+                    b.setText('')
+                if A == 'Westcliff':
+                    b.setText('')
+                if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
+                    b.setText('')
+            else:
                 b.setText('')
-            if A == 'Westcliff':
-                b.setText('')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
-                b.setText('')
-        else:
+        if Flags.battle == True and Inventory.openInventory == False:
             b.setText('')
 
     def UpdateZButton(self,locale):
@@ -666,41 +696,50 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         L = Locations
         A = locale[0]
         Lc = L.currentCoord
-        if L.overworld == False:
-            if A == 'Home':
-                b.setText('')
-            if A == 'Westcliff':
-                b.setText('')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
-                b.setText('')
-        if L.overworld == True:
-            if (Lc[0] >= 3 and Lc[0] <= 20) and Lc[1] == 1:
-                b.setText('')
-            else:
-                b.setText('South')
+        if Flags.battle == False:
+            if L.overworld == False:
+                if A == 'Home':
+                    b.setText('')
+                if A == 'Westcliff':
+                    b.setText('')
+                if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
+                    b.setText('')
+            if L.overworld == True:
+                if (Lc[0] >= 3 and Lc[0] <= 20) and Lc[1] == 1:
+                    b.setText('')
+                else:
+                    b.setText('South')
+        if Flags.battle == True and Inventory.openInventory == False:
+            b.setText('')
 
     def UpdateCButton(self,locale):
         b = self.ButtonC
         L = Locations
         A = locale[0]
-        if L.overworld == False:
-            if A == 'Home':
+        if Flags.battle == False:
+            if L.overworld == False:
+                if A == 'Home':
+                    b.setText('')
+                if A == 'Westcliff':
+                    b.setText('')
+                if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
+                    b.setText('')
+            else:
                 b.setText('')
-            if A == 'Westcliff':
-                b.setText('')
-            if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
-                b.setText('')
-        else:
+        if Flags.battle == True and Inventory.openInventory == False:
             b.setText('')
 
     def UpdateVButton(self,locale):
         b = self.ButtonV
         L = Locations
         A = locale[0]
-        if L.overworld == True:
+        if Flags.battle == False:
+            if L.overworld == True:
+                b.setText('')
+            else:
+                b.setText('Leave')  
+        if Flags.battle == True and Inventory.openInventory == False:
             b.setText('')
-        else:
-            b.setText('Leave')  
     
     ##### Button Pressed #####
      
@@ -721,6 +760,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 self.ExploreFunction(c)
         if b == 'Talk':
             self.DialogueFunction(c,'Talk')
+        if b == 'Attack':
+            self.BattleFunction('Attack')
     
     def ButtonWPressed(self):
         b = self.ButtonW.text()
@@ -737,8 +778,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if b == 'Buy Items':
             self.ShopFunction()
             self.ShopText()
-        if  b == 'North':
+        if b == 'North':
             self.OverWorldMovement('w')
+        if b == 'Defend':
+            self.BattleFunction('Defend')
 
     def ButtonEPressed(self):
         b = self.ButtonE.text()
@@ -754,6 +797,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.RoomChangeFunction(c,L.sVillageBlacksmith,'enter')
         if b == 'Sell Items':
             self.SellItemsInventory()
+        if b == 'Run':
+            self.BattleFunction('Run')
             
     def ButtonRPressed(self):
         b = self.ButtonR.text()
@@ -763,6 +808,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.RoomChangeFunction(c,L.sVillageMagician,'enter')
         if b == 'Westcliff':
             self.RoomChangeFunction(c,L.startingVillage,'enter')
+        if b == 'Wait':
+            self.BattleFunction('Wait')
 
     def ButtonAPressed(self):
         b = self.ButtonA.text()
@@ -824,8 +871,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             Inventory.openInventory = True
             self.OpenInventory()
             self.InventoryText()
-        
-            
+        if Flags.battle == True:
+            self.ButtonUpdate()
+
     def ButtonXPressed(self):
         b = self.ButtonX.text()
         L = Locations
@@ -856,6 +904,31 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.LeaveFunction(c,None)
 
 ##### ACTION FUNCTIONS (called by player action)#####
+    def MonsterAction(self):
+        roll = random.randint(1,5)
+        mon = MonsterCharacter.monster
+        if roll >= 3:
+            self.Text(f'The {mon[0]} attacks with its {mon[3]} dealing {mon[4]} damage.')
+
+    def BattleFunction(self,action):
+        I = Inventory.equipment[1]
+        W = Inventory.eDictionary[I]
+        if action == 'Attack':
+            self.Text(f'You attack with your {I} dealing {W[1]} damage.')
+        if action == 'Defend':
+            self.Text('You defend')
+        if action == 'Run':
+            self.Text('You run')
+            Flags.battle = False
+            return
+        if action == 'Wait':
+            self.Text('You wait')
+        self.MonsterAction()
+
+    def MonsterSelection(self,location):
+        if location == 'Cliffside Farms':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'rat')
+
     def ShopFunction(self):
         shopItems = NpcShops.shopsDictionary[Locations.currentLocation]
         b = 'self.Button'
@@ -927,6 +1000,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if Inventory.openSell == True:
             self.SellItemFunction(item)
         self.UpdateInformation()
+        if Flags.battle == True:
+            self.BattleFunction('')
 
     def InventoryText(self):
         buttonList = ['Q','W','E','A','S','D','Z','X','C']
@@ -1038,8 +1113,57 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         Locations.currentCoord = Lc
         print(Locations.currentCoord)
         self.CheckCoords()
+        self.EncounterSystem(0.12)
 
 ##### OHER HELPER FUNCTIONS #####
+    def EncounterSystem(self,chance):
+        area = Locations.currentLocation
+        roll = random.randint
+        itemFind = -20
+        enemyEncounter = -20
+        randomEvent = -20 
+        if Locations.overworld == True:
+            if area == 'Forest':
+                itemFind = (5 + roll(1,100)) * chance
+                enemyEncounter = (5 + roll(1,100)) * chance
+                randomEvent = (15 + roll(1,100)) * chance
+            if area == 'Cliffside Farms':
+                itemFind = (0 + roll(1,100)) * chance
+                enemyEncounter = (0 + roll(1,100)) * chance
+                randomEvent = (10 + roll(1,100)) * chance
+            if area == 'Lighthouse Road':
+                itemFind = (-5 + roll(1,100)) * chance
+                enemyEncounter = (-15 + roll(1,100)) * chance
+                randomEvent = (5 + roll(1,100)) * chance
+            if area == 'Cliffside Plains':
+                itemFind = (-5 + roll(1,100)) * chance
+                enemyEncounter = (-5 + roll(1,100)) * chance
+                randomEvent = (5 + roll(1,100)) * chance
+            if area == 'Westcliff Plains':
+                itemFind = (-5 + roll(1,100)) * chance
+                enemyEncounter = (5 + roll(1,100)) * chance
+                randomEvent = (5 + roll(1,100)) * chance
+            if area == 'Westcliff Road':
+                itemFind = (-5 + roll(1,100)) * chance
+                enemyEncounter = (5 + roll(1,100)) * chance
+                randomEvent = (10 + roll(1,100)) * chance
+            if area == 'Westcliff Beach':
+                itemFind = (-5 + roll(1,100)) * chance
+                enemyEncounter = (5 + roll(1,100)) * chance
+                randomEvent = (0 + roll(1,100)) * chance
+            if area == 'Westcliff Shallows':
+                itemFind = (-10 + roll(1,100)) * chance
+                enemyEncounter = (5 + roll(1,100)) * chance
+                randomEvent = (5 + roll(1,100)) * chance
+        print(itemFind,enemyEncounter,randomEvent)  
+        if itemFind > enemyEncounter and itemFind > randomEvent and itemFind > 10:
+            print('find item')
+        if enemyEncounter > itemFind and enemyEncounter > randomEvent and enemyEncounter > 10:
+            print('Battle')
+            Flags.battle = True
+            self.MonsterSelection(area)
+        if randomEvent > itemFind and randomEvent > enemyEncounter and randomEvent > 10:
+            print ('Random Event')
 
     def UpdateDateTime(self):
         T = Time

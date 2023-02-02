@@ -10,4 +10,4 @@ Mostly here to keep track of location coodinates
     # westcliff shallows [13,1],[20,5]  DONE
     # westCliffBeach = [[13,6],[15,6],  DONE
                         [17,6],[24,6]]  DONE
-    # westcliffdocks = [16,6]
+    # westcliffdocks = [16,6]           DONE
