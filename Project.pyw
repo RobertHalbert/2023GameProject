@@ -4,12 +4,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget
 from PyQt5.QtCore import pyqtSignal, Qt
 import Ui_Game, Ui_CCWindow
 
-class Character:
-    def __init__(self,name,hp,stamina):
-        self.name = name
-        self.hp = hp
-        self.stamina = stamina
-
 class Skills:
     def __init__(self,fishing,gathering,hunting,crafting):
         self.fishing = fishing
@@ -53,32 +47,19 @@ class Skills:
             self.crafting = 2
         return text
 
-class Weapon:
-    def __init__(self,wname,damage):
-        self.wname = wname
-        self.damage = damage
-
 class Attack:
     attackdamage = 0
     def AttackFunction(self):
         pass
 
-class Armor:
-    def __init__(self,aname,defence):
-        self.aname = aname
-        self.defence = defence
-
-class MonsterCharacter(Character,Armor,Weapon,Attack):
-    def __init__(self, name, hp, stamina,wname,damage,aname,defence):
-        super().__init__(name, hp, stamina,wname,damage,aname,defence)
+class MonsterCharacter():
     monster = ''
-    rat = ['rat',2,2,'claws',1,'fur',0]
-    slime = ['slime',2,2,'slime',1,'slime',0]
+    rat = ['rat',5,5,'claws',1,'fur',0]
+    slime = ['slime',8,8,'slime',1,'slime',0]
 
 
-class PlayerCharacter(Character,Armor,Weapon,Attack):
+class PlayerCharacter():
     def __init__(self, name, hp, stamina, attack, defence, strength, dexterity, arcane, constitution, charisma, level):
-        super().__init__(name, hp, attack, defence, stamina)
         self.strength = strength
         self.dexterity = dexterity
         self.arcane = arcane
@@ -90,6 +71,7 @@ class PlayerCharacter(Character,Armor,Weapon,Attack):
         self.stamina = stamina
         self.attack = attack
         self.defence = defence
+    hp = 0
     name = ''
     level = 1
     strength = 1
@@ -98,9 +80,8 @@ class PlayerCharacter(Character,Armor,Weapon,Attack):
     constitution = 1
     charisma = 1
     apperenceList = ['','','','','']
-    def setStats(self):
-        self.hp = 3 + self.level*2 + self.constitution * self.level
-
+    currentHP = 1
+    
 class Inventory:
     openInventory = False
     openStore = False
@@ -108,7 +89,7 @@ class Inventory:
     gold = 20
     inventoryLimit = 9
     currentInventory = ['cloth','club']
-    equipment = ['','hands','','']
+    equipment = ['cloth','hands','','']
     eDictionary= {
         # ITEM : ['Description',Variable,Application,Type,Value]
         'hands':['hands',0,''],
@@ -458,6 +439,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.ButtonZ.clicked.connect(lambda:self.GridButtonPressed('Z'))
         self.frameButtons.setVisible(False)
         self.frameInfo.setVisible(False)
+        self.groupBoxEnemy.setVisible(False)
         self.ButtonZ.setText('Inventory')
         self.mainTextBox.appendPlainText("Welcome to (My Game)!\n\nStart a new game by selecting 'New game' in the Menu or by pressing 'F3'.")
         
@@ -491,6 +473,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.CharacterCreation()
 
     def GameSetup(self):
+        self.setStats()
         self.frameWindow.setEnabled(True)
         self.frameButtons.setVisible(True)
         self.frameInfo.setVisible(True)
@@ -909,12 +892,24 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         mon = MonsterCharacter.monster
         if roll >= 3:
             self.Text(f'The {mon[0]} attacks with its {mon[3]} dealing {mon[4]} damage.')
+            PlayerCharacter.currentHP -= mon[4] - Inventory.eDictionary[Inventory.equipment[0]][1]
+        mon = MonsterCharacter.monster
+        hp = round(100 * (mon[1]/mon[2]))
+        self.labelHPEnemy.setText(f"{mon[0]} Hitpoints: {mon[1]}/{mon[2]}".capitalize())
+        self.progressBarEnemyHp.setValue(hp)
+        self.UpdateInformation()
+        if PlayerCharacter.currentHP <=0:
+            Flags.battle = False
+            self.LossSystem()
 
     def BattleFunction(self,action):
         I = Inventory.equipment[1]
         W = Inventory.eDictionary[I]
         if action == 'Attack':
-            self.Text(f'You attack with your {I} dealing {W[1]} damage.')
+            strengthBonus = round(PlayerCharacter.strength/(PlayerCharacter.strength+W[1]))
+            damage = strengthBonus + W[1]
+            self.Text(f'You attack with your {I} dealing {damage} damage.')
+            MonsterCharacter.monster[1] -= damage
         if action == 'Defend':
             self.Text('You defend')
         if action == 'Run':
@@ -923,11 +918,20 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             return
         if action == 'Wait':
             self.Text('You wait')
+        if MonsterCharacter.monster[1] <= 0:
+            Flags.battle = False
+            self.groupBoxEnemy.setVisible(False)
+            return
         self.MonsterAction()
 
     def MonsterSelection(self,location):
+        self.mainTextBox.clear()
         if location == 'Cliffside Farms':
             MonsterCharacter.monster = getattr(MonsterCharacter,'rat')
+            mon = MonsterCharacter.monster
+            self.labelEnemy.setText(f"{mon[0]}".capitalize())
+            self.labelHPEnemy.setText(f"{mon[0]} Hitpoints: {mon[1]}/{mon[2]}".capitalize())
+        self.Text(f"A {mon[0]} appears!")
 
     def ShopFunction(self):
         shopItems = NpcShops.shopsDictionary[Locations.currentLocation]
@@ -1039,6 +1043,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 
     def RestFunction(self):
         self.SetTime(180)
+        PlayerCharacter.currentHP = PlayerCharacter.hp
         self.Text("Rest for 3 hours.")
 
     def LeaveFunction(self,location,var):
@@ -1116,6 +1121,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.EncounterSystem(0.12)
 
 ##### OHER HELPER FUNCTIONS #####
+    def LossSystem(self):
+        self.mainTextBox.clear()
+        self.Text('You lost')
+
     def EncounterSystem(self,chance):
         area = Locations.currentLocation
         roll = random.randint
@@ -1162,6 +1171,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             print('Battle')
             Flags.battle = True
             self.MonsterSelection(area)
+            self.groupBoxEnemy.setVisible(True)
         if randomEvent > itemFind and randomEvent > enemyEncounter and randomEvent > 10:
             print ('Random Event')
 
@@ -1187,6 +1197,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.labelWEquippped.setText(Inventory.equipment[1].capitalize())
         self.labelGold.setText(f"Gold: {str(Inventory.gold)}")
         self.labelLocation.setText(Locations.currentLocation)
+        self.labelPlayerHealth.setText(f"Hitpoints: {PlayerCharacter.currentHP}/{PlayerCharacter.hp}")
+        hp = round(100 *(PlayerCharacter.currentHP/PlayerCharacter.hp))
+        self.barHealth.setValue(hp)
 
     def DialogueFunction(self,target,var):
         """Function to call text for given event. (target of function,variable)"""
@@ -1201,7 +1214,12 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.CCreate = CreationWindow()
         self.CCreate.signal_function.connect(self.GameSetup)
         self.CCreate.show()
-       
+    
+    def setStats(self):
+        PC = PlayerCharacter
+        PC.hp = 3 + PC.level*2 + PC.constitution * PC.level
+        PC.currentHP = PC.hp
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     the_form = MyForm(CreationWindow)
