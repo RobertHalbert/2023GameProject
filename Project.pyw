@@ -47,16 +47,11 @@ class Skills:
             self.crafting = 2
         return text
 
-class Attack:
-    attackdamage = 0
-    def AttackFunction(self):
-        pass
-
 class MonsterCharacter():
+    # [name,currenthp,maxhp,weaponname,damage,armor/fur/clothes/etc.,defense,xpvalue]
     monster = ''
-    rat = ['rat',5,5,'claws',1,'fur',0]
-    slime = ['slime',8,8,'slime',1,'slime',0]
-
+    rat = ['rat',5,5,'claws',1,'fur',0,1]
+    slime = ['slime',8,8,'slime',1,'slime',0,3]
 
 class PlayerCharacter():
     def __init__(self, name, hp, stamina, attack, defence, strength, dexterity, arcane, constitution, charisma, level):
@@ -81,6 +76,8 @@ class PlayerCharacter():
     charisma = 1
     apperenceList = ['','','','','']
     currentHP = 1
+    currentXp = 0
+    xpNeeded = 999999
     
 class Inventory:
     openInventory = False
@@ -141,6 +138,7 @@ class Inventory:
             pass
     
 class Flags:
+    levelUp = False
     battle = False
     gameStart = 0
     startingVillageFirstVisit = 0
@@ -437,6 +435,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.ButtonW.clicked.connect(lambda:self.GridButtonPressed('W'))
         self.ButtonX.clicked.connect(lambda:self.GridButtonPressed('X'))
         self.ButtonZ.clicked.connect(lambda:self.GridButtonPressed('Z'))
+        self.actionExit_Game.triggered.connect(self.EndGame)
         self.frameButtons.setVisible(False)
         self.frameInfo.setVisible(False)
         self.groupBoxEnemy.setVisible(False)
@@ -458,8 +457,14 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if event.key() == Qt.Key_V: self.GridButtonPressed('V')
         if event.key() == Qt.Key_F3 and self.actionNew_Game.isEnabled(): self.StartGame()
         if event.key() == Qt.Key_F4: self.EndGame()
+        if event.key() == Qt.Key_F8: self.Debug()
 
 #Main Functions
+    def Debug(self):
+        PlayerCharacter.currentXp += 10
+        self.UpdateInformation()
+        self.ButtonUpdate()
+
     def GridButtonPressed(self,button):
         buttonpressed = 'self.Button' + button +'Pressed()'
         I = Inventory
@@ -533,6 +538,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 b.setText('')
         if Flags.battle == True and Inventory.openInventory == False:
             b.setText('Attack')  
+        if Flags.levelUp == True:
+            b.setText('Strength')
 
     def UpdateWButton(self,locale):
         b = self.ButtonW
@@ -556,6 +563,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                     b.setText('North')
         if Flags.battle == True and Inventory.openInventory == False:
             b.setText('Defend')
+        if Flags.levelUp == True:
+            b.setText('Dexterity')
 
     def UpdateEButton(self,locale):
         b = self.ButtonE
@@ -575,6 +584,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 b.setText('')
         if Flags.battle == True and Inventory.openInventory == False:
             b.setText('Run')
+        if Flags.levelUp == True:
+            b.setText('Arcane')
 
     def UpdateRButton(self,locale):
         b = self.ButtonR
@@ -595,6 +606,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                     b.setText('')
         if Flags.battle == True and Inventory.openInventory == False:
             b.setText('Wait')
+        if Flags.levelUp == True:
+            b.setText('Constitution')
 
     def UpdateAButton(self,locale):
         b = self.ButtonA
@@ -616,6 +629,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                     b.setText('West')
         if Flags.battle == True and Inventory.openInventory == False:
             b.setText('')
+        if Flags.levelUp == True:
+            b.setText('Charisma')
 
     def UpdateSButton(self,locale):
         b = self.ButtonS
@@ -631,7 +646,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                     b.setText('')
             else:
                 b.setText('Explore')
-        if Flags.battle == True and Inventory.openInventory == False:
+        if (Flags.battle == True and Inventory.openInventory == False) or Flags.levelUp == True:
             b.setText('')
 
     def UpdateDButton(self,locale):
@@ -648,7 +663,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                     b.setText('')
             else:
                 b.setText('East')
-        if Flags.battle == True and Inventory.openInventory == False:
+        if (Flags.battle == True and Inventory.openInventory == False) or Flags.levelUp == True:
             b.setText('')
 
     def UpdateFButton(self,locale):
@@ -673,6 +688,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         I = Inventory
         if I.openInventory == False or I.openStore == False:
             b.setText('Inventory')
+        if Flags.levelUp == True:
+            b.setText('')
 
     def UpdateXButton(self,locale):
         b = self.ButtonX
@@ -692,7 +709,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                     b.setText('')
                 else:
                     b.setText('South')
-        if Flags.battle == True and Inventory.openInventory == False:
+        if (Flags.battle == True and Inventory.openInventory == False) or Flags.levelUp == True:
             b.setText('')
 
     def UpdateCButton(self,locale):
@@ -709,7 +726,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                     b.setText('')
             else:
                 b.setText('')
-        if Flags.battle == True and Inventory.openInventory == False:
+        if (Flags.battle == True and Inventory.openInventory == False) or Flags.levelUp == True:
             b.setText('')
 
     def UpdateVButton(self,locale):
@@ -721,7 +738,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 b.setText('')
             else:
                 b.setText('Leave')  
-        if Flags.battle == True and Inventory.openInventory == False:
+        if (Flags.battle == True and Inventory.openInventory == False) or Flags.levelUp == True:
             b.setText('')
     
     ##### Button Pressed #####
@@ -745,7 +762,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.DialogueFunction(c,'Talk')
         if b == 'Attack':
             self.BattleFunction('Attack')
-    
+        if b == 'Strength':
+            self.StatIncrease(b)
+
     def ButtonWPressed(self):
         b = self.ButtonW.text()
         L = Locations
@@ -765,6 +784,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.OverWorldMovement('w')
         if b == 'Defend':
             self.BattleFunction('Defend')
+        if b == 'Dexterity':
+            self.StatIncrease(b)
 
     def ButtonEPressed(self):
         b = self.ButtonE.text()
@@ -782,6 +803,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.SellItemsInventory()
         if b == 'Run':
             self.BattleFunction('Run')
+        if b == 'Aarcane':
+            self.StatIncrease(b)
             
     def ButtonRPressed(self):
         b = self.ButtonR.text()
@@ -793,6 +816,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.RoomChangeFunction(c,L.startingVillage,'enter')
         if b == 'Wait':
             self.BattleFunction('Wait')
+        if b == 'Constitution':
+            self.StatIncrease(b)
 
     def ButtonAPressed(self):
         b = self.ButtonA.text()
@@ -808,6 +833,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.RoomChangeFunction(c,Locations.villageHome,'')
         if  b == 'West':
             self.OverWorldMovement('a')
+        if b == 'Charisma':
+            self.StatIncrease(b)
     
     def ButtonSPressed(self):
         b = self.ButtonS.text()
@@ -921,6 +948,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if MonsterCharacter.monster[1] <= 0:
             Flags.battle = False
             self.groupBoxEnemy.setVisible(False)
+            self.Text(f"You killed the {MonsterCharacter.monster[0]} and gained {MonsterCharacter.monster[7]}")
+            PlayerCharacter.currentXp += MonsterCharacter.monster[7]
+            self.UpdateInformation()
             return
         self.MonsterAction()
 
@@ -929,8 +959,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if location == 'Cliffside Farms':
             MonsterCharacter.monster = getattr(MonsterCharacter,'rat')
             mon = MonsterCharacter.monster
+            mon[1]=mon[2]
             self.labelEnemy.setText(f"{mon[0]}".capitalize())
             self.labelHPEnemy.setText(f"{mon[0]} Hitpoints: {mon[1]}/{mon[2]}".capitalize())
+            self.progressBarEnemyHp.setValue(100)
         self.Text(f"A {mon[0]} appears!")
 
     def ShopFunction(self):
@@ -1045,6 +1077,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.SetTime(180)
         PlayerCharacter.currentHP = PlayerCharacter.hp
         self.Text("Rest for 3 hours.")
+        self.UpdateInformation()
 
     def LeaveFunction(self,location,var):
         L = Locations
@@ -1200,7 +1233,29 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.labelPlayerHealth.setText(f"Hitpoints: {PlayerCharacter.currentHP}/{PlayerCharacter.hp}")
         hp = round(100 *(PlayerCharacter.currentHP/PlayerCharacter.hp))
         self.barHealth.setValue(hp)
-
+        self.labelLevel.setText(f"Level: {PlayerCharacter.level}")
+        self.labelXp.setText(f"Experience: {PlayerCharacter.currentXp}/{PlayerCharacter.xpNeeded}")
+        if PlayerCharacter.currentXp >= PlayerCharacter.xpNeeded:
+            self.LevelUpFunction()        
+        
+    def LevelUpFunction(self):
+        Flags.levelUp = True
+        self.Text("You've gained a level! Select a stat to increase.")
+        PlayerCharacter.currentXp -= PlayerCharacter.xpNeeded
+        PlayerCharacter.currentHP = PlayerCharacter.hp
+        PlayerCharacter.level += 2
+    
+    def StatIncrease(self,stat):
+        P = PlayerCharacter
+        if stat == 'Strength': P.strength += 1
+        if stat == 'Dexterity': P.dexterity += 1
+        if stat == 'Arcane': P.arcane += 1
+        if stat == 'Constitution': P.constitution += 1
+        if stat == 'Charisma': P.charisma += 1
+        PlayerCharacter.currentHP = PlayerCharacter.hp
+        self.UpdateInformation()
+        Flags.levelUp = False
+    
     def DialogueFunction(self,target,var):
         """Function to call text for given event. (target of function,variable)"""
         Dialogue.text = ''
@@ -1219,6 +1274,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         PC = PlayerCharacter
         PC.hp = 3 + PC.level*2 + PC.constitution * PC.level
         PC.currentHP = PC.hp
+        PC.xpNeeded = PC.level * 10
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
