@@ -175,6 +175,8 @@ class Time:
 
 class Locations:
     currentLocation = ''
+    # area determines the curent region {0:westcliff,}
+    area = 0
     overworld = False
     villageHome = 'Home'
     startingVillage = 'Westcliff'
@@ -848,6 +850,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.BuyItemFunction(b)
         if b == 'Farmer':
             self.RoomChangeFunction(c,Locations.sVillageFarmer,'enter')
+        if b == 'Explore':
+            self.EncounterSystem(0.2)
     
     def ButtonDPressed(self):
         b = self.ButtonD.text()
@@ -1156,7 +1160,17 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 ##### OHER HELPER FUNCTIONS #####
     def LossSystem(self):
         self.mainTextBox.clear()
-        self.Text('You lost')
+        self.Text(f'You were defeated by the {MonsterCharacter.monster[0]}...')
+        self.Text(f"You lost {round(Inventory.gold/2)} gold...")
+        Inventory.gold = round(Inventory.gold/2)
+        if Locations.area == 0:
+            Locations.currentLocation = 'Home'
+            Locations.currentCoord = [11,7]
+            Locations.overworld = False
+            PlayerCharacter.currentHP = PlayerCharacter.hp
+            self.UpdateInformation()
+            self.ButtonUpdate()
+
 
     def EncounterSystem(self,chance):
         area = Locations.currentLocation
@@ -1183,7 +1197,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 randomEvent = (5 + roll(1,100)) * chance
             if area == 'Westcliff Plains':
                 itemFind = (-5 + roll(1,100)) * chance
-                enemyEncounter = (5 + roll(1,100)) * chance
+                enemyEncounter = (-50 + roll(1,100)) * chance
                 randomEvent = (5 + roll(1,100)) * chance
             if area == 'Westcliff Road':
                 itemFind = (-5 + roll(1,100)) * chance
@@ -1243,7 +1257,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.Text("You've gained a level! Select a stat to increase.")
         PlayerCharacter.currentXp -= PlayerCharacter.xpNeeded
         PlayerCharacter.currentHP = PlayerCharacter.hp
-        PlayerCharacter.level += 2
+        PlayerCharacter.level += 1
     
     def StatIncrease(self,stat):
         P = PlayerCharacter
@@ -1253,6 +1267,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if stat == 'Constitution': P.constitution += 1
         if stat == 'Charisma': P.charisma += 1
         PlayerCharacter.currentHP = PlayerCharacter.hp
+        self.setStats()
         self.UpdateInformation()
         Flags.levelUp = False
     
