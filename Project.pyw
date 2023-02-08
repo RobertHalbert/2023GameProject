@@ -52,6 +52,7 @@ class MonsterCharacter():
     monster = ''
     rat = ['rat',5,5,'claws',1,'fur',0,1]
     slime = ['slime',8,8,'slime',1,'slime',0,3]
+    crab = ['crab', 10,10,'pincers',3,'shell',1,5]
 
 class PlayerCharacter():
     def __init__(self, name, hp, stamina, attack, defence, strength, dexterity, arcane, constitution, charisma, level):
@@ -78,6 +79,7 @@ class PlayerCharacter():
     currentHP = 1
     currentXp = 0
     xpNeeded = 999999
+    slots = 1
     
 class Inventory:
     openInventory = False
@@ -142,6 +144,13 @@ class Flags:
     battle = False
     gameStart = 0
     startingVillageFirstVisit = 0
+    farmquest1 = 0
+    magicQuest = 0
+    magicAvailable = 0
+
+class QuestChecks:
+    ratsKilled = 0
+    slimesKilled = 0
 
 class Time:
     daynames = {0:'Starday',1:'Secday',2:'Midday',3:'Urthday',4:'Endsday'}
@@ -196,7 +205,6 @@ class Dialogue:
             text = "Game Started\n" + "Your Home"
         else: text = "Your Home" 
         return text
-        
     def Westcliff(var):
         if Flags.startingVillageFirstVisit == 0:
             text = "Introduction\n" + "Village"
@@ -227,7 +235,13 @@ class Dialogue:
         if var == 'enter':
             text = 'Magicians place'
         elif var == 'Talk':
-            text = 'Hello'
+            if Flags.magicQuest == 0:
+                text = '"Kill ten slimes and I will teach you some magic"'
+                Flags.magicQuest = 1
+            elif Flags.magicQuest == 2:
+                text = '"Good job. Here is some basic magic"'
+                Flags.magicQuest = 3
+            else: text = 'Hello'
         elif var == 'Buy Items':
             text = 'Magic'
         else: text =''
@@ -236,7 +250,13 @@ class Dialogue:
         if var == 'enter':
             text = 'Farmers place'
         elif var == 'Talk':
-            text = 'Sup?'
+            if Flags.farmquest1 == 0:
+                text = '"Kill 5 rats in the farms north of here."'
+                Flags.farmquest1 = 1
+            elif Flags.farmquest1 == 2:
+                text = '"Thanks for killing those rats"\nYou gained 5 gold and 5 experience"'
+                Flags.farmquest1 = 3
+            else: text = 'Sup?'
         elif var == 'Buy Items':
             text = 'Foodstuffs'
         else: text =''
@@ -440,7 +460,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.actionExit_Game.triggered.connect(self.EndGame)
         self.frameButtons.setVisible(False)
         self.frameInfo.setVisible(False)
-        self.groupBoxEnemy.setVisible(False)
+        self.frameEnemyInfo.setVisible(False)
         self.ButtonZ.setText('Inventory')
         self.mainTextBox.appendPlainText("Welcome to (My Game)!\n\nStart a new game by selecting 'New game' in the Menu or by pressing 'F3'.")
         
@@ -630,7 +650,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 else:
                     b.setText('West')
         if Flags.battle == True and Inventory.openInventory == False:
-            b.setText('')
+            b.setText('Magic') #TEMP?
         if Flags.levelUp == True:
             b.setText('Charisma')
 
@@ -805,7 +825,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.SellItemsInventory()
         if b == 'Run':
             self.BattleFunction('Run')
-        if b == 'Aarcane':
+        if b == 'Arcane':
             self.StatIncrease(b)
             
     def ButtonRPressed(self):
@@ -837,6 +857,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.OverWorldMovement('a')
         if b == 'Charisma':
             self.StatIncrease(b)
+        if b == 'Magic': #TEMP?
+            self.BattleFunction('Magic')
     
     def ButtonSPressed(self):
         b = self.ButtonS.text()
@@ -949,24 +971,40 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             return
         if action == 'Wait':
             self.Text('You wait')
+        if action == 'Magic':
+            damage = PlayerCharacter.arcane + 1
+            self.Text(f"You cast magic, dealing {damage} damage to the {MonsterCharacter.monster}.")
         if MonsterCharacter.monster[1] <= 0:
+            self.MonsterQuestCheck(MonsterCharacter.monster[0])
             Flags.battle = False
-            self.groupBoxEnemy.setVisible(False)
+            self.frameEnemyInfo.setVisible(False)
             self.Text(f"You killed the {MonsterCharacter.monster[0]} and gained {MonsterCharacter.monster[7]}")
             PlayerCharacter.currentXp += MonsterCharacter.monster[7]
             self.UpdateInformation()
             return
         self.MonsterAction()
 
+    def MonsterQuestCheck(self,monster):
+        if monster == 'rat' and Flags.farmquest1 == 1:
+            QuestChecks.ratsKilled += 1
+            if QuestChecks.ratsKilled >= 5:
+                Flags.farmquest1 = 2
+        if monster == 'slime' and Flags.magicQuest == 1:
+            QuestChecks.slimesKilled += 1
+            if QuestChecks.slimesKilled >= 10:
+                Flags.magicQuest = 2
+
     def MonsterSelection(self,location):
+        mon = MonsterCharacter.monster
         self.mainTextBox.clear()
         if location == 'Cliffside Farms':
             MonsterCharacter.monster = getattr(MonsterCharacter,'rat')
-            mon = MonsterCharacter.monster
-            mon[1]=mon[2]
-            self.labelEnemy.setText(f"{mon[0]}".capitalize())
-            self.labelHPEnemy.setText(f"{mon[0]} Hitpoints: {mon[1]}/{mon[2]}".capitalize())
-            self.progressBarEnemyHp.setValue(100)
+        if location == 'Forest':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'slime')
+        mon[1]=mon[2]
+        self.labelEnemy.setText(f"{mon[0]}".capitalize())
+        self.labelHPEnemy.setText(f"{mon[0]} Hitpoints: {mon[1]}/{mon[2]}".capitalize())
+        self.progressBarEnemyHp.setValue(100)
         self.Text(f"A {mon[0]} appears!")
 
     def ShopFunction(self):
@@ -1158,6 +1196,23 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.EncounterSystem(0.12)
 
 ##### OHER HELPER FUNCTIONS #####
+    def QuestRewards(self,quest):
+        if quest == 'Farm':
+            PlayerCharacter.currentXp += 5
+            Inventory.gold += 5
+        if quest == 'Magic':
+            PlayerCharacter.currentXp += 5
+            Flags.magicAvailable = 1
+        self.UpdateInformation()
+
+    def QuestCheck(self):
+        if Flags.farmquest1 == 3:
+            self.QuestRewards('Farm')
+            Flags.farmquest1 = 4
+        if Flags.magicQuest == 3:
+            self.QuestRewards('Magic')
+            Flags.magicQuest = 4
+
     def LossSystem(self):
         self.mainTextBox.clear()
         self.Text(f'You were defeated by the {MonsterCharacter.monster[0]}...')
@@ -1169,7 +1224,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             Locations.overworld = False
             PlayerCharacter.currentHP = PlayerCharacter.hp
             self.UpdateInformation()
-            self.ButtonUpdate()
 
 
     def EncounterSystem(self,chance):
@@ -1218,7 +1272,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             print('Battle')
             Flags.battle = True
             self.MonsterSelection(area)
-            self.groupBoxEnemy.setVisible(True)
+            self.frameEnemyInfo.setVisible(True)
         if randomEvent > itemFind and randomEvent > enemyEncounter and randomEvent > 10:
             print ('Random Event')
 
@@ -1249,6 +1303,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.barHealth.setValue(hp)
         self.labelLevel.setText(f"Level: {PlayerCharacter.level}")
         self.labelXp.setText(f"Experience: {PlayerCharacter.currentXp}/{PlayerCharacter.xpNeeded}")
+        self.labelStrength.setText(f"Strength:\t {PlayerCharacter.strength}")
+        self.labelDexterity.setText(f"Dexterity:\t {PlayerCharacter.dexterity}")
+        self.labelArcane.setText(f"Arcane:\t\t {PlayerCharacter.arcane}")
+        self.labelConstitution.setText(f"Constitution:\t {PlayerCharacter.constitution}")
+        self.labelCharisma.setText(f"Charisma:\t {PlayerCharacter.charisma}")
         if PlayerCharacter.currentXp >= PlayerCharacter.xpNeeded:
             self.LevelUpFunction()        
         
@@ -1279,6 +1338,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         concat = (d+target+v).replace(' ','')
         text = eval(concat)
         self.Text(text)
+        self.QuestCheck()
 
     def CharacterCreation(self):
         self.CCreate = CreationWindow()
@@ -1290,6 +1350,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         PC.hp = 3 + PC.level*2 + PC.constitution * PC.level
         PC.currentHP = PC.hp
         PC.xpNeeded = PC.level * 10
+        PC.slots = round(PC.arcane/2)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -53,7 +53,7 @@
        <x>0</x>
        <y>0</y>
        <width>231</width>
-       <height>471</height>
+       <height>611</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -68,7 +68,7 @@
         <x>10</x>
         <y>10</y>
         <width>221</width>
-        <height>431</height>
+        <height>481</height>
        </rect>
       </property>
       <layout class="QFormLayout" name="formLayoutInfo">
@@ -192,6 +192,57 @@
         <widget class="QLabel" name="labelXp">
          <property name="text">
           <string>xp</string>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="0" colspan="2">
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Preferred</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>38</width>
+           <height>13</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="14" column="0" colspan="2">
+        <widget class="QLabel" name="labelStrength">
+         <property name="text">
+          <string>Strength</string>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="0" colspan="2">
+        <widget class="QLabel" name="labelDexterity">
+         <property name="text">
+          <string>Dexterity</string>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="0" colspan="2">
+        <widget class="QLabel" name="labelArcane">
+         <property name="text">
+          <string>Arcane</string>
+         </property>
+        </widget>
+       </item>
+       <item row="17" column="0" colspan="2">
+        <widget class="QLabel" name="labelConstitution">
+         <property name="text">
+          <string>Constitution</string>
+         </property>
+        </widget>
+       </item>
+       <item row="18" column="0" colspan="2">
+        <widget class="QLabel" name="labelCharisma">
+         <property name="text">
+          <string>Charisma</string>
          </property>
         </widget>
        </item>
@@ -382,23 +433,26 @@
       </layout>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBoxEnemy">
+    <widget class="QFrame" name="frameEnemyInfo">
      <property name="geometry">
       <rect>
-       <x>820</x>
-       <y>10</y>
-       <width>181</width>
-       <height>381</height>
+       <x>810</x>
+       <y>0</y>
+       <width>201</width>
+       <height>461</height>
       </rect>
      </property>
-     <property name="title">
-      <string/>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
      </property>
      <widget class="QWidget" name="formLayoutWidget_2">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>0</y>
+        <x>10</x>
+        <y>10</y>
         <width>181</width>
         <height>321</height>
        </rect>
