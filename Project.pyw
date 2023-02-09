@@ -53,6 +53,8 @@ class MonsterCharacter():
     rat = ['rat',5,5,'claws',1,'fur',0,1]
     slime = ['slime',8,8,'slime',1,'slime',0,3]
     crab = ['crab', 10,10,'pincers',3,'shell',1,5]
+    hawk = ['hawk',12,12,'talons',5,'feathers',1,8]
+    thief = ['theif',15,15,'dagger',8,'leather',4,12]
 
 class PlayerCharacter():
     def __init__(self, name, hp, stamina, attack, defence, strength, dexterity, arcane, constitution, charisma, level):
@@ -80,6 +82,7 @@ class PlayerCharacter():
     currentXp = 0
     xpNeeded = 999999
     slots = 1
+    slotsleft = 1
     
 class Inventory:
     openInventory = False
@@ -187,14 +190,7 @@ class Locations:
     # area determines the curent region {0:westcliff,}
     area = 0
     overworld = False
-    villageHome = 'Home'
-    startingVillage = 'Westcliff'
     overworldPlaceholder = 'World'
-    startingForest = 'Forest'
-    sVillageBlacksmith = 'Blacksmiths'
-    sVillageMerchant = 'Merchants'
-    sVillageMagician = 'Magicians'
-    sVillageFarmer = 'Farmers'
     ########## Default World Size is 500,500
     currentCoord = [11,7]
 
@@ -461,6 +457,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.frameButtons.setVisible(False)
         self.frameInfo.setVisible(False)
         self.frameEnemyInfo.setVisible(False)
+        self.labelSlots.setVisible(False)
         self.ButtonZ.setText('Inventory')
         self.mainTextBox.appendPlainText("Welcome to (My Game)!\n\nStart a new game by selecting 'New game' in the Menu or by pressing 'F3'.")
         
@@ -505,7 +502,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.frameButtons.setVisible(True)
         self.frameInfo.setVisible(True)
         self.UpdateInformation()
-        self.LocationUpdate('villageHome','start')
+        self.LocationUpdate('Home','start')
         self.ButtonUpdate()
         self.SetTime(0)
         self.actionNew_Game.setEnabled(False)
@@ -536,7 +533,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             buttontoupdate = 'self.Update'+buttonList[x]+f'Button({locale})'
             eval(buttontoupdate)
             buttonText = eval('self.Button'+buttonList[x]+".text()")
-            if buttonText == '':
+            if buttonText == '' or (buttonText == 'Magic' and PlayerCharacter.slotsleft == 0):
                 eval('self.Button'+buttonList[x]+'.setEnabled(False)')
             else:
                 eval('self.Button'+buttonList[x]+'.setEnabled(True)')
@@ -622,8 +619,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                     b.setText('')
             elif L.overworld == True:
-                if A == 'Westcliff':
-                    b.setText('Westcliff')
+                if A == 'Westcliff' or A == 'Westcliff Docks' or A == 'Lighthouse':
+                    b.setText(f'{Locations.currentLocation}')
                 else :
                     b.setText('')
         if Flags.battle == True and Inventory.openInventory == False:
@@ -798,7 +795,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if Inventory.openStore == True:
             self.BuyItemFunction(b)
         if b == 'Merchant':
-            self.RoomChangeFunction(c,L.sVillageMerchant,'enter')
+            self.RoomChangeFunction(c,'Merchants','enter')
         if b == 'Buy Items':
             self.ShopFunction()
             self.ShopText()
@@ -820,7 +817,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if Inventory.openStore == True:
             self.BuyItemFunction(b)
         if b == 'Blacksmith':
-            self.RoomChangeFunction(c,L.sVillageBlacksmith,'enter')
+            self.RoomChangeFunction(c,'Blacksmiths','enter')
         if b == 'Sell Items':
             self.SellItemsInventory()
         if b == 'Run':
@@ -833,9 +830,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         L = Locations
         c = Locations.currentLocation
         if b == 'Magician':
-            self.RoomChangeFunction(c,L.sVillageMagician,'enter')
-        if b == 'Westcliff':
-            self.RoomChangeFunction(c,L.startingVillage,'enter')
+            self.RoomChangeFunction(c,'Magicians','enter')
+        if b == 'Westcliff' or b == 'Westcliff Docks' or b == 'Lighthouse':
+            self.RoomChangeFunction(c,L.currentLocation,'enter')
         if b == 'Wait':
             self.BattleFunction('Wait')
         if b == 'Constitution':
@@ -852,7 +849,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if Inventory.openStore == True:
             self.BuyItemFunction(b)
         if b == 'Home':
-            self.RoomChangeFunction(c,Locations.villageHome,'')
+            self.RoomChangeFunction(c,'Home','')
         if  b == 'West':
             self.OverWorldMovement('a')
         if b == 'Charisma':
@@ -871,7 +868,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if Inventory.openStore == True:
             self.BuyItemFunction(b)
         if b == 'Farmer':
-            self.RoomChangeFunction(c,Locations.sVillageFarmer,'enter')
+            self.RoomChangeFunction(c,'Farmers','enter')
         if b == 'Explore':
             self.EncounterSystem(0.2)
     
@@ -968,12 +965,15 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if action == 'Run':
             self.Text('You run')
             Flags.battle = False
+            self.frameEnemyInfo.setVisible(False)
             return
         if action == 'Wait':
             self.Text('You wait')
         if action == 'Magic':
             damage = PlayerCharacter.arcane + 1
-            self.Text(f"You cast magic, dealing {damage} damage to the {MonsterCharacter.monster}.")
+            self.Text(f"You cast magic, dealing {damage} damage to the {MonsterCharacter.monster[0]}.")
+            MonsterCharacter.monster[1] -= damage
+            PlayerCharacter.slotsleft -= 1
         if MonsterCharacter.monster[1] <= 0:
             self.MonsterQuestCheck(MonsterCharacter.monster[0])
             Flags.battle = False
@@ -995,12 +995,18 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 Flags.magicQuest = 2
 
     def MonsterSelection(self,location):
-        mon = MonsterCharacter.monster
         self.mainTextBox.clear()
         if location == 'Cliffside Farms':
             MonsterCharacter.monster = getattr(MonsterCharacter,'rat')
         if location == 'Forest':
             MonsterCharacter.monster = getattr(MonsterCharacter,'slime')
+        if location == 'Westcliff Beach' or location == 'Westcliff Shallows':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'crab')
+        if location == 'Westcliff Plains':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'hawk')
+        if location == 'Westcliff Road':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'thief')
+        mon = MonsterCharacter.monster
         mon[1]=mon[2]
         self.labelEnemy.setText(f"{mon[0]}".capitalize())
         self.labelHPEnemy.setText(f"{mon[0]} Hitpoints: {mon[1]}/{mon[2]}".capitalize())
@@ -1119,6 +1125,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.SetTime(180)
         PlayerCharacter.currentHP = PlayerCharacter.hp
         self.Text("Rest for 3 hours.")
+        PlayerCharacter.slotsleft = PlayerCharacter.slots
         self.UpdateInformation()
 
     def LeaveFunction(self,location,var):
@@ -1132,15 +1139,15 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.DialogueFunction(Locations.currentLocation,'enter')
         else:
             if A == 'Home' or A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
-                L.currentLocation = L.startingVillage
-            if A == 'Westcliff':
+                L.currentLocation = 'Westcliff'
+            if A == 'Westcliff' or A == 'Westcliff Docks' or A == 'Lighhouse':
                 L.overworld = True
             self.DialogueFunction(L.currentLocation,var)
             self.SetTime(5)
             self.labelLocation.setText(Locations.currentLocation)
 
     def EnterRoom(self,location,target):
-        if location == Locations.startingVillage:
+        if location == 'Westcliff' or location == 'Lighthouse' or location == 'Westcliff Docks':
             Locations.currentLocation = target
             Locations.overworld = False   
         self.SetTime(5)     
@@ -1150,33 +1157,40 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         Lc = Locations.currentCoord
         Ll = Locations.currentLocation
         if Lc[0] == 11 and Lc[1] == 7:
-            Ll = Locations.startingVillage
+            Ll = 'Westcliff'
             self.SetTime(30)
         if (Lc[0] >= 3 and Lc[0] <= 12) and (Lc[1] >= 1 and Lc[1] <= 6):
-            Ll = Locations.startingForest
+            Ll = 'Forest'
             self.SetTime(60)
-        if (Lc[0] >= 4 and Lc[0] <= 10) and Lc[1] == 7:
-            Ll = 'Lighthouse Road'
-            self.SetTime(30)
         if Lc[0] == 3 and Lc[1] == 7:
             Ll = 'Lighthouse'
             self.SetTime(30)
-        if (Lc[0] >= 3 and Lc[0] <= 7) and (Lc[1] >= 8 and Lc[1] <= 11):
-            Ll = 'Cliffside Plains'
-            self.SetTime(30)
-        if (Lc[0] >= 8 and Lc[0] <= 14) and (Lc[1] >= 8 and Lc[1] <= 11):
-            Ll = 'Cliffside Farms'
-            self.SetTime(30)
-        if (Lc[0] >= 12 and Lc[0] <= 24) and Lc[1] == 7:
-            Ll = 'Westcliff Road'
-        if (Lc[0] >= 15 and Lc[0] <= 24) and (Lc[1] >= 8 and Lc[1] <= 18):
-            Ll = 'Westcliff Plains'
-        if ((Lc[0] >= 13 and Lc[0] <= 15) or (Lc[0] >= 17 and Lc[0] <= 20)) and Lc[1] == 6:
-            Ll = 'Westcliff Beach'
         if Lc[0] == 16 and Lc[1] == 6:
             Ll = 'Westcliff Docks'
+            self.SetTime(30)
+
+        # AREAS
+        if (Lc[0] >= 4 and Lc[0] <= 10) and Lc[1] == 7:
+            Ll = 'Lighthouse Road'
+            self.SetTime(30)
+        if (Lc[0] >= 3 and Lc[0] <= 7) and (Lc[1] >= 8 and Lc[1] <= 11):
+            Ll = 'Cliffside Plains'
+            self.SetTime(45)
+        if (Lc[0] >= 8 and Lc[0] <= 14) and (Lc[1] >= 8 and Lc[1] <= 11):
+            Ll = 'Cliffside Farms'
+            self.SetTime(45)
+        if (Lc[0] >= 12 and Lc[0] <= 24) and Lc[1] == 7:
+            Ll = 'Westcliff Road'
+            self.SetTime(30)
+        if (Lc[0] >= 15 and Lc[0] <= 24) and (Lc[1] >= 8 and Lc[1] <= 18):
+            Ll = 'Westcliff Plains'
+            self.SetTime(45)
+        if ((Lc[0] >= 13 and Lc[0] <= 15) or (Lc[0] >= 17 and Lc[0] <= 20)) and Lc[1] == 6:
+            Ll = 'Westcliff Beach'
+            self.SetTime(45)
         if (Lc[0] >= 13 and Lc[0] <= 20) and (Lc[1] >= 1 and Lc[1] <= 5):
             Ll = 'Westcliff Shallows'
+            self.SetTime(60)
         Locations.currentLocation = Ll
         self.UpdateInformation()
         
@@ -1203,6 +1217,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if quest == 'Magic':
             PlayerCharacter.currentXp += 5
             Flags.magicAvailable = 1
+            PlayerCharacter.slotsleft = PlayerCharacter.slots
+            self.labelSlots.setVisible(True)
         self.UpdateInformation()
 
     def QuestCheck(self):
@@ -1287,8 +1303,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.labelDate.setText(f"Date: {dn}\t{d}/{mo:0>2d}")
 
     def LocationUpdate(self,location,var):
-        locale = getattr(Locations,location)
-        Locations.currentLocation = locale
+        Locations.currentLocation = location
         self.labelLocation.setText(Locations.currentLocation)
         self.DialogueFunction(Locations.currentLocation,var)
 
@@ -1308,6 +1323,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.labelArcane.setText(f"Arcane:\t\t {PlayerCharacter.arcane}")
         self.labelConstitution.setText(f"Constitution:\t {PlayerCharacter.constitution}")
         self.labelCharisma.setText(f"Charisma:\t {PlayerCharacter.charisma}")
+        self.labelSlots.setText(f"Spell Power Remaining: {PlayerCharacter.slotsleft}/{PlayerCharacter.slots}")
         if PlayerCharacter.currentXp >= PlayerCharacter.xpNeeded:
             self.LevelUpFunction()        
         
