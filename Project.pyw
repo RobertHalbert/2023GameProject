@@ -90,30 +90,30 @@ class Inventory:
     openSell = False
     gold = 20
     inventoryLimit = 9
-    currentInventory = ['cloth','club']
+    currentInventory = ['cloth','club','apple','apple']
     equipment = ['cloth','hands','','']
     eDictionary= {
-        # ITEM : ['Description',Variable,Application,Type,Value]
+        # ITEM : ['Description',Variable,Application,Type,Value, max allowed]
         'hands':['hands',0,''],
         # Equipment
-        'cloth':['A set of cloth clothes.', 0,'defence:','a',2],
-        'club':['A plain old club.',1,'attack:','w',1],
-        'dagger':['An iron dagger.',2,'attack:','w',10],
+        'cloth':['A set of cloth clothes.', 0,'defence:','a',2,1],
+        'club':['A plain old club.',1,'attack:','w',1,1],
+        'dagger':['An iron dagger.',2,'attack:','w',10,1],
         # Raw 
-        'apple':['a red apple','','','i',2],
-        'wheat':['a buchel of golden wheat','','','i',12],
-        'meat': ['some cow meat','','','i',5],
-        'iron ingot': ['an ingot of iron','','','i',15],
-        'fabric':['some fabric for crafting','','','i',14],
-        'component':['a magical material','','','i',18],
+        'apple':['a red apple','','','i',2,10],
+        'wheat':['a buchel of golden wheat','','','i',12,10],
+        'meat': ['some cow meat','','','i',5,10],
+        'iron ingot': ['an ingot of iron','','','i',15,5],
+        'fabric':['some fabric for crafting','','','i',14,5],
+        'component':['a magical material','','','i',18,5],
         # Potions
-        'potion':['a mysterious red liquid','','','i',22],
+        'potion':['a mysterious red liquid','','','i',22,5],
         # Arrow
-        'arrow':['a wooden arrow','','','i',2,0],
+        'arrow':['a wooden arrow','','','i',2,0,20],
         # Spells
-        'magic spell':['a magic spell','','','i',30],
+        'magic spell':['a magic spell','','','i',30,1],
         # Upgrades
-        'Backpack':['A bag for carrying','','','u',100]
+        'Backpack':['A bag for carrying','','','u',100,1]
     }
     def EquipFunction(item):
         I = Inventory
@@ -1087,17 +1087,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if Flags.battle == True:
             self.BattleFunction('')
 
-    def InventoryText(self):
-        buttonList = ['Q','W','E','A','S','D','Z','X','C']
-        self.mainTextBox.clear()
-        b = 'self.Button'
-        t = '.text()'
-        I = Inventory
-        self.Text('-------------------------------------------------------------------------------')
-        for x in range(len(Inventory.currentInventory)):
-            itemT = eval(b+buttonList[x]+t)
-            self.Text(f'{itemT}\t{I.eDictionary[itemT][0]}\t\t{I.eDictionary[itemT][2]} {I.eDictionary[itemT][1]}')
-
     def OpenInventory(self):
         I = Inventory
         b = 'self.Button'
@@ -1105,15 +1094,19 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         t = '.setText'
         self.ButtonV.setText('Leave'),self.ButtonV.setEnabled(True)
         self.ButtonZ.setText('')
+        invCount = self.InventoryCount()
         if len(I.currentInventory) < 10:
             self.ButtonR.setText(''),self.ButtonR.setEnabled(False)
             self.ButtonF.setText(''),self.ButtonR.setEnabled(False)
         for i in buttonList:
             eval(b+i+t+'("""""")')
             eval(b+i+'.setEnabled(False)')
-        for i in range(len(I.currentInventory)):
-            item = I.currentInventory[i]
-            eval(b+buttonList[i]+t+f'("{item}")')
+        for i in range(len(invCount)):
+            if invCount[i][1] == 1:
+                eval(b+buttonList[i]+t+f'("{invCount[i][0]}")')
+            elif invCount[i][1] > 1:
+                eval(b+buttonList[i]+t+f'("{invCount[i][0]} x{invCount[i][1]}")')
+
         for i in range(len(I.currentInventory)):
             buttonText = eval(b + buttonList[i] +".text()")
             if buttonText == '':
@@ -1210,6 +1203,28 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.EncounterSystem(0.12)
 
 ##### OHER HELPER FUNCTIONS #####
+    def InventoryText(self):
+        self.mainTextBox.clear()
+        I = Inventory
+        self.Text('-------------------------------------------------------------------------------')
+        compInv = set(I.currentInventory)
+        countInv = self.InventoryCount()
+        for x in range(len(compInv)):
+            if countInv[x][1] == 1:
+                self.Text(f'{countInv[x][0]}\t{I.eDictionary[countInv[x][0]][0]}\t\t{I.eDictionary[countInv[x][0]][2]} {I.eDictionary[countInv[x][0]][1]}')
+            else:
+                self.Text(f'{countInv[x][0]}\t{I.eDictionary[countInv[x][0]][0]}  x{countInv[x][1]}\t{I.eDictionary[countInv[x][0]][2]} {I.eDictionary[countInv[x][0]][1]}')
+
+    def InventoryCount(self):
+        I = Inventory
+        compInv = set(I.currentInventory)
+        countInv = [''] * len(compInv)
+        count = 0
+        for i in compInv:
+            countInv[count] = [i,I.currentInventory.count(i)]
+            count += 1
+        return countInv
+
     def QuestRewards(self,quest):
         if quest == 'Farm':
             PlayerCharacter.currentXp += 5
