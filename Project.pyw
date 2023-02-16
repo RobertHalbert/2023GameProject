@@ -122,6 +122,8 @@ class Inventory:
                 if item in I.equipment[x]:
                     I.equipment[x] = ''
                     text = f'You remove the {item}'
+                    if I.equipment[1] == '':
+                        I.equipment[1] = 'hands'
                     return text 
             if I.eDictionary[item][3] == 'a':
                 text = f'You don the {item}'
@@ -139,6 +141,12 @@ class Inventory:
                 text = f'You wear the {item} around your neck'
                 I.equipment[3] = item
                 return text
+            if I.eDictionary[item][3] == 'i':
+                if item == 'apple':
+                    text = f'You eat the {item}.'
+                    I.currentInventory.remove(item)
+                    return text
+                
         except:
             pass
     
@@ -1078,9 +1086,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.UpdateInformation()
 
     def InventoryFunction(self,item):
+        item = item.translate({ord(i): None for i in 'x2345678910 '})
         if Inventory.openInventory == True:
             text = Inventory.EquipFunction(item)
             self.Text(text)
+            self.OpenInventory()
         if Inventory.openSell == True:
             self.SellItemFunction(item)
         self.UpdateInformation()
