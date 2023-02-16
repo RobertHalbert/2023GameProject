@@ -102,6 +102,7 @@ class Inventory:
         # Raw 
         'apple':['a red apple','','','i',2,10],
         'wheat':['a buchel of golden wheat','','','i',12,10],
+        'mushroom': ['a edible mushroom','','','i',1,10],
         'meat': ['some cow meat','','','i',5,10],
         'iron ingot': ['an ingot of iron','','','i',15,5],
         'fabric':['some fabric for crafting','','','i',14,5],
@@ -149,7 +150,28 @@ class Inventory:
                 
         except:
             pass
-    
+    def ItemFindFunction(location):
+        I = Inventory
+        text = ''
+        if location == 'Forest':
+            text = 'You found a mushroom.'
+            if len(set(I.currentInventory)) < I.inventoryLimit and I.currentInventory.count('mushroom') < 10:
+                text = text + ' You place it in your bag.'
+                I.currentInventory.append('mushroom')
+            else:
+                text = text + ' But there is no more space for mushrooms.'
+        if location == 'Farm':
+            text = 'You found an apple.'
+            if len(set(I.currentInventory)) < I.inventoryLimit and I.currentInventory.count('mushroom') < 10:
+                text = text + ' You place it in your bag.'
+                I.currentInventory.append('apple')
+            else:
+                text = text + ' But there is no more space for apples.'
+        if location == 'Lighthouse Road' or location == 'Westcliff Road':
+            text = 'You find a coin on the ground.'
+            I.gold += 1
+        return text
+
 class Flags:
     levelUp = False
     battle = False
@@ -878,6 +900,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if b == 'Farmer':
             self.RoomChangeFunction(c,'Farmers','enter')
         if b == 'Explore':
+            self.Text("You look around the area.")
             self.EncounterSystem(0.2)
     
     def ButtonDPressed(self):
@@ -986,7 +1009,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.MonsterQuestCheck(MonsterCharacter.monster[0])
             Flags.battle = False
             self.frameEnemyInfo.setVisible(False)
-            self.Text(f"You killed the {MonsterCharacter.monster[0]} and gained {MonsterCharacter.monster[7]}")
+            self.Text(f"You killed the {MonsterCharacter.monster[0]} and gained {MonsterCharacter.monster[7]}xp")
             PlayerCharacter.currentXp += MonsterCharacter.monster[7]
             self.UpdateInformation()
             return
@@ -1004,7 +1027,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 
     def MonsterSelection(self,location):
         self.mainTextBox.clear()
-        if location == 'Cliffside Farms':
+        if location == 'Cliffside Farms' or location == 'Lighthouse Road':
             MonsterCharacter.monster = getattr(MonsterCharacter,'rat')
         if location == 'Forest':
             MonsterCharacter.monster = getattr(MonsterCharacter,'slime')
@@ -1117,7 +1140,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             elif invCount[i][1] > 1:
                 eval(b+buttonList[i]+t+f'("{invCount[i][0]} x{invCount[i][1]}")')
 
-        for i in range(len(I.currentInventory)):
+        for i in range(len(set(I.currentInventory))):
             buttonText = eval(b + buttonList[i] +".text()")
             if buttonText == '':
                 eval('self.Button'+buttonList[i]+'.setEnabled(False)')
@@ -1283,8 +1306,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 enemyEncounter = (0 + roll(1,100)) * chance
                 randomEvent = (10 + roll(1,100)) * chance
             if area == 'Lighthouse Road':
-                itemFind = (-5 + roll(1,100)) * chance
-                enemyEncounter = (-15 + roll(1,100)) * chance
+                itemFind = (-15 + roll(1,100)) * chance
+                enemyEncounter = (-30 + roll(1,100)) * chance
                 randomEvent = (5 + roll(1,100)) * chance
             if area == 'Cliffside Plains':
                 itemFind = (-5 + roll(1,100)) * chance
@@ -1308,7 +1331,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 randomEvent = (5 + roll(1,100)) * chance
         print(itemFind,enemyEncounter,randomEvent)  
         if itemFind > enemyEncounter and itemFind > randomEvent and itemFind > 10:
-            print('find item')
+            self.Text(Inventory.ItemFindFunction(area))
         if enemyEncounter > itemFind and enemyEncounter > randomEvent and enemyEncounter > 10:
             print('Battle')
             Flags.battle = True
@@ -1316,6 +1339,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.frameEnemyInfo.setVisible(True)
         if randomEvent > itemFind and randomEvent > enemyEncounter and randomEvent > 10:
             print ('Random Event')
+        self.UpdateInformation()
 
     def UpdateDateTime(self):
         T = Time
