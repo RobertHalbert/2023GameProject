@@ -107,6 +107,8 @@ class Inventory:
         'iron ingot': ['an ingot of iron','','','i',15,5],
         'fabric':['some fabric for crafting','','','i',14,5],
         'component':['a magical material','','','i',18,5],
+        'shell':['a small shell','','','i',1,10],
+        'small herb': ['a small herb','','','i',1,10],
         # Potions
         'potion':['a mysterious red liquid','','','i',22,5],
         # Arrow
@@ -170,6 +172,20 @@ class Inventory:
         if location == 'Lighthouse Road' or location == 'Westcliff Road':
             text = 'You find a coin on the ground.'
             I.gold += 1
+        if location == 'Cliffside Plains' or location == 'Westcliff Plains':
+            text = 'You find a small herb.'
+            if len(set(I.currentInventory)) < I.inventoryLimit and I.currentInventory.count('small herb') < 10:
+                text = text + ' You place it in your bag.'
+                I.currentInventory.append('small herb')
+            else:
+                text = text + ' But there is no more space for these herbs.'
+        if location == 'Westcliff Beach' or location == 'Westcliff Shallows':
+            text = 'You find a small shell.'
+            if len(set(I.currentInventory)) < I.inventoryLimit and I.currentInventory.count('shell') < 10:
+                text = text + ' You place it in your bag.'
+                I.currentInventory.append('shell')
+            else:
+                text = text + ' But there is no more space for more shells.'
         return text
 
 class Flags:
@@ -969,11 +985,14 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
 
 ##### ACTION FUNCTIONS (called by player action)#####
     def MonsterAction(self):
-        roll = random.randint(1,5)
+        roll = random.randint(1,100)
         mon = MonsterCharacter.monster
-        if roll >= 3:
-            self.Text(f'The {mon[0]} attacks with its {mon[3]} dealing {mon[4]} damage.')
+        self.Text(f'The {mon[0]} attacks with its {mon[3]}.')
+        if roll >= (PlayerCharacter.dexterity*2):
+            self.Text(f'It deals {mon[4]} damage.')
             PlayerCharacter.currentHP -= mon[4] - Inventory.eDictionary[Inventory.equipment[0]][1]
+        else:
+            self.Text('But it missed.')
         mon = MonsterCharacter.monster
         hp = round(100 * (mon[1]/mon[2]))
         self.labelHPEnemy.setText(f"{mon[0]} Hitpoints: {mon[1]}/{mon[2]}".capitalize())
@@ -1014,35 +1033,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.UpdateInformation()
             return
         self.MonsterAction()
-
-    def MonsterQuestCheck(self,monster):
-        if monster == 'rat' and Flags.farmquest1 == 1:
-            QuestChecks.ratsKilled += 1
-            if QuestChecks.ratsKilled >= 5:
-                Flags.farmquest1 = 2
-        if monster == 'slime' and Flags.magicQuest == 1:
-            QuestChecks.slimesKilled += 1
-            if QuestChecks.slimesKilled >= 10:
-                Flags.magicQuest = 2
-
-    def MonsterSelection(self,location):
-        self.mainTextBox.clear()
-        if location == 'Cliffside Farms' or location == 'Lighthouse Road':
-            MonsterCharacter.monster = getattr(MonsterCharacter,'rat')
-        if location == 'Forest':
-            MonsterCharacter.monster = getattr(MonsterCharacter,'slime')
-        if location == 'Westcliff Beach' or location == 'Westcliff Shallows':
-            MonsterCharacter.monster = getattr(MonsterCharacter,'crab')
-        if location == 'Westcliff Plains':
-            MonsterCharacter.monster = getattr(MonsterCharacter,'hawk')
-        if location == 'Westcliff Road':
-            MonsterCharacter.monster = getattr(MonsterCharacter,'thief')
-        mon = MonsterCharacter.monster
-        mon[1]=mon[2]
-        self.labelEnemy.setText(f"{mon[0]}".capitalize())
-        self.labelHPEnemy.setText(f"{mon[0]} Hitpoints: {mon[1]}/{mon[2]}".capitalize())
-        self.progressBarEnemyHp.setValue(100)
-        self.Text(f"A {mon[0]} appears!")
 
     def ShopFunction(self):
         shopItems = NpcShops.shopsDictionary[Locations.currentLocation]
@@ -1236,6 +1226,36 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.EncounterSystem(0.12)
 
 ##### OHER HELPER FUNCTIONS #####
+
+    def MonsterQuestCheck(self,monster):
+        if monster == 'rat' and Flags.farmquest1 == 1:
+            QuestChecks.ratsKilled += 1
+            if QuestChecks.ratsKilled >= 5:
+                Flags.farmquest1 = 2
+        if monster == 'slime' and Flags.magicQuest == 1:
+            QuestChecks.slimesKilled += 1
+            if QuestChecks.slimesKilled >= 10:
+                Flags.magicQuest = 2
+
+    def MonsterSelection(self,location):
+        self.mainTextBox.clear()
+        if location == 'Cliffside Farms' or location == 'Lighthouse Road':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'rat')
+        if location == 'Forest':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'slime')
+        if location == 'Westcliff Beach' or location == 'Westcliff Shallows':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'crab')
+        if location == 'Westcliff Plains':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'hawk')
+        if location == 'Westcliff Road':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'thief')
+        mon = MonsterCharacter.monster
+        mon[1]=mon[2]
+        self.labelEnemy.setText(f"{mon[0]}".capitalize())
+        self.labelHPEnemy.setText(f"{mon[0]} Hitpoints: {mon[1]}/{mon[2]}".capitalize())
+        self.progressBarEnemyHp.setValue(100)
+        self.Text(f"A {mon[0]} appears!")
+
     def InventoryText(self):
         self.mainTextBox.clear()
         I = Inventory
