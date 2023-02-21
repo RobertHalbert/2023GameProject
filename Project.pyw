@@ -162,7 +162,7 @@ class Inventory:
                 I.currentInventory.append('mushroom')
             else:
                 text = text + ' But there is no more space for mushrooms.'
-        if location == 'Farm':
+        if location == 'Cliffside Farms':
             text = 'You found an apple.'
             if len(set(I.currentInventory)) < I.inventoryLimit and I.currentInventory.count('mushroom') < 10:
                 text = text + ' You place it in your bag.'
@@ -191,11 +191,13 @@ class Inventory:
 class Flags:
     levelUp = False
     battle = False
+    magicAvailable = False
+    craftingAvailable = False
     gameStart = 0
     startingVillageFirstVisit = 0
     farmquest1 = 0
     magicQuest = 0
-    magicAvailable = 0
+    merchantQuest = 0
 
 class QuestChecks:
     ratsKilled = 0
@@ -256,10 +258,25 @@ class Dialogue:
         else: text = "Village"
         return text
     def Merchants(var):
+        invCount = MyForm.InventoryCount(MyForm)
+        apples = [s for s in invCount if 'apple' in s]
+        mushroom = [s for s in invCount if 'mushroom' in s]
         if var == 'enter':
            text = 'Merhcants place'
         elif var == 'Talk':
-            text = 'Hi'
+            if Flags.merchantQuest == 0:
+                text = 'If you bring me 5 mushrooms and 5 apples, I can teach you how to make your own potions.'
+                Flags.merchantQuest = 1
+            try:
+                if Flags.merchantQuest == 1 and mushroom[0][1] >= 5 and apples[0][1] >= 5:
+                    for i in range(5):
+                        Inventory.currentInventory.remove('apple')
+                        Inventory.currentInventory.remove('mushroom')
+                        Flags.merchantQuest = 2
+                        Flags.craftingAvailable = True
+                        text = 'Thanks'
+            except:
+                text = 'Hi'
         elif var == 'Buy Items':
             text = 'Tools'
         else: text =''
@@ -282,6 +299,7 @@ class Dialogue:
                 Flags.magicQuest = 1
             elif Flags.magicQuest == 2:
                 text = '"Good job. Here is some basic magic"'
+                Flags.magicAvailable = True
                 Flags.magicQuest = 3
             else: text = 'Hello'
         elif var == 'Buy Items':
@@ -296,7 +314,7 @@ class Dialogue:
                 text = '"Kill 5 rats in the farms north of here."'
                 Flags.farmquest1 = 1
             elif Flags.farmquest1 == 2:
-                text = '"Thanks for killing those rats"\nYou gained 5 gold and 5 experience"'
+                text = '"Thanks for killing those rats"\nYou gained 5 gold and 5 experience'
                 Flags.farmquest1 = 3
             else: text = 'Sup?'
         elif var == 'Buy Items':
@@ -692,7 +710,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                     b.setText('')
                 else:
                     b.setText('West')
-        if Flags.battle == True and Inventory.openInventory == False:
+        if Flags.battle == True and Inventory.openInventory == False and Flags.magicAvailable == True:
             b.setText('Magic') #TEMP?
         if Flags.levelUp == True:
             b.setText('Charisma')
@@ -1264,9 +1282,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         countInv = self.InventoryCount()
         for x in range(len(compInv)):
             if countInv[x][1] == 1:
-                self.Text(f'{countInv[x][0]}\t{I.eDictionary[countInv[x][0]][0]}\t\t{I.eDictionary[countInv[x][0]][2]} {I.eDictionary[countInv[x][0]][1]}')
+                self.Text(f'{countInv[x][0]}\t\t{I.eDictionary[countInv[x][0]][0]}\t\t{I.eDictionary[countInv[x][0]][2]} {I.eDictionary[countInv[x][0]][1]}')
             else:
-                self.Text(f'{countInv[x][0]}\t{I.eDictionary[countInv[x][0]][0]}  x{countInv[x][1]}\t{I.eDictionary[countInv[x][0]][2]} {I.eDictionary[countInv[x][0]][1]}')
+                self.Text(f'{countInv[x][0]}\t\t{I.eDictionary[countInv[x][0]][0]}  x{countInv[x][1]}\t{I.eDictionary[countInv[x][0]][2]} {I.eDictionary[countInv[x][0]][1]}')
 
     def InventoryCount(self):
         I = Inventory
@@ -1313,42 +1331,42 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def EncounterSystem(self,chance):
         area = Locations.currentLocation
         roll = random.randint
-        itemFind = -20
-        enemyEncounter = -20
-        randomEvent = -20 
+        itemFind = 0
+        enemyEncounter = 0  - (PlayerCharacter.charisma/10)
+        randomEvent = 0 
         if Locations.overworld == True:
             if area == 'Forest':
-                itemFind = (5 + roll(1,100)) * chance
-                enemyEncounter = (5 + roll(1,100)) * chance
-                randomEvent = (15 + roll(1,100)) * chance
+                itemFind += (5 + roll(1,100)) * chance
+                enemyEncounter += (5 + roll(1,100)) * chance
+                randomEvent += (15 + roll(1,100)) * chance
             if area == 'Cliffside Farms':
-                itemFind = (0 + roll(1,100)) * chance
-                enemyEncounter = (0 + roll(1,100)) * chance
-                randomEvent = (10 + roll(1,100)) * chance
+                itemFind += (0 + roll(1,100)) * chance
+                enemyEncounter += (0 + roll(1,100)) * chance
+                randomEvent += (10 + roll(1,100)) * chance
             if area == 'Lighthouse Road':
-                itemFind = (-15 + roll(1,100)) * chance
-                enemyEncounter = (-30 + roll(1,100)) * chance
-                randomEvent = (5 + roll(1,100)) * chance
+                itemFind += (-15 + roll(1,100)) * chance
+                enemyEncounter += (-30 + roll(1,100)) * chance
+                randomEvent += (5 + roll(1,100)) * chance
             if area == 'Cliffside Plains':
-                itemFind = (-5 + roll(1,100)) * chance
-                enemyEncounter = (-5 + roll(1,100)) * chance
-                randomEvent = (5 + roll(1,100)) * chance
+                itemFind += (-5 + roll(1,100)) * chance
+                enemyEncounter += (-5 + roll(1,100)) * chance
+                randomEvent += (5 + roll(1,100)) * chance
             if area == 'Westcliff Plains':
-                itemFind = (-5 + roll(1,100)) * chance
-                enemyEncounter = (-50 + roll(1,100)) * chance
-                randomEvent = (5 + roll(1,100)) * chance
+                itemFind += (-5 + roll(1,100)) * chance
+                enemyEncounter += (-50 + roll(1,100)) * chance
+                randomEvent += (5 + roll(1,100)) * chance
             if area == 'Westcliff Road':
-                itemFind = (-5 + roll(1,100)) * chance
-                enemyEncounter = (5 + roll(1,100)) * chance
-                randomEvent = (10 + roll(1,100)) * chance
+                itemFind += (-5 + roll(1,100)) * chance
+                enemyEncounter += (5 + roll(1,100)) * chance
+                randomEvent += (10 + roll(1,100)) * chance
             if area == 'Westcliff Beach':
-                itemFind = (-5 + roll(1,100)) * chance
-                enemyEncounter = (5 + roll(1,100)) * chance
-                randomEvent = (0 + roll(1,100)) * chance
+                itemFind += (-5 + roll(1,100)) * chance
+                enemyEncounter += (5 + roll(1,100)) * chance
+                randomEvent += (0 + roll(1,100)) * chance
             if area == 'Westcliff Shallows':
-                itemFind = (-10 + roll(1,100)) * chance
-                enemyEncounter = (5 + roll(1,100)) * chance
-                randomEvent = (5 + roll(1,100)) * chance
+                itemFind += (-10 + roll(1,100)) * chance
+                enemyEncounter += (5 + roll(1,100)) * chance
+                randomEvent += (5 + roll(1,100)) * chance
         print(itemFind,enemyEncounter,randomEvent)  
         if itemFind > enemyEncounter and itemFind > randomEvent and itemFind > 10:
             self.Text(Inventory.ItemFindFunction(area))

@@ -5,4 +5,5 @@ count = 0
 for i in compiledList:
     numberedList[count] = [i,thisList.count(i)]
     count += 1
-print(numberedList[0][1])
+matching = [s for s in numberedList if 'one' in s]
+print(matching[0][1])
