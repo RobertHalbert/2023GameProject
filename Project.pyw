@@ -83,14 +83,19 @@ class PlayerCharacter():
     xpNeeded = 999999
     slots = 1
     slotsleft = 1
+    def HealFunction(ammount):
+        PlayerCharacter.currentHP += ammount
+        if PlayerCharacter.currentHP > PlayerCharacter.hp:
+            PlayerCharacter.currentHP = PlayerCharacter.hp
     
 class Inventory:
+    openCrafting = False
     openInventory = False
     openStore = False
     openSell = False
     gold = 20
     inventoryLimit = 9
-    currentInventory = ['cloth','club','apple','apple']
+    currentInventory = ['cloth','club','apple','apple','apple','apple','apple','apple','mushroom','mushroom','mushroom','mushroom','mushroom','mushroom']
     equipment = ['cloth','hands','','']
     eDictionary= {
         # ITEM : ['Description',Variable,Application,Type,Value, max allowed]
@@ -127,31 +132,30 @@ class Inventory:
                     text = f'You remove the {item}'
                     if I.equipment[1] == '':
                         I.equipment[1] = 'hands'
-                    return text 
             if I.eDictionary[item][3] == 'a':
                 text = f'You don the {item}'
                 I.equipment[0] = item
-                return text
             if I.eDictionary[item][3] == 'w':
                 text = f'You equip the {item}'
                 I.equipment[1] = item
-                return text
             if I.eDictionary[item][3] == 'r':
                 text = f'You put the {item} on your finger'
                 I.equipment[2] = item
-                return text
             if I.eDictionary[item][3] == 'n':
                 text = f'You wear the {item} around your neck'
                 I.equipment[3] = item
-                return text
             if I.eDictionary[item][3] == 'i':
                 if item == 'apple':
                     text = f'You eat the {item}.'
                     I.currentInventory.remove(item)
-                    return text
-                
+                if item == 'potion':
+                    text = 'You drink the potion. You feel better'
+                    PlayerCharacter.HealFunction(5)
+                    I.currentInventory.remove(item)            
         except:
             pass
+        
+        return text    
     def ItemFindFunction(location):
         I = Inventory
         text = ''
@@ -264,9 +268,7 @@ class Dialogue:
         if var == 'enter':
            text = 'Merhcants place'
         elif var == 'Talk':
-            if Flags.merchantQuest == 0:
-                text = 'If you bring me 5 mushrooms and 5 apples, I can teach you how to make your own potions.'
-                Flags.merchantQuest = 1
+            text = ''
             try:
                 if Flags.merchantQuest == 1 and mushroom[0][1] >= 5 and apples[0][1] >= 5:
                     for i in range(5):
@@ -277,9 +279,11 @@ class Dialogue:
                         text = 'Thanks'
             except:
                 text = 'Hi'
+            if Flags.merchantQuest == 0:
+                text = 'If you bring me 5 mushrooms and 5 apples, I can teach you how to make your own potions.'
+                Flags.merchantQuest = 1
         elif var == 'Buy Items':
             text = 'Tools'
-        else: text =''
         return text
     def Blacksmiths(var):
         if var == 'enter':
@@ -552,7 +556,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         buttonpressed = 'self.Button' + button +'Pressed()'
         I = Inventory
         eval(buttonpressed)
-        if (I.openInventory == False) and (I.openStore == False) and (I.openSell == False):
+        if (I.openInventory == False) and (I.openStore == False) and (I.openSell == False) and (I.openCrafting == False):
             self.ButtonUpdate()
 
     def StartGame(self):
@@ -677,7 +681,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if Flags.battle == False:
             if L.overworld == False:
                 if A == 'Home':
-                    b.setText('')
+                    if Flags.craftingAvailable == True:
+                        b.setText('Craft')
+                    else:
+                        b.setText('')   
                 if A == 'Westcliff':
                     b.setText('Magician')
                 if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
@@ -893,6 +900,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         b = self.ButtonR.text()
         L = Locations
         c = Locations.currentLocation
+        if b == 'Craft':
+            Inventory.openCrafting = True
+            self.CraftingFuction()
         if b == 'Magician':
             self.RoomChangeFunction(c,'Magicians','enter')
         if b == 'Westcliff' or b == 'Westcliff Docks' or b == 'Lighthouse':
@@ -906,6 +916,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         b = self.ButtonA.text()
         L = Locations
         c = Locations.currentLocation
+        if b == 'Potion':
+            self.MakePotion()
         if Inventory.openInventory == True:
             self.InventoryFunction(b)
         if Inventory.openSell == True:
@@ -1000,8 +1012,31 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         L = Locations
         if b == 'Leave':
             self.LeaveFunction(c,None)
+            self.ButtonUpdate()
 
 ##### ACTION FUNCTIONS (called by player action)#####
+    def CraftingFuction(self):
+        invCount = self.InventoryCount()
+        apples = [s for s in invCount if 'apple' in s]
+        mushroom = [s for s in invCount if 'mushroom' in s]
+        I = Inventory
+        b = 'self.Button'
+        buttonList = ['Q','W','E','A','S','D','Z','X','C']
+        t = '.setText'
+        self.ButtonV.setText('Leave'),self.ButtonV.setEnabled(True)
+        self.ButtonZ.setText('')
+        self.ButtonR.setText('')
+        for i in buttonList:
+            eval(b+i+t+'("""""")')
+            eval(b+i+'.setEnabled(False)')
+        self.ButtonA.setText('Potion')
+        try:
+            if apples[0][1] > 0 and mushroom[0][1] > 0:
+                self.ButtonA.setEnabled(True)
+            self.Text('Potion:  Heals 5HP    Requires: 1 Apple, 1 Mushroom')
+        except:
+            pass
+
     def MonsterAction(self):
         roll = random.randint(1,100)
         mon = MonsterCharacter.monster
@@ -1163,12 +1198,14 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.UpdateInformation()
 
     def LeaveFunction(self,location,var):
+        I = Inventory
         L = Locations
         A = location
-        if Inventory.openInventory == True or Inventory.openStore == True or Inventory.openSell == True:
+        if I.openInventory == True or I.openStore == True or I.openSell == True or I.openCrafting == True:
             Inventory.openInventory = False
             Inventory.openStore = False
             Inventory.openSell = False
+            Inventory.openCrafting = False
             self.mainTextBox.clear()
             self.DialogueFunction(Locations.currentLocation,'enter')
         else:
@@ -1244,6 +1281,12 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.EncounterSystem(0.12)
 
 ##### OHER HELPER FUNCTIONS #####
+    def MakePotion(self):
+        self.Text('You make a potion')
+        Inventory.currentInventory.remove('apple')
+        Inventory.currentInventory.remove('mushroom')
+        Inventory.currentInventory.append('potion')
+        self.CraftingFuction()
 
     def MonsterQuestCheck(self,monster):
         if monster == 'rat' and Flags.farmquest1 == 1:
@@ -1336,12 +1379,12 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         randomEvent = 0 
         if Locations.overworld == True:
             if area == 'Forest':
-                itemFind += (5 + roll(1,100)) * chance
-                enemyEncounter += (5 + roll(1,100)) * chance
-                randomEvent += (15 + roll(1,100)) * chance
-            if area == 'Cliffside Farms':
-                itemFind += (0 + roll(1,100)) * chance
+                itemFind += (-5 + roll(1,100)) * chance
                 enemyEncounter += (0 + roll(1,100)) * chance
+                randomEvent += (10 + roll(1,100)) * chance
+            if area == 'Cliffside Farms':
+                itemFind += (-5 + roll(1,100)) * chance
+                enemyEncounter += (-5 + roll(1,100)) * chance
                 randomEvent += (10 + roll(1,100)) * chance
             if area == 'Lighthouse Road':
                 itemFind += (-15 + roll(1,100)) * chance
