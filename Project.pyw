@@ -48,13 +48,13 @@ class Skills:
         return text
 
 class MonsterCharacter():
-    # [name,currenthp,maxhp,weaponname,damage,armor/fur/clothes/etc.,defense,xpvalue]
+    # [name,currenthp,maxhp,weaponname,damage,armor/fur/clothes/etc.,defense,xpvalue,level]
     monster = ''
-    rat = ['rat',5,5,'claws',1,'fur',0,1]
-    slime = ['slime',8,8,'slime',1,'slime',0,3]
-    crab = ['crab', 10,10,'pincers',3,'shell',1,5]
-    hawk = ['hawk',12,12,'talons',5,'feathers',1,8]
-    thief = ['theif',15,15,'dagger',8,'leather',4,12]
+    rat = ['rat',5,5,'claws',1,'fur',0,1,1]
+    slime = ['slime',8,8,'slime',1,'slime',0,3,1]
+    crab = ['crab', 10,10,'pincers',3,'shell',1,5,2]
+    hawk = ['hawk',12,12,'talons',5,'feathers',1,8,3]
+    thief = ['theif',15,15,'dagger',8,'leather',4,12,5]
 
 class PlayerCharacter():
     def __init__(self, name, hp, stamina, attack, defence, strength, dexterity, arcane, constitution, charisma, level):
@@ -726,7 +726,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                     b.setText('')
             else:
-                if (x == 3 and (y >=1 and y <=11)) or (x == 22 and y >=12):
+                if (x == 3 and (y >=1 and y <=11)) or (x == 22 and y >=12) or (x == 28 and (y >= 1 and y <=8)):
                     b.setText('')
                 else:
                     b.setText('West')
@@ -757,6 +757,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         L = Locations
         Ll = L.currentCoord
         A = locale[0]
+        x = Ll[0]
+        y = Ll[1]
         if Flags.battle == False:
             if L.overworld == False:
                 if A == 'Home':
@@ -766,7 +768,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                     b.setText('')
             else:
-                if Ll[0] == 24 and (Ll[1] >= 6 and Ll[1] <=8):
+                if (x == 24 and (y >= 1 and y <=8)):
                     b.setText('')
                 else:
                     b.setText('East')
@@ -803,6 +805,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         L = Locations
         A = locale[0]
         Lc = L.currentCoord
+        x = Lc[0]
+        y = Lc[1]
         if Flags.battle == False:
             if L.overworld == False:
                 if A == 'Home':
@@ -812,7 +816,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                     b.setText('')
             if L.overworld == True:
-                if ((Lc[0] >= 3 and Lc[0] <= 20) and Lc[1] == 1):
+                if ((x >= 3 and x <= 24) and y == 1) or ((x>=25 and x<=27) and y==9):
                     b.setText('')
                 else:
                     b.setText('South')
@@ -1198,6 +1202,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def BattleFunction(self,action):
         I = Inventory.equipment[1]
         W = Inventory.eDictionary[I]
+      #  dexCheck = (PlayerCharacter.dexterity*(PlayerCharacter.level/MonsterCharacter.monster[8])) #DEBUG
+        dexCheck = 3
         if action == 'Attack':
             strengthBonus = round(PlayerCharacter.strength/(PlayerCharacter.strength+W[1]))
             damage = strengthBonus + W[1]
@@ -1206,10 +1212,14 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if action == 'Defend':
             self.Text('You defend')
         if action == 'Run':
-            self.Text('You run')
-            Flags.battle = False
-            self.frameEnemyInfo.setVisible(False)
-            return
+            runChance = random.randint(1,100)
+            if runChance < (50*(0.25 + dexCheck)-25):
+                self.Text('You run away.')
+                Flags.battle = False
+                self.frameEnemyInfo.setVisible(False)
+                return
+            else:
+                self.Text('You try to run, but are unable to get away.')
         if action == 'Wait':
             self.Text('You wait')
         if action == 'Magic':
@@ -1370,7 +1380,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if ((x >= 13 and x <= 15) or (x >= 17 and x <= 20)) and y == 6:
             Ll = 'Westcliff Beach'
             self.SetTime(45)
-        if (x >= 13 and x <= 20) and (y >= 1 and y <= 5):
+        if (x >= 13 and x <= 24) and (y >= 1 and y <= 5):
             Ll = 'Westcliff Shallows'
             self.SetTime(60)
         # AREA 2
