@@ -248,6 +248,8 @@ class Locations:
 
 class Dialogue:
     text = ''
+    def Introduction(var):
+        text = f""
     def Home(var):
         if var == 'start':
             text = "Game Started\n" + "Your Home"
@@ -742,6 +744,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def UpdateDButton(self,locale):
         b = self.ButtonD
         L = Locations
+        Ll = L.currentCoord
         A = locale[0]
         if Flags.battle == False:
             if L.overworld == False:
@@ -752,7 +755,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                     b.setText('')
             else:
-                b.setText('East')
+                if Ll[0] == 24 and (Ll[1] >= 6 and Ll[1] <=8):
+                    b.setText('')
+                else:
+                    b.setText('East')
         if (Flags.battle == True and Inventory.openInventory == False) or Flags.levelUp == True:
             b.setText('')
 
@@ -795,7 +801,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                     b.setText('')
             if L.overworld == True:
-                if (Lc[0] >= 3 and Lc[0] <= 20) and Lc[1] == 1:
+                if ((Lc[0] >= 3 and Lc[0] <= 20) and Lc[1] == 1):
                     b.setText('')
                 else:
                     b.setText('South')
@@ -1014,7 +1020,137 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.LeaveFunction(c,None)
             self.ButtonUpdate()
 
-##### ACTION FUNCTIONS (called by player action)#####
+##### Other FUNCTIONS #####
+    def RestFunction(self):
+        self.SetTime(180)
+        PlayerCharacter.currentHP = PlayerCharacter.hp
+        self.Text("Rest for 3 hours.")
+        PlayerCharacter.slotsleft = PlayerCharacter.slots
+        self.UpdateInformation()
+
+    def LeaveFunction(self,location,var):
+        I = Inventory
+        L = Locations
+        A = location
+        if I.openInventory == True or I.openStore == True or I.openSell == True or I.openCrafting == True:
+            Inventory.openInventory = False
+            Inventory.openStore = False
+            Inventory.openSell = False
+            Inventory.openCrafting = False
+            self.mainTextBox.clear()
+            self.DialogueFunction(Locations.currentLocation,'enter')
+        else:
+            if A == 'Home' or A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
+                L.currentLocation = 'Westcliff'
+            if A == 'Westcliff' or A == 'Westcliff Docks' or A == 'Lighhouse':
+                L.overworld = True
+            self.DialogueFunction(L.currentLocation,var)
+            self.SetTime(5)
+            self.labelLocation.setText(Locations.currentLocation)
+
+    def EnterRoom(self,location,target):
+        if location == 'Westcliff' or location == 'Lighthouse' or location == 'Westcliff Docks':
+            Locations.currentLocation = target
+            Locations.overworld = False   
+        self.SetTime(5)     
+        self.labelLocation.setText(Locations.currentLocation)
+    
+
+### INVENTORY RELATED FUNCTIONS ###
+
+    def BuyItemFunction(self,item):
+        I = Inventory
+        itemCost = I.eDictionary[item][4]
+        if itemCost > I.gold:
+            self.Text('You do not have enough gold!')
+        else:
+            self.Text(f'You bought a {item}')
+            I.gold -= itemCost
+            I.currentInventory.append(item)
+            self.UpdateInformation()
+
+    def InventoryCount(self):
+        I = Inventory
+        compInv = set(I.currentInventory)
+        countInv = [''] * len(compInv)
+        count = 0
+        for i in compInv:
+            countInv[count] = [i,I.currentInventory.count(i)]
+            count += 1
+        return countInv
+
+    def InventoryFunction(self,item):
+        item = item.translate({ord(i): None for i in 'x2345678910 '})
+        if Inventory.openInventory == True:
+            text = Inventory.EquipFunction(item)
+            self.Text(text)
+            self.OpenInventory()
+        if Inventory.openSell == True:
+            self.SellItemFunction(item)
+        self.UpdateInformation()
+        if Flags.battle == True:
+            self.BattleFunction('')
+
+    def InventoryText(self):
+        self.mainTextBox.clear()
+        I = Inventory
+        self.Text('-------------------------------------------------------------------------------')
+        compInv = set(I.currentInventory)
+        countInv = self.InventoryCount()
+        for x in range(len(compInv)):
+            if countInv[x][1] == 1:
+                self.Text(f'{countInv[x][0]}\t\t{I.eDictionary[countInv[x][0]][0]}\t\t{I.eDictionary[countInv[x][0]][2]} {I.eDictionary[countInv[x][0]][1]}')
+            else:
+                self.Text(f'{countInv[x][0]}\t\t{I.eDictionary[countInv[x][0]][0]}  x{countInv[x][1]}\t{I.eDictionary[countInv[x][0]][2]} {I.eDictionary[countInv[x][0]][1]}')
+
+    def OpenInventory(self):
+        I = Inventory
+        b = 'self.Button'
+        buttonList = ['Q','W','E','A','S','D','Z','X','C']
+        t = '.setText'
+        self.ButtonV.setText('Leave'),self.ButtonV.setEnabled(True)
+        self.ButtonZ.setText('')
+        invCount = self.InventoryCount()
+        if len(I.currentInventory) < 10:
+            self.ButtonR.setText(''),self.ButtonR.setEnabled(False)
+            self.ButtonF.setText(''),self.ButtonR.setEnabled(False)
+        for i in buttonList:
+            eval(b+i+t+'("""""")')
+            eval(b+i+'.setEnabled(False)')
+        for i in range(len(invCount)):
+            if invCount[i][1] == 1:
+                eval(b+buttonList[i]+t+f'("{invCount[i][0]}")')
+            elif invCount[i][1] > 1:
+                eval(b+buttonList[i]+t+f'("{invCount[i][0]} x{invCount[i][1]}")')
+
+        for i in range(len(set(I.currentInventory))):
+            buttonText = eval(b + buttonList[i] +".text()")
+            if buttonText == '':
+                eval('self.Button'+buttonList[i]+'.setEnabled(False)')
+            else:
+                eval('self.Button'+buttonList[i]+'.setEnabled(True)')
+
+    def SellItemFunction(self,item):
+        I = Inventory
+        for x in I.currentInventory:
+            if item in I.equipment:
+                self.Text('You cannot sell equipped items.')
+                break
+        else:
+            self.Text(f"You sell the item for {I.eDictionary[item][4]} gold.")
+            I.gold += I.eDictionary[f'{item}'][4]
+            self.UpdateInformation()
+            I.currentInventory.remove(item)
+            self.OpenInventory()
+
+    def SellItemsInventory(self):
+        Inventory.openSell = True
+        self.OpenInventory()
+
+### ###
+
+### CRAFTING FUNCTIONS ###
+
     def CraftingFuction(self):
         invCount = self.InventoryCount()
         apples = [s for s in invCount if 'apple' in s]
@@ -1037,23 +1173,16 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         except:
             pass
 
-    def MonsterAction(self):
-        roll = random.randint(1,100)
-        mon = MonsterCharacter.monster
-        self.Text(f'The {mon[0]} attacks with its {mon[3]}.')
-        if roll >= (PlayerCharacter.dexterity*2):
-            self.Text(f'It deals {mon[4]} damage.')
-            PlayerCharacter.currentHP -= mon[4] - Inventory.eDictionary[Inventory.equipment[0]][1]
-        else:
-            self.Text('But it missed.')
-        mon = MonsterCharacter.monster
-        hp = round(100 * (mon[1]/mon[2]))
-        self.labelHPEnemy.setText(f"{mon[0]} Hitpoints: {mon[1]}/{mon[2]}".capitalize())
-        self.progressBarEnemyHp.setValue(hp)
-        self.UpdateInformation()
-        if PlayerCharacter.currentHP <=0:
-            Flags.battle = False
-            self.LossSystem()
+    def MakePotion(self):
+        self.Text('You make a potion')
+        Inventory.currentInventory.remove('apple')
+        Inventory.currentInventory.remove('mushroom')
+        Inventory.currentInventory.append('potion')
+        self.CraftingFuction()
+
+### ###
+
+### BATTLE RELATED FUNTIONS ###
 
     def BattleFunction(self,action):
         I = Inventory.equipment[1]
@@ -1086,6 +1215,69 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.UpdateInformation()
             return
         self.MonsterAction()
+
+    def LossSystem(self):
+        self.mainTextBox.clear()
+        self.Text(f'You were defeated by the {MonsterCharacter.monster[0]}...')
+        self.Text(f"You lost {round(Inventory.gold/2)} gold...")
+        Inventory.gold = round(Inventory.gold/2)
+        if Locations.area == 0:
+            Locations.currentLocation = 'Home'
+            Locations.currentCoord = [11,7]
+            Locations.overworld = False
+            PlayerCharacter.currentHP = PlayerCharacter.hp
+            self.UpdateInformation()
+
+    def MonsterAction(self):
+        roll = random.randint(1,100)
+        mon = MonsterCharacter.monster
+        self.Text(f'The {mon[0]} attacks with its {mon[3]}.')
+        if roll >= (PlayerCharacter.dexterity*2):
+            self.Text(f'It deals {mon[4]} damage.')
+            PlayerCharacter.currentHP -= mon[4] - Inventory.eDictionary[Inventory.equipment[0]][1]
+        else:
+            self.Text('But it missed.')
+        mon = MonsterCharacter.monster
+        hp = round(100 * (mon[1]/mon[2]))
+        self.labelHPEnemy.setText(f"{mon[0]} Hitpoints: {mon[1]}/{mon[2]}".capitalize())
+        self.progressBarEnemyHp.setValue(hp)
+        self.UpdateInformation()
+        if PlayerCharacter.currentHP <=0:
+            Flags.battle = False
+            self.LossSystem()
+
+    def MonsterSelection(self,location):
+        self.mainTextBox.clear()
+        if location == 'Cliffside Farms' or location == 'Lighthouse Road':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'rat')
+        if location == 'Forest':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'slime')
+        if location == 'Westcliff Beach' or location == 'Westcliff Shallows':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'crab')
+        if location == 'Westcliff Plains':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'hawk')
+        if location == 'Westcliff Road':
+            MonsterCharacter.monster = getattr(MonsterCharacter,'thief')
+        mon = MonsterCharacter.monster
+        mon[1]=mon[2]
+        self.labelEnemy.setText(f"{mon[0]}".capitalize())
+        self.labelHPEnemy.setText(f"{mon[0]} Hitpoints: {mon[1]}/{mon[2]}".capitalize())
+        self.progressBarEnemyHp.setValue(100)
+        self.Text(f"A {mon[0]} appears!")
+
+    def MonsterQuestCheck(self,monster):
+        if monster == 'rat' and Flags.farmquest1 == 1:
+            QuestChecks.ratsKilled += 1
+            if QuestChecks.ratsKilled >= 5:
+                Flags.farmquest1 = 2
+        if monster == 'slime' and Flags.magicQuest == 1:
+            QuestChecks.slimesKilled += 1
+            if QuestChecks.slimesKilled >= 10:
+                Flags.magicQuest = 2
+
+### ###
+
+## SHOP RELATED FUNCTIONS ###
 
     def ShopFunction(self):
         shopItems = NpcShops.shopsDictionary[Locations.currentLocation]
@@ -1123,107 +1315,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             theItem = I.eDictionary[itemT]
             self.Text(f'{itemT}\t {theItem[0]}\t\t{theItem[2]} {theItem[1]}\tPrice: {theItem[4]}')
 
-    def SellItemsInventory(self):
-        Inventory.openSell = True
-        self.OpenInventory()
+### ###
 
-    def SellItemFunction(self,item):
-        I = Inventory
-        for x in I.currentInventory:
-            if item in I.equipment:
-                self.Text('You cannot sell equipped items.')
-                break
-        else:
-            self.Text(f"You sell the item for {I.eDictionary[item][4]} gold.")
-            I.gold += I.eDictionary[f'{item}'][4]
-            self.UpdateInformation()
-            I.currentInventory.remove(item)
-            self.OpenInventory()
-
-    def BuyItemFunction(self,item):
-        I = Inventory
-        itemCost = I.eDictionary[item][4]
-        if itemCost > I.gold:
-            self.Text('You do not have enough gold!')
-        else:
-            self.Text(f'You bought a {item}')
-            I.gold -= itemCost
-            I.currentInventory.append(item)
-            self.UpdateInformation()
-
-    def InventoryFunction(self,item):
-        item = item.translate({ord(i): None for i in 'x2345678910 '})
-        if Inventory.openInventory == True:
-            text = Inventory.EquipFunction(item)
-            self.Text(text)
-            self.OpenInventory()
-        if Inventory.openSell == True:
-            self.SellItemFunction(item)
-        self.UpdateInformation()
-        if Flags.battle == True:
-            self.BattleFunction('')
-
-    def OpenInventory(self):
-        I = Inventory
-        b = 'self.Button'
-        buttonList = ['Q','W','E','A','S','D','Z','X','C']
-        t = '.setText'
-        self.ButtonV.setText('Leave'),self.ButtonV.setEnabled(True)
-        self.ButtonZ.setText('')
-        invCount = self.InventoryCount()
-        if len(I.currentInventory) < 10:
-            self.ButtonR.setText(''),self.ButtonR.setEnabled(False)
-            self.ButtonF.setText(''),self.ButtonR.setEnabled(False)
-        for i in buttonList:
-            eval(b+i+t+'("""""")')
-            eval(b+i+'.setEnabled(False)')
-        for i in range(len(invCount)):
-            if invCount[i][1] == 1:
-                eval(b+buttonList[i]+t+f'("{invCount[i][0]}")')
-            elif invCount[i][1] > 1:
-                eval(b+buttonList[i]+t+f'("{invCount[i][0]} x{invCount[i][1]}")')
-
-        for i in range(len(set(I.currentInventory))):
-            buttonText = eval(b + buttonList[i] +".text()")
-            if buttonText == '':
-                eval('self.Button'+buttonList[i]+'.setEnabled(False)')
-            else:
-                eval('self.Button'+buttonList[i]+'.setEnabled(True)')
-
-    def RestFunction(self):
-        self.SetTime(180)
-        PlayerCharacter.currentHP = PlayerCharacter.hp
-        self.Text("Rest for 3 hours.")
-        PlayerCharacter.slotsleft = PlayerCharacter.slots
-        self.UpdateInformation()
-
-    def LeaveFunction(self,location,var):
-        I = Inventory
-        L = Locations
-        A = location
-        if I.openInventory == True or I.openStore == True or I.openSell == True or I.openCrafting == True:
-            Inventory.openInventory = False
-            Inventory.openStore = False
-            Inventory.openSell = False
-            Inventory.openCrafting = False
-            self.mainTextBox.clear()
-            self.DialogueFunction(Locations.currentLocation,'enter')
-        else:
-            if A == 'Home' or A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
-                L.currentLocation = 'Westcliff'
-            if A == 'Westcliff' or A == 'Westcliff Docks' or A == 'Lighhouse':
-                L.overworld = True
-            self.DialogueFunction(L.currentLocation,var)
-            self.SetTime(5)
-            self.labelLocation.setText(Locations.currentLocation)
-
-    def EnterRoom(self,location,target):
-        if location == 'Westcliff' or location == 'Lighthouse' or location == 'Westcliff Docks':
-            Locations.currentLocation = target
-            Locations.overworld = False   
-        self.SetTime(5)     
-        self.labelLocation.setText(Locations.currentLocation)
-
+### OVERWORLD \ LOCATION FUCTIONS ###
     def CheckCoords(self):
         Lc = Locations.currentCoord
         Ll = Locations.currentLocation
@@ -1264,113 +1358,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.SetTime(60)
         Locations.currentLocation = Ll
         self.UpdateInformation()
-        
-    def OverWorldMovement(self,button):
-        Lc = Locations.currentCoord
-        if button == 'w':
-            Lc[1] += 1
-        if button == 'x':
-            Lc[1] -= 1
-        if button == 'd':
-            Lc[0] += 1
-        if button == 'a':
-            Lc[0] -= 1
-        Locations.currentCoord = Lc
-        print(Locations.currentCoord)
-        self.CheckCoords()
-        self.EncounterSystem(0.12)
-
-##### OHER HELPER FUNCTIONS #####
-    def MakePotion(self):
-        self.Text('You make a potion')
-        Inventory.currentInventory.remove('apple')
-        Inventory.currentInventory.remove('mushroom')
-        Inventory.currentInventory.append('potion')
-        self.CraftingFuction()
-
-    def MonsterQuestCheck(self,monster):
-        if monster == 'rat' and Flags.farmquest1 == 1:
-            QuestChecks.ratsKilled += 1
-            if QuestChecks.ratsKilled >= 5:
-                Flags.farmquest1 = 2
-        if monster == 'slime' and Flags.magicQuest == 1:
-            QuestChecks.slimesKilled += 1
-            if QuestChecks.slimesKilled >= 10:
-                Flags.magicQuest = 2
-
-    def MonsterSelection(self,location):
-        self.mainTextBox.clear()
-        if location == 'Cliffside Farms' or location == 'Lighthouse Road':
-            MonsterCharacter.monster = getattr(MonsterCharacter,'rat')
-        if location == 'Forest':
-            MonsterCharacter.monster = getattr(MonsterCharacter,'slime')
-        if location == 'Westcliff Beach' or location == 'Westcliff Shallows':
-            MonsterCharacter.monster = getattr(MonsterCharacter,'crab')
-        if location == 'Westcliff Plains':
-            MonsterCharacter.monster = getattr(MonsterCharacter,'hawk')
-        if location == 'Westcliff Road':
-            MonsterCharacter.monster = getattr(MonsterCharacter,'thief')
-        mon = MonsterCharacter.monster
-        mon[1]=mon[2]
-        self.labelEnemy.setText(f"{mon[0]}".capitalize())
-        self.labelHPEnemy.setText(f"{mon[0]} Hitpoints: {mon[1]}/{mon[2]}".capitalize())
-        self.progressBarEnemyHp.setValue(100)
-        self.Text(f"A {mon[0]} appears!")
-
-    def InventoryText(self):
-        self.mainTextBox.clear()
-        I = Inventory
-        self.Text('-------------------------------------------------------------------------------')
-        compInv = set(I.currentInventory)
-        countInv = self.InventoryCount()
-        for x in range(len(compInv)):
-            if countInv[x][1] == 1:
-                self.Text(f'{countInv[x][0]}\t\t{I.eDictionary[countInv[x][0]][0]}\t\t{I.eDictionary[countInv[x][0]][2]} {I.eDictionary[countInv[x][0]][1]}')
-            else:
-                self.Text(f'{countInv[x][0]}\t\t{I.eDictionary[countInv[x][0]][0]}  x{countInv[x][1]}\t{I.eDictionary[countInv[x][0]][2]} {I.eDictionary[countInv[x][0]][1]}')
-
-    def InventoryCount(self):
-        I = Inventory
-        compInv = set(I.currentInventory)
-        countInv = [''] * len(compInv)
-        count = 0
-        for i in compInv:
-            countInv[count] = [i,I.currentInventory.count(i)]
-            count += 1
-        return countInv
-
-    def QuestRewards(self,quest):
-        if quest == 'Farm':
-            PlayerCharacter.currentXp += 5
-            Inventory.gold += 5
-        if quest == 'Magic':
-            PlayerCharacter.currentXp += 5
-            Flags.magicAvailable = 1
-            PlayerCharacter.slotsleft = PlayerCharacter.slots
-            self.labelSlots.setVisible(True)
-        self.UpdateInformation()
-
-    def QuestCheck(self):
-        if Flags.farmquest1 == 3:
-            self.QuestRewards('Farm')
-            Flags.farmquest1 = 4
-        if Flags.magicQuest == 3:
-            self.QuestRewards('Magic')
-            Flags.magicQuest = 4
-
-    def LossSystem(self):
-        self.mainTextBox.clear()
-        self.Text(f'You were defeated by the {MonsterCharacter.monster[0]}...')
-        self.Text(f"You lost {round(Inventory.gold/2)} gold...")
-        Inventory.gold = round(Inventory.gold/2)
-        if Locations.area == 0:
-            Locations.currentLocation = 'Home'
-            Locations.currentCoord = [11,7]
-            Locations.overworld = False
-            PlayerCharacter.currentHP = PlayerCharacter.hp
-            self.UpdateInformation()
-
-
+    
     def EncounterSystem(self,chance):
         area = Locations.currentLocation
         roll = random.randint
@@ -1422,6 +1410,46 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             print ('Random Event')
         self.UpdateInformation()
 
+    def LocationUpdate(self,location,var):
+        Locations.currentLocation = location
+        self.labelLocation.setText(Locations.currentLocation)
+        self.DialogueFunction(Locations.currentLocation,var)
+
+    def OverWorldMovement(self,button):
+        Lc = Locations.currentCoord
+        if button == 'w':
+            Lc[1] += 1
+        if button == 'x':
+            Lc[1] -= 1
+        if button == 'd':
+            Lc[0] += 1
+        if button == 'a':
+            Lc[0] -= 1
+        Locations.currentCoord = Lc
+        print(Locations.currentCoord)
+        self.CheckCoords()
+        self.EncounterSystem(0.12)
+
+### ###
+    def QuestRewards(self,quest):
+        if quest == 'Farm':
+            PlayerCharacter.currentXp += 5
+            Inventory.gold += 5
+        if quest == 'Magic':
+            PlayerCharacter.currentXp += 5
+            Flags.magicAvailable = 1
+            PlayerCharacter.slotsleft = PlayerCharacter.slots
+            self.labelSlots.setVisible(True)
+        self.UpdateInformation()
+
+    def QuestCheck(self):
+        if Flags.farmquest1 == 3:
+            self.QuestRewards('Farm')
+            Flags.farmquest1 = 4
+        if Flags.magicQuest == 3:
+            self.QuestRewards('Magic')
+            Flags.magicQuest = 4
+
     def UpdateDateTime(self):
         T = Time
         mi = T.minute
@@ -1431,11 +1459,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         dn = T.currentDayName
         self.labelTime.setText(f"Time: {h}:{mi:02}")
         self.labelDate.setText(f"Date: {dn}\t{d}/{mo:0>2d}")
-
-    def LocationUpdate(self,location,var):
-        Locations.currentLocation = location
-        self.labelLocation.setText(Locations.currentLocation)
-        self.DialogueFunction(Locations.currentLocation,var)
 
     def UpdateInformation(self):
         self.labelName.setText(PlayerCharacter.name)
