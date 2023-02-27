@@ -364,6 +364,15 @@ class Dialogue:
     def WestcliffDocks(var):
         text = 'Westcliff Docks'
         return text
+    def NorthRoad(var):
+        text = 'North Road'
+        return text
+    def DecoVineyard(var):
+        text = 'Deco Vineyard'
+        return text
+    def VineyardBuilding(var):
+        text = 'Vineyard Building'
+        return text
 
 class NonPlayerCharacters:
     pass
@@ -706,6 +715,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         L = Locations
         A = locale[0]
         Lc = Locations.currentCoord
+        x = Lc[0]
+        y = Lc[1]
         if Flags.battle == False:
             if L.overworld == False:
                 if A == 'Home':
@@ -715,7 +726,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                     b.setText('')
             else:
-                if Lc[0] == 3 and Lc[1] >=1 and Lc[1] <=11:
+                if (x == 3 and (y >=1 and y <=11)) or (x == 22 and y >=12):
                     b.setText('')
                 else:
                     b.setText('West')
@@ -1321,41 +1332,58 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def CheckCoords(self):
         Lc = Locations.currentCoord
         Ll = Locations.currentLocation
-        if Lc[0] == 11 and Lc[1] == 7:
+        x = Lc[0]
+        y = Lc[1]
+        if x == 11 and y == 7:
             Ll = 'Westcliff'
             self.SetTime(30)
-        if (Lc[0] >= 3 and Lc[0] <= 12) and (Lc[1] >= 1 and Lc[1] <= 6):
-            Ll = 'Forest'
-            self.SetTime(60)
-        if Lc[0] == 3 and Lc[1] == 7:
+        if x == 3 and y == 7:
             Ll = 'Lighthouse'
             self.SetTime(30)
-        if Lc[0] == 16 and Lc[1] == 6:
+        if x == 16 and y == 6:
             Ll = 'Westcliff Docks'
             self.SetTime(30)
+        if x == 28 and y == 10:
+            Ll = 'Vineyard Building'
+            self.SetTime(30)
 
-        # AREAS
-        if (Lc[0] >= 4 and Lc[0] <= 10) and Lc[1] == 7:
+        #### AREAS ####
+        # AREA 1
+        if (x >= 3 and x <= 12) and (y >= 1 and y <= 6):
+            Ll = 'Forest'
+            self.SetTime(60)
+        if (x >= 4 and x <= 10) and y == 7:
             Ll = 'Lighthouse Road'
             self.SetTime(30)
-        if (Lc[0] >= 3 and Lc[0] <= 7) and (Lc[1] >= 8 and Lc[1] <= 11):
+        if (x >= 3 and x <= 7) and (y >= 8 and y <= 11):
             Ll = 'Cliffside Plains'
             self.SetTime(45)
-        if (Lc[0] >= 8 and Lc[0] <= 14) and (Lc[1] >= 8 and Lc[1] <= 11):
+        if (x >= 8 and x <= 14) and (y >= 8 and y <= 11):
             Ll = 'Cliffside Farms'
             self.SetTime(45)
-        if (Lc[0] >= 12 and Lc[0] <= 24) and Lc[1] == 7:
+        if (x >= 12 and x <= 24) and y == 7:
             Ll = 'Westcliff Road'
             self.SetTime(30)
-        if (Lc[0] >= 15 and Lc[0] <= 24) and (Lc[1] >= 8 and Lc[1] <= 18):
+        if ((x >= 15 and x <= 24) and (y >= 8 and y <= 11)) or ((x>=22 and x<=24) and (y>=12 and y<=13)):
             Ll = 'Westcliff Plains'
             self.SetTime(45)
-        if ((Lc[0] >= 13 and Lc[0] <= 15) or (Lc[0] >= 17 and Lc[0] <= 20)) and Lc[1] == 6:
+        if ((x >= 13 and x <= 15) or (x >= 17 and x <= 20)) and y == 6:
             Ll = 'Westcliff Beach'
             self.SetTime(45)
-        if (Lc[0] >= 13 and Lc[0] <= 20) and (Lc[1] >= 1 and Lc[1] <= 5):
+        if (x >= 13 and x <= 20) and (y >= 1 and y <= 5):
             Ll = 'Westcliff Shallows'
             self.SetTime(60)
+        # AREA 2
+        if x != 28 and y != 10:
+            if (x >= 26 and x <=31) and (y >= 9 and y<=11):
+                Ll = 'Deco Vineyard'
+                self.SetTime(45)
+        if x == 25 and (y>=9 and y<=18):
+                Ll = 'North Road'
+                self.SetTime(30)
+
+
+
         Locations.currentLocation = Ll
         self.UpdateInformation()
     
