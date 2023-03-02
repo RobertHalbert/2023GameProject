@@ -4,12 +4,41 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget
 from PyQt5.QtCore import pyqtSignal, Qt
 import Ui_Game, Ui_CCWindow
 
+# File saving/loading
+class File:
+    def SaveGameFunction():
+        filename = './save.txt'
+        save_object = open(filename,'w')
+        sk = Skills
+        pc = PlayerCharacter
+        i = Inventory
+        f = Flags
+        t = Time
+        skills = [sk.crafting,sk.fishing,sk.gathering,sk.hunting]
+        stats = [pc.hp,pc.name,pc.level,pc.strength,pc.dexterity,pc.arcane,pc.constitution,
+                 pc.charisma,pc.apperenceList,pc.currentHP,pc.currentXp,pc.slotsleft]
+        items = [i.gold,i.inventoryLimit,i.currentInventory,i.equipment]
+        flags = [f.battle,f.magicAvailable,f.gameStart,f.startingVillageFirstVisit,
+                 f.farmquest1,f.magicQuest,f.merchantQuest]
+        time = [t.currentDayName,t.minute,t.hour,t.day,t.year]
+        location = [Locations.currentLocation,Locations.currentCoord,Locations.overworld]
+        compiled = [skills,stats,items,flags,time,location]
+        save_object.write(f"{compiled}")
+        save_object.close
+    def LoadGameFunction():
+        def filter_brackets(var):
+            b = ['[',']',"'",'"',' ',',']
+            return False if var in b else True
+        filename = './save.txt'
+        load_object = open(filename,'r')
+        compiled = load_object.read()
+        new = filter(filter_brackets,compiled)
+        load_object = tuple(new)
+        print(load_object)
+    
+    
+
 class Skills:
-    def __init__(self,fishing,gathering,hunting,crafting):
-        self.fishing = fishing
-        self.gathering = gathering
-        self.hunting = hunting
-        self.crafting = crafting
     fishing = 3
     gathering = 3
     hunting = 3
@@ -57,18 +86,6 @@ class MonsterCharacter():
     thief = ['theif',15,15,'dagger',8,'leather',4,12,5]
 
 class PlayerCharacter():
-    def __init__(self, name, hp, stamina, attack, defence, strength, dexterity, arcane, constitution, charisma, level):
-        self.strength = strength
-        self.dexterity = dexterity
-        self.arcane = arcane
-        self.constitution = constitution
-        self.charisma = charisma
-        self.level = level
-        self.name = name
-        self.hp = hp
-        self.stamina = stamina
-        self.attack = attack
-        self.defence = defence
     hp = 0
     name = ''
     level = 1
@@ -533,6 +550,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.ButtonX.clicked.connect(lambda:self.GridButtonPressed('X'))
         self.ButtonZ.clicked.connect(lambda:self.GridButtonPressed('Z'))
         self.actionExit_Game.triggered.connect(self.EndGame)
+        # self.actionSave_Game.triggered.connect(self.SaveGameTiggered)
+        # self.actionLoad_Game.triggered.connect(self.LoadGameTriggered)
         self.frameButtons.setVisible(False)
         self.frameInfo.setVisible(False)
         self.frameEnemyInfo.setVisible(False)
@@ -558,6 +577,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if event.key() == Qt.Key_F8: self.Debug()
 
 #Main Functions
+    def SaveGameTiggered(self):
+        File.SaveGameFunction()
+    def LoadGameTriggered(self):
+        File.LoadGameFunction()
+
     def Debug(self):
         PlayerCharacter.currentXp += 10
         self.UpdateInformation()
