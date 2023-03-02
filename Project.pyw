@@ -4,40 +4,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget
 from PyQt5.QtCore import pyqtSignal, Qt
 import Ui_Game, Ui_CCWindow
 
-# File saving/loading
-class File:
-    def SaveGameFunction():
-        filename = './save.txt'
-        save_object = open(filename,'w')
-        sk = Skills
-        pc = PlayerCharacter
-        i = Inventory
-        f = Flags
-        t = Time
-        skills = [sk.crafting,sk.fishing,sk.gathering,sk.hunting]
-        stats = [pc.hp,pc.name,pc.level,pc.strength,pc.dexterity,pc.arcane,pc.constitution,
-                 pc.charisma,pc.apperenceList,pc.currentHP,pc.currentXp,pc.slotsleft]
-        items = [i.gold,i.inventoryLimit,i.currentInventory,i.equipment]
-        flags = [f.battle,f.magicAvailable,f.gameStart,f.startingVillageFirstVisit,
-                 f.farmquest1,f.magicQuest,f.merchantQuest]
-        time = [t.currentDayName,t.minute,t.hour,t.day,t.year]
-        location = [Locations.currentLocation,Locations.currentCoord,Locations.overworld]
-        compiled = [skills,stats,items,flags,time,location]
-        save_object.write(f"{compiled}")
-        save_object.close
-    def LoadGameFunction():
-        def filter_brackets(var):
-            b = ['[',']',"'",'"',' ',',']
-            return False if var in b else True
-        filename = './save.txt'
-        load_object = open(filename,'r')
-        compiled = load_object.read()
-        new = filter(filter_brackets,compiled)
-        load_object = tuple(new)
-        print(load_object)
-    
-    
-
 class Skills:
     fishing = 3
     gathering = 3
@@ -100,6 +66,8 @@ class PlayerCharacter():
     xpNeeded = 999999
     slots = 1
     slotsleft = 1
+    harvests = 1
+    harvestsLeft = 1
     def HealFunction(ammount):
         PlayerCharacter.currentHP += ammount
         if PlayerCharacter.currentHP > PlayerCharacter.hp:
@@ -219,6 +187,7 @@ class Flags:
     farmquest1 = 0
     magicQuest = 0
     merchantQuest = 0
+    cityEntryQuest = 0
 
 class QuestChecks:
     ratsKilled = 0
@@ -390,6 +359,12 @@ class Dialogue:
     def VineyardBuilding(var):
         text = 'Vineyard Building'
         return text
+    def CityGuard(var):
+        if Flags.cityEntryQuest == 0:
+            text = 'Halt, this city is locked down until further notice due to the attacks from the north\nIf you want to enter the city, help us in securing the areas north of the city.'
+            Flags.cityEntryQuest = 1
+            return text
+        
 
 class NonPlayerCharacters:
     pass
@@ -550,8 +525,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         self.ButtonX.clicked.connect(lambda:self.GridButtonPressed('X'))
         self.ButtonZ.clicked.connect(lambda:self.GridButtonPressed('Z'))
         self.actionExit_Game.triggered.connect(self.EndGame)
-        # self.actionSave_Game.triggered.connect(self.SaveGameTiggered)
-        # self.actionLoad_Game.triggered.connect(self.LoadGameTriggered)
         self.frameButtons.setVisible(False)
         self.frameInfo.setVisible(False)
         self.frameEnemyInfo.setVisible(False)
@@ -577,10 +550,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if event.key() == Qt.Key_F8: self.Debug()
 
 #Main Functions
-    def SaveGameTiggered(self):
-        File.SaveGameFunction()
-    def LoadGameTriggered(self):
-        File.LoadGameFunction()
 
     def Debug(self):
         PlayerCharacter.currentXp += 10
@@ -703,7 +672,16 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 if A == 'Tavern':
                     b.setText('')
             else:
-                b.setText('')
+                if (L.currentCoord[0] >= 5 and L.currentCoord[0]<=10) and (L.currentCoord[1]>=3 and L.currentCoord[1]<=4):
+                    b.setText('Mushrooms')
+                elif (L.currentCoord[0] >= 8 and L.currentCoord[0]<=9) and (L.currentCoord[1]>=8 and L.currentCoord[1]<=11):
+                    b.setText('Apples')
+                elif (L.currentCoord[0] >= 5 and L.currentCoord[0]<=10) and (L.currentCoord[1]>=3 and L.currentCoord[1]<=4):
+                    b.setText('Fish')
+                elif (L.currentCoord[0] >= 17 and L.currentCoord[0]<=21) and (L.currentCoord[1]>=9 and L.currentCoord[1]<=11):
+                    b.setText('Hunt')
+                else:
+                    b.setText('')
         if Flags.battle == True and Inventory.openInventory == False:
             b.setText('Run')
         if Flags.levelUp == True:
@@ -727,7 +705,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             elif L.overworld == True:
                 if A == 'Westcliff' or A == 'Westcliff Docks' or A == 'Lighthouse':
                     b.setText(f'{Locations.currentLocation}')
-                else :
+                elif Locations.currentCoord[0] == 24 and Locations.currentCoord[1] == 7:
+                    b.setText('City Guard')
+                else:
                     b.setText('')
         if Flags.battle == True and Inventory.openInventory == False:
             b.setText('Wait')
@@ -956,6 +936,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.BattleFunction('Wait')
         if b == 'Constitution':
             self.StatIncrease(b)
+        if b == 'City Guard':
+            Dialogue
 
     def ButtonAPressed(self):
         b = self.ButtonA.text()
@@ -1065,6 +1047,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         PlayerCharacter.currentHP = PlayerCharacter.hp
         self.Text("Rest for 3 hours.")
         PlayerCharacter.slotsleft = PlayerCharacter.slots
+        PlayerCharacter.harvestsLeft = PlayerCharacter.harvests
         self.UpdateInformation()
 
     def LeaveFunction(self,location,var):
@@ -1424,51 +1407,40 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
     def EncounterSystem(self,chance):
         area = Locations.currentLocation
         roll = random.randint
-        itemFind = 0
         enemyEncounter = 0  - (PlayerCharacter.charisma/10)
         randomEvent = 0 
         if Locations.overworld == True:
             if area == 'Forest':
-                itemFind += (-5 + roll(1,100)) * chance
                 enemyEncounter += (0 + roll(1,100)) * chance
                 randomEvent += (10 + roll(1,100)) * chance
             if area == 'Cliffside Farms':
-                itemFind += (-5 + roll(1,100)) * chance
                 enemyEncounter += (-5 + roll(1,100)) * chance
                 randomEvent += (10 + roll(1,100)) * chance
             if area == 'Lighthouse Road':
-                itemFind += (-15 + roll(1,100)) * chance
                 enemyEncounter += (-30 + roll(1,100)) * chance
                 randomEvent += (5 + roll(1,100)) * chance
             if area == 'Cliffside Plains':
-                itemFind += (-5 + roll(1,100)) * chance
                 enemyEncounter += (-5 + roll(1,100)) * chance
                 randomEvent += (5 + roll(1,100)) * chance
             if area == 'Westcliff Plains':
-                itemFind += (-5 + roll(1,100)) * chance
                 enemyEncounter += (-50 + roll(1,100)) * chance
                 randomEvent += (5 + roll(1,100)) * chance
             if area == 'Westcliff Road':
-                itemFind += (-5 + roll(1,100)) * chance
                 enemyEncounter += (5 + roll(1,100)) * chance
                 randomEvent += (10 + roll(1,100)) * chance
             if area == 'Westcliff Beach':
-                itemFind += (-5 + roll(1,100)) * chance
                 enemyEncounter += (5 + roll(1,100)) * chance
                 randomEvent += (0 + roll(1,100)) * chance
             if area == 'Westcliff Shallows':
-                itemFind += (-10 + roll(1,100)) * chance
                 enemyEncounter += (5 + roll(1,100)) * chance
                 randomEvent += (5 + roll(1,100)) * chance
-        print(itemFind,enemyEncounter,randomEvent)  
-        if itemFind > enemyEncounter and itemFind > randomEvent and itemFind > 10:
-            self.Text(Inventory.ItemFindFunction(area))
-        if enemyEncounter > itemFind and enemyEncounter > randomEvent and enemyEncounter > 10:
+        print(enemyEncounter,randomEvent)  
+        if enemyEncounter > randomEvent and enemyEncounter > 10:
             print('Battle')
             Flags.battle = True
             self.MonsterSelection(area)
             self.frameEnemyInfo.setVisible(True)
-        if randomEvent > itemFind and randomEvent > enemyEncounter and randomEvent > 10:
+        if randomEvent > enemyEncounter and randomEvent > 10:
             print ('Random Event')
         self.UpdateInformation()
 
@@ -1582,6 +1554,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         PC.currentHP = PC.hp
         PC.xpNeeded = PC.level * 10
         PC.slots = round(PC.arcane/2)
+        PC.harvests = round(PC.constitution/2)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
