@@ -93,12 +93,13 @@ class Inventory:
         'apple':['a red apple','','','i',2,10],
         'wheat':['a buchel of golden wheat','','','i',12,10],
         'mushroom': ['a edible mushroom','','','i',1,10],
-        'meat': ['some cow meat','','','i',5,10],
+        'meat': ['some animal meat','','','i',5,10],
         'iron ingot': ['an ingot of iron','','','i',15,5],
         'fabric':['some fabric for crafting','','','i',14,5],
         'component':['a magical material','','','i',18,5],
         'shell':['a small shell','','','i',1,10],
         'small herb': ['a small herb','','','i',1,10],
+        'fish': ['a small fish','','','i',1,10],
         # Potions
         'potion':['a mysterious red liquid','','','i',22,5],
         # Arrow
@@ -175,6 +176,20 @@ class Inventory:
                 I.currentInventory.append('shell')
             else:
                 text = text + ' But there is no more space for more shells.'
+        if location == 'Ocean':
+            text = 'You manage to hook a fish!'
+            if len(set(I.currentInventory)) < I.inventoryLimit and I.currentInventory.count('fish') < 10:
+                text = text + ' You place it in your bag.'
+                I.currentInventory.append('fish')
+            else:
+                text = text + ' But there is no more space for more fish.'
+        if location == 'Hunt':
+            text = 'Your hunt was successful!'
+            if len(set(I.currentInventory)) < I.inventoryLimit and I.currentInventory.count('meat') < 10:
+                text = text + ' You place the meat in your bag.'
+                I.currentInventory.append('meat')
+            else:
+                text = text + ' But there is no more space for more meat.'
         return text
 
 class Flags:
@@ -673,9 +688,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                     b.setText('')
             else:
                 if (L.currentCoord[0] >= 5 and L.currentCoord[0]<=10) and (L.currentCoord[1]>=3 and L.currentCoord[1]<=4):
-                    b.setText('Mushrooms')
+                    b.setText('Gather') #Mushrooms
                 elif (L.currentCoord[0] >= 8 and L.currentCoord[0]<=9) and (L.currentCoord[1]>=8 and L.currentCoord[1]<=11):
-                    b.setText('Apples')
+                    b.setText('Gather') #Apples
+                elif (L.currentCoord[0] >= 4 and L.currentCoord[0]<=6) and (L.currentCoord[1]>=9 and L.currentCoord[1]<=11):
+                    b.setText('Gather') #Herbs
                 elif (L.currentCoord[0] >= 5 and L.currentCoord[0]<=10) and (L.currentCoord[1]>=3 and L.currentCoord[1]<=4):
                     b.setText('Fish')
                 elif (L.currentCoord[0] >= 17 and L.currentCoord[0]<=21) and (L.currentCoord[1]>=9 and L.currentCoord[1]<=11):
@@ -920,7 +937,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             self.BattleFunction('Run')
         if b == 'Arcane':
             self.StatIncrease(b)
-            
+        if Inventory.openInventory == False and Inventory.openSell == False and Inventory.openStore == False:
+            if b == 'Gather' or b == 'Hunt' or b == 'Fish':
+                self.SkillUse(b)
+
     def ButtonRPressed(self):
         b = self.ButtonR.text()
         L = Locations
@@ -1177,6 +1197,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         invCount = self.InventoryCount()
         apples = [s for s in invCount if 'apple' in s]
         mushroom = [s for s in invCount if 'mushroom' in s]
+        herb = [s for s in invCount if 'herb' in s]
+        meat = [s for s in invCount if 'meat' in s]
         I = Inventory
         b = 'self.Button'
         buttonList = ['Q','W','E','A','S','D','Z','X','C']
@@ -1191,17 +1213,47 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         try:
             if apples[0][1] > 0 and mushroom[0][1] > 0:
                 self.ButtonA.setEnabled(True)
-            self.Text('Potion:  Heals 5HP    Requires: 1 Apple, 1 Mushroom')
+            self.Text('Potion:  Heals 5HP         Requires: 1 Apple, 1 Mushroom')
+        except:
+            pass
+        try:
+            if meat[0][1] > 0 and herb[0][1] > 0 and Skills.crafting >= 4:
+                self.ButtonS.setEnabled(True)
+            self.Text('Elixir:  Restores slots   Resuires: 2 Meat, 2 Herb')
         except:
             pass
 
     def MakePotion(self):
+        Skills.crafting += 0.2
         self.Text('You make a potion')
         Inventory.currentInventory.remove('apple')
         Inventory.currentInventory.remove('mushroom')
         Inventory.currentInventory.append('potion')
         self.CraftingFuction()
 
+    def SkillUse(self,var):
+        roll = random.randint(1,20)
+        Time.SetTime(120)
+        if var == 'Gather':
+            if Skills.gathering > roll:
+                self.Text(Inventory.ItemFindFunction(Locations.currentLocation))
+                Skills.gathering += 0.2
+            else:
+                self.Text("You try to find something of use, but find nothing.")
+        if var == 'Fish':
+            if Skills.fishing > roll:
+                self.Text(Inventory.ItemFindFunction('Ocean'))
+                Skills.fishing += 0.2
+            else:
+                self.Text('You spend a few hours fishing, but nothing bites.')
+        if var == 'Hunt':
+            if Skills.hunting > roll:
+                self.Text(Inventory.ItemFindFunction('Hunt'))
+                Skills.hunting += 0.2
+            else:
+                self.Text('You spend a few hours hunting, but find nothing.')
+            
+    
 ### ###
 
 ### BATTLE RELATED FUNTIONS ###
