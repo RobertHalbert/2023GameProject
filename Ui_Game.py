@@ -206,9 +206,6 @@ class Ui_MainWindow(object):
         self.actionExit_Game.setObjectName("actionExit_Game")
         self.menuMenu.addAction(self.actionNew_Game)
         self.menuMenu.addSeparator()
-        self.menuMenu.addAction(self.actionLoad_Game)
-        self.menuMenu.addAction(self.actionSave_Game)
-        self.menuMenu.addSeparator()
         self.menuMenu.addAction(self.actionExit_Game)
         self.menubar.addAction(self.menuMenu.menuAction())
 

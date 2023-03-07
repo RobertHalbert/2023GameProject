@@ -49,7 +49,7 @@ class MonsterCharacter():
     slime = ['slime',8,8,'slime',1,'slime',0,3,1]
     crab = ['crab', 10,10,'pincers',3,'shell',1,5,2]
     hawk = ['hawk',12,12,'talons',5,'feathers',1,8,3]
-    thief = ['theif',15,15,'dagger',8,'leather',4,12,5]
+    thief = ['thief',15,15,'dagger',8,'leather',4,12,5]
 
 class PlayerCharacter():
     hp = 0
@@ -102,6 +102,7 @@ class Inventory:
         'fish': ['a small fish','','','i',1,10],
         # Potions
         'potion':['a mysterious red liquid','','','i',22,5],
+        'elixir':['a mysterious blue liquid','','','i',22,5],
         # Arrow
         'arrow':['a wooden arrow','','','i',2,0,20],
         # Spells
@@ -135,9 +136,13 @@ class Inventory:
                     text = f'You eat the {item}.'
                     I.currentInventory.remove(item)
                 if item == 'potion':
-                    text = 'You drink the potion. You feel better'
+                    text = 'You drink the potion. You feel better!'
                     PlayerCharacter.HealFunction(5)
-                    I.currentInventory.remove(item)            
+                    I.currentInventory.remove(item)     
+                if item == 'elixir':
+                    text = 'You drink the potion. You feel energized!'
+                    PlayerCharacter.slotsleft = PlayerCharacter.slots
+                    PlayerCharacter.harvestsLeft = PlayerCharacter.harvests       
         except:
             pass
         
@@ -283,7 +288,7 @@ class Dialogue:
             except:
                 text = 'Hi'
             if Flags.merchantQuest == 0:
-                text = 'If you bring me 5 mushrooms and 5 apples, I can teach you how to make your own potions.'
+                text = '"If you bring me 5 mushrooms and 5 apples, I can teach you how to make your own potions."'
                 Flags.merchantQuest = 1
         elif var == 'Buy Items':
             text = 'Tools'
@@ -563,6 +568,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if event.key() == Qt.Key_F3 and self.actionNew_Game.isEnabled(): self.StartGame()
         if event.key() == Qt.Key_F4: self.EndGame()
         if event.key() == Qt.Key_F8: self.Debug()
+        if event.key() == Qt.Key_F7: Flags.craftingAvailable = True
 
 #Main Functions
 
@@ -693,7 +699,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                     b.setText('Gather') #Apples
                 elif (L.currentCoord[0] >= 4 and L.currentCoord[0]<=6) and (L.currentCoord[1]>=9 and L.currentCoord[1]<=11):
                     b.setText('Gather') #Herbs
-                elif (L.currentCoord[0] >= 5 and L.currentCoord[0]<=10) and (L.currentCoord[1]>=3 and L.currentCoord[1]<=4):
+                elif (L.currentCoord[0] == 17) and (L.currentCoord[1]==6):
                     b.setText('Fish')
                 elif (L.currentCoord[0] >= 17 and L.currentCoord[0]<=21) and (L.currentCoord[1]>=9 and L.currentCoord[1]<=11):
                     b.setText('Hunt')
@@ -720,7 +726,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 if A == 'Merchants' or A == 'Blacksmiths' or A == 'Farmers' or A == 'Magicians' or A == 'Tavern':
                     b.setText('')
             elif L.overworld == True:
-                if A == 'Westcliff' or A == 'Westcliff Docks' or A == 'Lighthouse':
+                if A == 'Westcliff':
                     b.setText(f'{Locations.currentLocation}')
                 elif Locations.currentCoord[0] == 24 and Locations.currentCoord[1] == 7:
                     b.setText('City Guard')
@@ -995,6 +1001,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if b == 'Explore':
             self.Text("You look around the area.")
             self.EncounterSystem(0.2)
+        if b == 'Elixir':
+            self.MakeElixir()
     
     def ButtonDPressed(self):
         b = self.ButtonD.text()
@@ -1210,16 +1218,18 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
             eval(b+i+t+'("""""")')
             eval(b+i+'.setEnabled(False)')
         self.ButtonA.setText('Potion')
+        self.Text('Potion:  Heals 5HP         Requires: 1 Apple, 1 Mushroom')
+        if Skills.crafting >= 4:
+            self.ButtonS.setText('Elixir')
+            self.Text('Elixir:  Restores slots      Requires: 2 Meat, 2 Herb')
         try:
             if apples[0][1] > 0 and mushroom[0][1] > 0:
                 self.ButtonA.setEnabled(True)
-            self.Text('Potion:  Heals 5HP         Requires: 1 Apple, 1 Mushroom')
         except:
             pass
         try:
             if meat[0][1] > 0 and herb[0][1] > 0 and Skills.crafting >= 4:
                 self.ButtonS.setEnabled(True)
-            self.Text('Elixir:  Restores slots   Resuires: 2 Meat, 2 Herb')
         except:
             pass
 
@@ -1231,27 +1241,41 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         Inventory.currentInventory.append('potion')
         self.CraftingFuction()
 
+    def MakeElixir(self):
+        Skills.crafting += 0.2
+        self.Text('You make an elixir')
+        Inventory.currentInventory.remove('meat')
+        Inventory.currentInventory.remove('meat')
+        Inventory.currentInventory.remove('herb')
+        Inventory.currentInventory.remove('herb')
+        Inventory.currentInventory.append('elixir')
+        self.CraftingFuction()
+
     def SkillUse(self,var):
-        roll = random.randint(1,20)
+        roll = random.randint(1,15)
         Time.SetTime(120)
         if var == 'Gather':
             if Skills.gathering > roll:
                 self.Text(Inventory.ItemFindFunction(Locations.currentLocation))
-                Skills.gathering += 0.2
+                if Skills.gathering < 10:
+                    Skills.gathering += 0.2
             else:
                 self.Text("You try to find something of use, but find nothing.")
         if var == 'Fish':
             if Skills.fishing > roll:
                 self.Text(Inventory.ItemFindFunction('Ocean'))
-                Skills.fishing += 0.2
+                if Skills.fishing < 10:
+                    Skills.fishing += 0.2
             else:
                 self.Text('You spend a few hours fishing, but nothing bites.')
         if var == 'Hunt':
             if Skills.hunting > roll:
                 self.Text(Inventory.ItemFindFunction('Hunt'))
-                Skills.hunting += 0.2
+                if Skills.hunting < 10:
+                    Skills.hunting += 0.2
             else:
                 self.Text('You spend a few hours hunting, but find nothing.')
+        self.UpdateDateTime()
             
     
 ### ###
@@ -1409,7 +1433,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if x == 3 and y == 7:
             Ll = 'Lighthouse'
             self.SetTime(30)
-        if x == 16 and y == 6:
+        if x == 17 and y == 6:
             Ll = 'Westcliff Docks'
             self.SetTime(30)
         if x == 28 and y == 10:
@@ -1436,7 +1460,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
         if ((x >= 15 and x <= 24) and (y >= 8 and y <= 11)) or ((x>=22 and x<=24) and (y>=12 and y<=13)):
             Ll = 'Westcliff Plains'
             self.SetTime(45)
-        if ((x >= 13 and x <= 15) or (x >= 17 and x <= 20)) and y == 6:
+        if ((x >= 13 and x <= 16) or (x >= 18 and x <= 20)) and y == 6:
             Ll = 'Westcliff Beach'
             self.SetTime(45)
         if (x >= 13 and x <= 24) and (y >= 1 and y <= 5):
@@ -1472,16 +1496,16 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):
                 enemyEncounter += (-30 + roll(1,100)) * chance
                 randomEvent += (5 + roll(1,100)) * chance
             if area == 'Cliffside Plains':
-                enemyEncounter += (-5 + roll(1,100)) * chance
+                enemyEncounter += (-50 + roll(1,100)) * chance
                 randomEvent += (5 + roll(1,100)) * chance
             if area == 'Westcliff Plains':
-                enemyEncounter += (-50 + roll(1,100)) * chance
+                enemyEncounter += (10 + roll(1,100)) * chance
                 randomEvent += (5 + roll(1,100)) * chance
             if area == 'Westcliff Road':
                 enemyEncounter += (5 + roll(1,100)) * chance
                 randomEvent += (10 + roll(1,100)) * chance
             if area == 'Westcliff Beach':
-                enemyEncounter += (5 + roll(1,100)) * chance
+                enemyEncounter += (0 + roll(1,100)) * chance
                 randomEvent += (0 + roll(1,100)) * chance
             if area == 'Westcliff Shallows':
                 enemyEncounter += (5 + roll(1,100)) * chance
