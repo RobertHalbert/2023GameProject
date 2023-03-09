@@ -263,7 +263,7 @@ class Dialogue:
         return text
     def Westcliff(var):
         if Flags.startingVillageFirstVisit == 0:
-            text = "Introduction\n" + "Village"
+            text = f'"Hey, {PlayerCharacter.name}! (Marchant) and (Farmer) are looking for you. Think they have a job for you to do."\n' + "Village"
             Flags.startingVillageFirstVisit = 1
         elif Locations.overworld == True:
             text = "Outside of Village"
@@ -288,7 +288,7 @@ class Dialogue:
             except:
                 text = 'Hi'
             if Flags.merchantQuest == 0:
-                text = '"If you bring me 5 mushrooms and 5 apples, I can teach you how to make your own potions."'
+                text = f'"Good to see you, {PlayerCharacter.name}.I have a job for you, I have been running low on some items and was hoping you would be willing to help me out. If you bring me 5 mushrooms and 5 apples, I can teach you how to make your own potions. You will find mushrooms a ways into the forest, you can get some apples from the farmer or pick them yourself on the west side of the farm."'
                 Flags.merchantQuest = 1
         elif var == 'Buy Items':
             text = 'Tools'
@@ -306,11 +306,13 @@ class Dialogue:
         if var == 'enter':
             text = 'Magicians place'
         elif var == 'Talk':
-            if Flags.magicQuest == 0:
-                text = '"Kill ten slimes and I will teach you some magic"'
+            if Flags.magicQuest == 0 and PlayerCharacter.level == 2:
+                text = '"The slimes in the forest are stargin to get out of hand, it is becoming dangerous for the townsfolk. If you can kill ten slimes, it will make the area a bit safer and I will even teach you some magic"'
                 Flags.magicQuest = 1
+            elif Flags.magicQuest == 0 and PlayerCharacter.level < 2:
+                text = '"Hmm, I may have a job for you... Come back when your a bit stronger."'
             elif Flags.magicQuest == 2:
-                text = '"Good job. Here is some basic magic"'
+                text = f'"Good job {PlayerCharacter.name}. Here, let me each you some basic magic. If you do not neglect your studies, it can be quite powerful. But it is also draining, you will only be able to case it a few times before you need to rest."'
                 Flags.magicAvailable = True
                 Flags.magicQuest = 3
             else: text = 'Hello'
@@ -323,10 +325,10 @@ class Dialogue:
             text = 'Farmers place'
         elif var == 'Talk':
             if Flags.farmquest1 == 0:
-                text = '"Kill 5 rats in the farms north of here."'
+                text = f'"Hey, {PlayerCharacter.name}. There has been a lot of rats eating my crops as of late. If you could kill 5 of these rats, I would be grateful. You can find them any part of the farm, just north of the town."'
                 Flags.farmquest1 = 1
             elif Flags.farmquest1 == 2:
-                text = '"Thanks for killing those rats"\nYou gained 5 gold and 5 experience'
+                text = '"Thanks for killing those rats. Here, some gold for your work."\nYou gained 5 gold and 5 experience'
                 Flags.farmquest1 = 3
             else: text = 'Sup?'
         elif var == 'Buy Items':
@@ -340,14 +342,14 @@ class Dialogue:
         return(text)
     def Tavern(var):
         if var == 'Enter':
-            text = 'Tavern'
+            text = 'This place used to be bustling with ativity throught the day. But now it is empty almost every day.'
         else: text = ''
         return text
     def LighthouseRoad(var):
         text = 'Lighthouse Road'
         return text
     def Lighthouse(var):
-        text = 'Lighthouse'
+        text = 'The old lighthouse. Hardly ever used anymore, since people hardly sail these days.'
         return text
     def CliffsidePlains(var):
         text = 'Cliffside Plains'
