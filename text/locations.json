@@ -1,0 +1,59 @@
+{
+    "Home": {
+        "description": "Your home.",
+        "rest": "You rest for an hour.",
+        "sleep": "You sleep for eight hours.",
+        "exit": "Westcliff"
+    },
+    "Westcliff": {
+        "description": "A small town.",
+        "Home": "Home",
+        "Merchant": "Merchant",
+        "exit": "overworld"
+    },
+    "Merchant": {
+        "description": "Merchant's place.",
+        "talk": "Hello there",
+        "buy": "buy items",
+        "sell": "sell items",
+        "exit": "Westcliff"
+    },
+    "Westcliff Farms": {
+        "description": "A decent sized field of various crops."
+    },
+    "Westcliff Forest": {
+        "description": "A lush and quiet forest."
+    },
+    "WestCliff Plains":{
+        "description": "A large open field of grass."
+    },
+    "WestCliff Road":{
+        "description": "The road connecting Westcliff to the city."
+    },
+    "Carrier City":{
+        "description": "A city with a port"
+    },
+    "Carrier Beach":{
+        "description": "A sandy beach"
+    },
+    "Carrier Road":{
+        "description": "A road connecting Carrier city and the town of Northcliff"
+    },
+    "Northcliff Forest":{
+        "description": "A forest surrounded by chasms."
+    },
+    "Northcliff":{
+        "description": "A small town near the edge of a cliff."
+    },
+    "Triad Road":{
+        "description": "A road connecting three towns"
+    },
+    "Cliffton":{
+        "description": "A town precariously looming over the abyss."
+    },
+    "Dark Forest":{
+        "description": "A forest where light seldom reaches the ground."
+    }
+
+    
+}

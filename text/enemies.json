@@ -1,0 +1,33 @@
+{
+    "Rat": {
+        "Hitpoints" : 4,
+        "Strength" : 1,
+        "Dexterity": 1,
+        "Constitution": 1,
+        "Arcana": 0,
+        "Charisma": 0,
+        "Armor": "none",
+        "Weapon": "none",
+        "Accesory": "none",
+        "Name": "Rat",
+        "Sex": "It",
+        "Loot": "Rat Tail",
+        "Level": 1
+    },
+    "Slime": {
+        "Hitpoints" : 8,
+        "Strength" : 2,
+        "Dexterity": 2,
+        "Constitution": 3,
+        "Arcana": 0,
+        "Charisma": 0,
+        "Armor": "none",
+        "Weapon": "Acid",
+        "Accesory": "none",
+        "Name": "Slime",
+        "Sex": "It",
+        "Loot": "Green Crystal",
+        "Level": 3
+    }
+    
+}

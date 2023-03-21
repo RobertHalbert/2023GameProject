@@ -1,0 +1,44 @@
+{
+        "WEAPONS": "This is where the weapons are put",
+        "Club":{
+            "description": "A simple club",
+            "type": "weapon",
+            "modifier": 1
+        },
+        "Dagger":{
+            "description": "a simple dagger",
+            "type": "weapon",
+            "modifier": 2
+        },
+        "Acid":{
+            "description":"a slime's acid",
+            "type": "weapon",
+            "modifier": 2
+        },
+
+        "ARMOR": "This is where the armor is put",
+        "Leather Tunic":{
+            "description": "A simple leather tunic",
+            "type": "armor",
+            "modifier": 1
+        },
+
+        "ITEMS": "These are where items go",
+        "Potion":{
+            "description": "a simple healing potion",
+            "type": "item",
+            "modifier": 5,
+            "use": "Hitpoints:"
+        },
+        "Rat Tail":{
+            "description": "A tail from a rat",
+            "type":"misc item",
+            "modifier": ""
+        },
+        "Green Crystal":{
+            "description": "A small crystal from a slime",
+            "type":"misc item",
+            "modifier":""
+        }
+
+}

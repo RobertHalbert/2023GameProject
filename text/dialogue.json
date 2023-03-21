@@ -1,0 +1,9 @@
+{
+    "General":{
+        "defeat":"You wake up in your home."
+    },
+    "Merchant":{
+        "quest1":"Oh, good. You're finally here. I've got a bit of a job for you since you're going to be heading out of Westcliff. I need some materials for our local alchemists, you can get them from some local monsters, 5 green crystals and 5 rat tails.",
+        "quest2": "You can find some rats in the farms north of Westcliff, and you can get the crystals by killing some slimes in the forest to the west."
+    }
+}
