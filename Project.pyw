@@ -391,7 +391,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonS.setText('South')
         self.ButtonD.setText('East')
         self.ButtonC.setText('Inventory')
-        if cX <= 10 and cY <= 7:
+        if cX <= 10 and cY <= 7:  # Westcliff Area #####
             if cX == 5 == cY:
                 self.ButtonQ.setText(f'Westcliff')
                 self.playerLocation = 'Westcliff'
@@ -403,55 +403,66 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 self.EncounterFunction(0.5)
             elif (10 >= cX >= 6) and cY == 5:
                 self.playerLocation = 'Westcliff Road'
-            elif cX <= 10 and ((cX >= 5 and cY < 4) or (cX >= 7 and 6 >= cY >= 7)):
+            elif cX <= 10 and ((cX >= 5 and cY <= 4) or (cX >= 7 and 7 >= cY >= 6)):
                 self.playerLocation = 'Westcliff Plains'
             if cY == 7:
                 self.ButtonW.setText('')
-                self.Text('A great cliff drops down to the north.')
-            if cX == 10 and cY < 4:
+            if cX == 10 and cY <= 4:
                 self.ButtonD.setText('')
-                self.Text('The ocean stretches out to the east.')
-        elif cX >= 11 and cY <= 8:
+        elif cX >= 11 and cY <= 8:  # Carrier Area #####
             if cX == 11 and cY == 5:
                 self.playerLocation = 'Carrier City'
                 self.ButtonS.setText('')
             elif 19 >= cX >= 12 and 8 >= cY >= 7:
                 if cY == 7:
                     self.ButtonS.setText('')
-                self.playerLocation = 'Eastern Beach'
+                self.playerLocation = 'Carrier Beach'
             elif cX == 11 and 8 >= cY >= 6:
                 self.playerLocation = 'Carrier Road'
-                if 6 >= cY >= 5:
-                    self.ButtonD.setText('')
-        elif 19 >= cX >= 6 and 13 >= cY >= 9:
+            if cX == 11 and 6 >= cY >= 5:
+                self.ButtonD.setText('')
+        elif 19 >= cX >= 6 and 13 >= cY >= 9:  # Northcliff Area #####
             if 10 >= cX >= 6 and cY == 9:
                 self.ButtonS.setText('')
             if cX == 6 and 11 >= cY >= 9:
                 self.ButtonA.setText('')
             if 11 >= cX >= 7 and cY == 9:
                 self.playerLocation = 'Carrier Road'
-            elif cX <= 19 and ((cX >= 7 and 13 >= cY >= 10) or (cX >= 12 and cY == 9)):
+            if cX <= 19 and ((cX >= 7 and 13 >= cY >= 10) or (cX >= 12 and cY == 9)):
                 self.playerLocation = 'Northcliff Forest'
                 if cY == 13:
                     self.ButtonW.setText('')
-            elif (cX == 6 and cY == 9):
-                self.playerLocation == 'Northcliff'
-            elif (cX == 6 and 13 >= cY >= 10):
-                self.playerLocation == 'Triad Road'
-        elif 5 >= cX >= 2 and 12 >= cY >= 10:
+            if cX == 6 and 13 >= cY >= 10:
+                self.playerLocation = 'Triad Road'
+            if cX == 6 and cY == 9:
+                self.playerLocation = 'Northcliff'
+        elif 5 >= cX >= 2 and 12 >= cY >= 10:  # Clifton Area #####
             if cX == 2:
                 self.ButtonA.setText('')
-                if cY <= 10:
+                if cY <= 11:
                     self.ButtonD.setText('')
             else:
                 self.ButtonS.setText('')
-            if cY <= 11:
-                self.playerLocation == 'Triad Road'
+            if cY >= 11:
+                self.playerLocation = 'Triad Road'
             else:
-                self.playerLocation == 'Cliffton'
+                self.playerLocation = 'Cliffton'
                 self.ButtonS.setText('')
-        elif 5 >= cX >= 0 and 19 >= cY >= 13:
-            self.playerLocation == 'Dark Forest'
+        elif 5 >= cX >= 0 and 19 >= cY >= 13:  # Dark Forest Area 1 #####
+            self.playerLocation = 'Dark Forest'
+        elif 19 >= cX >= 6 and 19 >= cY >= 14:  # Darkwood Area #####
+            if cX == 6 and cY == 14:
+                self.ButtonD.setText('')
+            if (cX >= 7 and cY == 15) or (16 >= cX >= 7 and cY == 16):
+                self.playerLocation = "Southern Fields"
+                if cY == 15:
+                    self.ButtonS.setText('')
+            elif (cX == 6 and cY <= 17) or (15 >= cX >= 6 and cY == 17):
+                self.playerLocation = "Triad Road"
+            elif cX == 16 and cY == 17:
+                self.playerLocation = 'Darkwood'
+            elif (cX <= 19 and cY >= 18) or (cX >= 17 and cY >= 16):
+                self.playerLocation = 'Dark Forest'
 
         if cX == 0:
             self.ButtonA.setText('')
@@ -461,7 +472,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             self.ButtonS.setText('')
         if cY == 19:
             self.ButtonW.setText('')
-        self.ButtonEnabled()
 
     ###########################################
 
@@ -764,9 +774,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if direction == 'West':
             self.playerCoordinates[0] -= 1
         self.TimeFunction(60)
-        self.OverWorldButtonUpdate()
+        self.ButtonUpdate()
         self.UpdateInformation()
-        print(self.playerCoordinates)
+        print(self.playerCoordinates, self.playerLocation)
 
     # Function to enter target area
     def EnterAreaFunction(self, target):
@@ -925,10 +935,12 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             self.year += 1
         if self.time < 360 or self.time > 1320:
             self.night = True
-            self.ButtonUpdate()
+            if self.overWorld == False:
+                self.ButtonUpdate()
         else:
             self.night = False
-            self.ButtonUpdate()
+            if self.overWorld == False:
+                self.ButtonUpdate()
 
 
 if __name__ == "__main__":

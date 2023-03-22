@@ -24,10 +24,10 @@
     "Westcliff Forest": {
         "description": "A lush and quiet forest."
     },
-    "WestCliff Plains":{
+    "Westcliff Plains":{
         "description": "A large open field of grass."
     },
-    "WestCliff Road":{
+    "Westcliff Road":{
         "description": "The road connecting Westcliff to the city."
     },
     "Carrier City":{
@@ -53,6 +53,12 @@
     },
     "Dark Forest":{
         "description": "A forest where light seldom reaches the ground."
+    },
+    "Southern Fields":{
+        "description": "Fields filled with vibrant grass ."
+    },
+    "Darkwood":{
+        "description": "A surprisingly friendly town."
     }
 
     
