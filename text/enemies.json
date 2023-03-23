@@ -28,6 +28,35 @@
         "Sex": "It",
         "Loot": "Green Crystal",
         "Level": 3
-    }
-    
+    },
+    "Wolf": {
+        "Hitpoints" : 14,
+        "Strength" : 3,
+        "Dexterity": 4,
+        "Constitution": 5,
+        "Arcana": 0,
+        "Charisma": 0,
+        "Armor": "none",
+        "Weapon": "Claws",
+        "Accesory": "none",
+        "Name": "Wolf",
+        "Sex": "It",
+        "Loot": "Wolf Fur",
+        "Level": 5
+    },
+    "Thief": {
+        "Hitpoints" : 20,
+        "Strength" : 5,
+        "Dexterity": 6,
+        "Constitution": 5,
+        "Arcana": 0,
+        "Charisma": 0,
+        "Armor": "none",
+        "Weapon": "Dagger",
+        "Accesory": "none",
+        "Name": "Wolf",
+        "Sex": "It",
+        "Loot": "Old Coin",
+        "Level": 7
+    } 
 }

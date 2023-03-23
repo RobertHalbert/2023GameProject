@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget
 from PyQt5.QtCore import Qt, pyqtSignal
 from uiFiles import Ui_Game, Ui_CCWindow
 
-
 class Battle:
     def __init__(self):
         self.damage = 0
@@ -20,13 +19,11 @@ class Battle:
         defender.hitPoints -= totalDamage
         return totalDamage
 
-
 class Equipment:
     def __init__(self, armor, weapon, accesory):
         self.armor = armor
         self.weapon = weapon
         self.accesory = accesory
-
 
 class Character(Equipment, Battle):
     def __init__(self, hitPoints, maxHP, strength, dexterity, constitution, arcana, charisma, armor, weapon, accesory, name, sex):
@@ -40,7 +37,6 @@ class Character(Equipment, Battle):
         self.charisma = charisma
         self.name = name
         self.sex = sex
-
 
 class PlayerCharacter(Character):
     def __init__(self, hitPoints, maxHP, strength, dexterity, constitution, arcana, charisma, armor, weapon, accesory, name, appearence, sex):
@@ -79,7 +75,6 @@ class PlayerCharacter(Character):
         if self.hitPoints > self.maxHP:
             self.hitPoints = self.maxHP
 
-
 class Enemy(Character):
     def __init__(self, hitPoints, maxHP, strength, dexterity, constitution, arcana, charisma, armor, weapon, accesory, name, sex, loot, level):
         super().__init__(hitPoints, maxHP, strength, dexterity, constitution,
@@ -87,10 +82,7 @@ class Enemy(Character):
         self.loot = loot
         self.level = level
 
-# Character Creation Window
-
-
-class CreationWindow(Ui_CCWindow.Ui_Form, QWidget):
+class CreationWindow(Ui_CCWindow.Ui_Form, QWidget):# Character Creation Window #####
     signal = pyqtSignal()
     strength = 1
     dexterity = 1
@@ -213,7 +205,6 @@ class CreationWindow(Ui_CCWindow.Ui_Form, QWidget):
         self.signal.emit()
         QWidget.close(self)
 
-
 class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     # These are used to access the json files
     with open("text/dialogue.json", "r") as d:
@@ -325,7 +316,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.frameInfo.setVisible(True)
 
 ##### Helper Functions #####
-
     def UpdateInformation(self):  # UPDATE INFO FOR UI ####
         self.labelStrength.setText(f'Strength: {player.strength}')
         self.labelDexterity.setText(f'Dexterity: {player.dexterity}')
@@ -347,7 +337,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.barHealth.setValue(bar)
 
     ##### BUTTONS ######
-
     def ButtonUpdate(self):  # UPDATE BUTTON TEXT ####
         buttonList = ['Q', 'W', 'E', 'R', 'A',
                       'S', 'D', 'F', 'Z', 'X', 'C', 'V']
@@ -377,7 +366,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonEnabled()
         self.UpdateInformation()
 
-    def OverWorldButtonUpdate(self):
+    def OverWorldButtonUpdate(self): # For 'overworld' traversal #####
         cX = self.playerCoordinates[0]
         cY = self.playerCoordinates[1]
         buttonList = ['Q', 'W', 'E', 'R', 'A',
@@ -391,7 +380,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonS.setText('South')
         self.ButtonD.setText('East')
         self.ButtonC.setText('Inventory')
-        if cX <= 10 and cY <= 7:  # Westcliff Area #####
+        if cX <= 10 and cY <= 7: #Westcliff area
             if cX == 5 == cY:
                 self.ButtonQ.setText(f'Westcliff')
                 self.playerLocation = 'Westcliff'
@@ -405,43 +394,45 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 self.playerLocation = 'Westcliff Road'
             elif cX <= 10 and ((cX >= 5 and cY <= 4) or (cX >= 7 and 7 >= cY >= 6)):
                 self.playerLocation = 'Westcliff Plains'
-            if cY == 7:
+            if cY == 7 and self.battleOn == False:
                 self.ButtonW.setText('')
-            if cX == 10 and cY <= 4:
+                self.Text('A great cliff drops down to the north.')
+            if cX == 10 and cY < 4 and self.battleOn == False:
                 self.ButtonD.setText('')
-        elif cX >= 11 and cY <= 8:  # Carrier Area #####
+                self.Text('The ocean stretches out to the east.')
+        elif cX >= 11 and cY <= 8: # Carrier Area
             if cX == 11 and cY == 5:
                 self.playerLocation = 'Carrier City'
                 self.ButtonS.setText('')
             elif 19 >= cX >= 12 and 8 >= cY >= 7:
-                if cY == 7:
+                if cY == 7 and self.battleOn == False:
                     self.ButtonS.setText('')
                 self.playerLocation = 'Carrier Beach'
             elif cX == 11 and 8 >= cY >= 6:
                 self.playerLocation = 'Carrier Road'
-            if cX == 11 and 6 >= cY >= 5:
-                self.ButtonD.setText('')
-        elif 19 >= cX >= 6 and 13 >= cY >= 9:  # Northcliff Area #####
-            if 10 >= cX >= 6 and cY == 9:
+                if 6 >= cY >= 5 and self.battleOn == False:
+                    self.ButtonD.setText('')
+        elif 19 >= cX >= 6 and 13 >= cY >= 9: #Northcliff Area
+            if 10 >= cX >= 6 and cY == 9 and self.battleOn == False:
                 self.ButtonS.setText('')
-            if cX == 6 and 11 >= cY >= 9:
+            if cX == 6 and 11 >= cY >= 9 and self.battleOn == False:
                 self.ButtonA.setText('')
             if 11 >= cX >= 7 and cY == 9:
                 self.playerLocation = 'Carrier Road'
-            if cX <= 19 and ((cX >= 7 and 13 >= cY >= 10) or (cX >= 12 and cY == 9)):
+            elif cX <= 19 and ((cX >= 7 and 13 >= cY >= 10) or (cX >= 12 and cY == 9)):
                 self.playerLocation = 'Northcliff Forest'
-                if cY == 13:
+                if cY == 13 and self.battleOn == False:
                     self.ButtonW.setText('')
-            if cX == 6 and 13 >= cY >= 10:
-                self.playerLocation = 'Triad Road'
-            if cX == 6 and cY == 9:
+            elif (cX == 6 and cY == 9):
                 self.playerLocation = 'Northcliff'
-        elif 5 >= cX >= 2 and 12 >= cY >= 10:  # Clifton Area #####
-            if cX == 2:
+            elif (cX == 6 and 13 >= cY >= 10):
+                self.playerLocation = 'Triad Road'
+        elif 5 >= cX >= 2 and 12 >= cY >= 10: #Clifton Area
+            if cX == 2 and self.battleOn == False:
                 self.ButtonA.setText('')
                 if cY <= 11:
                     self.ButtonD.setText('')
-            else:
+            elif self.battleOn == False:
                 self.ButtonS.setText('')
             if cY >= 11:
                 self.playerLocation = 'Triad Road'
@@ -463,7 +454,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 self.playerLocation = 'Darkwood'
             elif (cX <= 19 and cY >= 18) or (cX >= 17 and cY >= 16):
                 self.playerLocation = 'Dark Forest'
-
         if cX == 0:
             self.ButtonA.setText('')
         if cX == 19:
@@ -472,8 +462,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             self.ButtonS.setText('')
         if cY == 19:
             self.ButtonW.setText('')
-
-    ###########################################
+        self.ButtonEnabled()
 
     def ButtonEnabled(self):  # NO TEXT -> DISABLED BUTTON ####
         buttonList = ['Q', 'W', 'E', 'R', 'A',
@@ -486,7 +475,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 eval('self.Button'+buttonList[x]+".setEnabled(True)")
 
     ##### Button Pressed #####
-
     def ButtonQPressed(self):
         b = self.ButtonQ.text()
         pL = self.playerLocation
@@ -633,7 +621,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if b == 'Close':
             if self.shopOpen == self.inventoryOpen == True:
                 self.inventoryOpen = False
-                # function here for shop inventory
+                # function here for setting up shop inventory
             else:
                 self.shopOpen = False
                 self.inventoryOpen = False
@@ -645,16 +633,12 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     ##### FUNCTIONS #####
 
     # Battle Functions ##########
-
     def EnemySetup(self):  # Function to set up enemy stats
         self.battleOn = True
         global thisEnemy
         location = self.playerLocation
         self.Text("An enemy appears!")
-        if location == 'Westcliff Farms':
-            en = self.enemies["Rat"]
-        if location == 'Westcliff Forest':
-            en = self.enemies["Slime"]
+        en = self.enemies[self.locations[location]["enemy"]]
         thisEnemy = Enemy(en["Hitpoints"], en["Hitpoints"], en["Strength"], en["Dexterity"], en["Constitution"],
                           en["Arcana"], en["Charisma"], en["Armor"], en["Weapon"], en["Accesory"], en["Name"],
                           en["Sex"], en["Loot"], en["Level"])
@@ -755,16 +739,13 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.BattleEnd()
 
     # Location Functions ##########
-
-    # Function To determine random encounter
-    def EncounterFunction(self, chance):
+    def EncounterFunction(self, chance): # Function To determine random encounter
         pL = self.playerLocation
         roll = random.randint(1, 100)
         if roll * chance > 40:
             self.EnemySetup()
 
-    # Function to move player in overworld
-    def OverWorldMovement(self, direction):
+    def OverWorldMovement(self, direction): # Function to move player in overworld
         if direction == 'North':
             self.playerCoordinates[1] += 1
         if direction == 'East':
@@ -776,17 +757,14 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.TimeFunction(60)
         self.ButtonUpdate()
         self.UpdateInformation()
-        print(self.playerCoordinates, self.playerLocation)
 
-    # Function to enter target area
-    def EnterAreaFunction(self, target):
+    def EnterAreaFunction(self, target):  # Function to enter target area
         self.playerLocation = target
         if self.overWorld == True:
             self.overWorld = False
         self.ButtonUpdate()
 
-    # Function to leave current area
-    def LeaveAreaFunction(self, exit):
+    def LeaveAreaFunction(self, exit):  # Function to leave current area
         if exit == 'overworld':
             self.overWorld = True
             self.ButtonUpdate()
@@ -795,10 +773,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonUpdate()
 
     # Inventory Functions ##########
-
-    # Sets up inventory buttons and puts item info into text window
-
-    def SetUpInventory(self):
+    def SetUpInventory(self): # Sets up inventory buttons and puts item info into text window
         self.inventoryOpen = True
         buttonList = ['Q', 'W', 'E', 'A',
                       'S', 'D', 'Z', 'X', 'C']
@@ -831,8 +806,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             x += 1
         self.ButtonEnabled()
 
-    # Function to use items in inventory
-    def InventoryFunction(self, item):
+    def InventoryFunction(self, item):   # Function to use items in inventory
         itemType = self.items[item]['type']
         itemformated = item.lower()
         if itemType == 'weapon':
@@ -858,10 +832,16 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             self.EnemyAction()
 
     # Action Functions ##########
+    def QuestFinished(self,gold=0,item='none'):
+        text = ''
+        if item != 'none':
+            text += f'You place the {item} in your bag.'
+            player.inventory.append(item)
+        if gold > 0:
+            text += f'You put the {gold} gold in your pouch.'
+        self.Text(f'{text}')
 
-    # function to talk to npcs, using flags and the dialogue.json
-
-    def TalkFunction(self):
+    def TalkFunction(self): # function to talk to npcs, using flags and the dialogue.json
         pL = self.playerLocation
         count = 0
         compiledList = set(player.inventory)
@@ -878,14 +858,17 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             elif self.flags[0][1] == 1:
                 self.Text(self.dialogue[pL]['quest2'])
             elif self.flags[0][1] == 1 and ratTails[0][1] == 5 == greenCrystal[0][1]:
-                self.Text
+                self.Text(f'Thank you {player.name}. Here is some gold for your trouble.')
+                self.QuestFinished(15)
+                for i in range(5):
+                    player.inventory.remove('Rat Tail')
+                    player.inventory.remove('Green Crystal')
                 self.flags[0][1] = 2
             else:
                 self.Text(self.locations[pL]['talk'] +
                           f"{player.name}. How can I help you?")
 
-    # passes time heals %20 of hitpoints
-    def RestFunction(self, type):
+    def RestFunction(self, type): # passes time heals %20 of hitpoints
         if type == 'Rest':
             self.Text(f'{self.locations[self.playerLocation]["rest"]}')
             healAmount = round(player.maxHP*0.2)
@@ -899,10 +882,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.UpdateInformation()
 
     # Time Functions ##########
-
-    # Used to get month, current day of the month, and the prefex of the day for the UI
-
-    def FormatDate(self):
+   
+    def FormatDate(self):  # Used to get month, current day of the month, and the prefex of the day for the UI
         if self.day > 30:
             today = self.day % 30
             month = self.monthNames[(self.day//30)-1]
@@ -916,16 +897,14 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             add = 'th'
         return f"{today}{add} of the {month}, Year: {self.year}"
 
-    # Used to get the day name, and current time properly formatted for the UI
-    def FormatTime(self):
+    def FormatTime(self):# Used to get the day name, and current time properly formatted for the UI
         if self.day > 5:
             day = self.day % 5
         hour = self.time // 60
         minute = self.time % 60
         return f"{self.dayNames[day-1]} - {hour}:{minute:02d}"
 
-    # Will take added minutes, add to time and change the day and/or year accordingly
-    def TimeFunction(self, minutes):
+    def TimeFunction(self, minutes): # Will take added minutes, add to time and change the day and/or year accordingly
         self.time += minutes
         while self.time >= 1440:
             self.time -= 1440
@@ -933,13 +912,13 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         while self.day > 360:
             self.day -= 360
             self.year += 1
-        if self.time < 360 or self.time > 1320:
-            self.night = True
-            if self.overWorld == False:
+        if self.battleOn != True and self.overWorld != True:
+            if self.time < 360 or self.time > 1200:
+                self.night = True
+
                 self.ButtonUpdate()
-        else:
-            self.night = False
-            if self.overWorld == False:
+            else:
+                self.night = False
                 self.ButtonUpdate()
 
 

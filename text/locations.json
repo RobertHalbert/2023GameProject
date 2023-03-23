@@ -19,13 +19,16 @@
         "exit": "Westcliff"
     },
     "Westcliff Farms": {
-        "description": "A decent sized field of various crops."
+        "description": "A decent sized field of various crops.",
+        "enemy": "Rat"
     },
     "Westcliff Forest": {
-        "description": "A lush and quiet forest."
+        "description": "A lush and quiet forest.",
+        "enemy": "Slime"
     },
     "Westcliff Plains":{
-        "description": "A large open field of grass."
+        "description": "A large open field of grass.",
+        "enemy": "Rat"
     },
     "Westcliff Road":{
         "description": "The road connecting Westcliff to the city."
@@ -34,13 +37,15 @@
         "description": "A city with a port"
     },
     "Carrier Beach":{
-        "description": "A sandy beach"
+        "description": "A sandy beach",
+        "enemy": "Rat"
     },
     "Carrier Road":{
         "description": "A road connecting Carrier city and the town of Northcliff"
     },
     "Northcliff Forest":{
-        "description": "A forest surrounded by chasms."
+        "description": "A forest surrounded by chasms.",
+        "enemy": "Rat"
     },
     "Northcliff":{
         "description": "A small town near the edge of a cliff."
@@ -52,14 +57,17 @@
         "description": "A town precariously looming over the abyss."
     },
     "Dark Forest":{
-        "description": "A forest where light seldom reaches the ground."
+        "description": "A forest where light seldom reaches the ground.",
+        "enemy": "Rat"
     },
     "Southern Fields":{
-        "description": "Fields filled with vibrant grass ."
+        "description": "Fields filled with vibrant grass .",
+        "enemy": "Rat"
     },
     "Darkwood":{
         "description": "A surprisingly friendly town."
     }
+
 
     
 }

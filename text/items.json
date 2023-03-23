@@ -1,26 +1,36 @@
 {
-        "WEAPONS": "This is where the weapons are put",
+    "WEAPONS": "This is where the weapons are put",
         "Club":{
             "description": "A simple club",
             "type": "weapon",
-            "modifier": 1
+            "modifier": 1,
+            "value": 2
         },
         "Dagger":{
             "description": "a simple dagger",
             "type": "weapon",
-            "modifier": 2
+            "modifier": 3,
+            "value": 5
         },
+
+    "ENEMY WEAPONS": "This is where enemy weapons are stored",
         "Acid":{
             "description":"a slime's acid",
             "type": "weapon",
             "modifier": 2
         },
+        "Claws":{
+            "description":"a claws from a wolf",
+            "type": "weapon",
+            "modifier": 4
+        },
 
-        "ARMOR": "This is where the armor is put",
+    "ARMOR": "This is where the armor is put",
         "Leather Tunic":{
             "description": "A simple leather tunic",
             "type": "armor",
-            "modifier": 1
+            "modifier": 1,
+            "value": 6
         },
 
         "ITEMS": "These are where items go",
@@ -28,17 +38,32 @@
             "description": "a simple healing potion",
             "type": "item",
             "modifier": 5,
-            "use": "Hitpoints:"
+            "use": "Hitpoints:",
+            "value": 10
         },
         "Rat Tail":{
             "description": "A tail from a rat",
             "type":"misc item",
-            "modifier": ""
+            "modifier": "",
+            "value": 1
         },
         "Green Crystal":{
             "description": "A small crystal from a slime",
             "type":"misc item",
-            "modifier":""
+            "modifier":"",
+            "value": 2
+        },
+        "Wolf Fur":{
+            "description": "Fur from a wolf",
+            "type":"misc item",
+            "modifier":"",
+            "value": 3
+        },
+        "Old Coin":{
+            "description": "An antique coin",
+            "type":"misc item",
+            "modifier":"",
+            "value": 4
         }
 
 }
