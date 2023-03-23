@@ -3,10 +3,16 @@
         "defeat":"You wake up in your home."
     },
     "Merchant":{
-        "quest1":"Oh, good. You're finally here. I've got a bit of a job for you since you're going to be heading out of Westcliff. I need some materials for our local alchemists, you can get them from some local monsters, 5 green crystals and 5 rat tails.",
-        "quest2": "You can find some rats in the farms north of Westcliff, and you can get the crystals by killing some slimes in the forest to the west. I need five of each."
+        "quest1":"Oh, good. You're finally here. I've got a bit of a job for you since you're going to be heading out of Westcliff.\n I need some materials for our local alchemists, you can get them from some local monsters, 5 green crystals and 5 rat tails.",
+        "quest2": "You can find some rats in the farms north of Westcliff, and you can get the crystals by killing some slimes in the forest to the west. I need five of each.",
+        "lead":"Oh! By the way, Doran came by looking for you. Said he wanted to put you to work, and to come by the guardhouse when you are ready."
     },
     "Blacksmith":{
-        
+        "intro1":"It's not much but I've got something for you. Here, something to hit those critters with.",
+        "intro2":"If you manage to earn some coin, come back and buy some proper weapons and armor!"
+    },
+    "Doran":{
+        "quest1":"",
+        "quest2":""
     }
 }

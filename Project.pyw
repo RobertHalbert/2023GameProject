@@ -230,7 +230,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     dayNames = ('Starday', 'Runesday', 'Midsday', 'Terrday', 'Ornsday')
     monthNames = ('First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth',
                   'Seventh', 'Eighth', 'Nineth', 'Tenth', 'Eleventh', 'Twelfth')
-    flags = [['Merchant', 0]]
+    flags = [['Merchant', 0],['Blacksmith',0],['Doran',0]]
 
     # Initialize everything
     def __init__(self, CCreate):
@@ -363,6 +363,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 if self.night == False:
                     self.ButtonW.setText(f'Merchant')
                     self.ButtonE.setText(f"Blacksmith")
+                if self.flags[2][1] != 0:
+                    self.ButtonA.setText('Guardhouse')
         else:
             self.OverWorldButtonUpdate()
         self.ButtonEnabled()
@@ -740,8 +742,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             f'You killed the {thisEnemy.name}. You gained {xpGain} xp and found {goldGain} gold.')
         player.inventory.append(thisEnemy.loot)
         player.experience += xpGain
+        player.gold = goldGain
         player.CheckXP()
         self.BattleEnd()
+
 
     def UpdateEnemyInformation(self):  # Function to update enemy info for UI
         self.labelEnemy.setText(thisEnemy.name)
@@ -770,6 +774,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.battleOn = False
         self.ButtonUpdate()
         self.frameEnemyInfo.setVisible(False)
+        self.UpdateInformation()
 
     def BattleLoss(self):  # Function if player loses
         self.TimeFunction(360)
@@ -966,6 +971,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 self.Text(self.dialogue[pL]['quest2'])
             elif self.flags[0][1] == 1 and ratTails[0][1] == 5 == greenCrystal[0][1]:
                 self.Text(f'Thank you {player.name}. Here is some gold for your trouble.')
+                self.Text(self.dialogue[pL]['lead'])
+                self.flags[2][1] = 1
                 self.QuestFinished(15)
                 for i in range(5):
                     player.inventory.remove('Rat Tail')
@@ -974,6 +981,15 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             else:
                 self.Text(self.locations[pL]['talk'] +
                           f"{player.name}. How can I help you?")
+        if pL == 'Blacksmith':
+            if self.flags[1][1] == 0:
+                self.Text(f"Ah, {player.name}. Good of you to drop by, heard you were going out to make a name for youself!")
+                self.Text(self.dialogue[pL]["intro1"])
+                self.QuestFinished(0,"Club")
+                self.Text(self.dialogue[pL]["intro2"])
+                self.flags[1][1] = 1
+            else:
+                self.Text(f"G'day {player.name}.")
 
     def RestFunction(self, type): # passes time heals %20 of hitpoints
         if type == 'Rest':
@@ -985,7 +1001,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             self.Text(f'{self.locations[self.playerLocation]["sleep"]}')
             healAmount = round(player.maxHP)
             player.HealFunction(healAmount)
-            self.TimeFunction(480)
+            self.TimeFunction(600)
         self.UpdateInformation()
 
     # Time Functions ##########
@@ -1020,7 +1036,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             self.day -= 360
             self.year += 1
         if self.battleOn != True and self.overWorld != True:
-            if self.time < 360 or self.time > 1200:
+            if self.time < 360 or self.time > 1140:
                 self.night = True
                 self.ButtonUpdate()
             else:

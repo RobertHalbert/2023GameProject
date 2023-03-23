@@ -7,20 +7,26 @@
             "value": 2
         },
         "Dagger":{
-            "description": "a simple dagger",
+            "description": "A simple dagger",
             "type": "weapon",
             "modifier": 3,
             "value": 5
         },
+        "Sword":{
+            "description": "A simple sword",
+            "type": "weapon",
+            "modifier": 5,
+            "value": 20
+        },
 
     "ENEMY WEAPONS": "This is where enemy weapons are stored",
         "Acid":{
-            "description":"a slime's acid",
+            "description":"A slime's acid",
             "type": "weapon",
             "modifier": 2
         },
         "Claws":{
-            "description":"a claws from a wolf",
+            "description":"Claws from a wolf",
             "type": "weapon",
             "modifier": 4
         },

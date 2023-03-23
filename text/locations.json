@@ -3,7 +3,7 @@
     "Home": {
         "description": "Your home.",
         "rest": "You rest for an hour.",
-        "sleep": "You sleep for eight hours.",
+        "sleep": "You sleep for the night.",
         "exit": "Westcliff"
     },
     "Westcliff": {
@@ -11,6 +11,7 @@
         "Home": "Home",
         "Merchant": "Merchant",
         "Blacksmith":"Blacksmith",
+        "Guardhouse":"Guardhouse",
         "exit": "overworld"
     },
     "Merchant": {
@@ -25,6 +26,11 @@
         "talk": "Hello there",
         "buy": "buy items",
         "sell": "sell items",
+        "exit": "Westcliff"
+    },
+    "Guardhouse": {
+        "description": "This place is where the guards work.",
+        "talk": "Hello there",
         "exit": "Westcliff"
     },
     "Westcliff Farms": {
@@ -78,7 +84,7 @@
     },
 "SHOPS":"All shops are stored here",
     "Merchant Shop": ["Bandages","Potion"],
-    "Blacksmith Shop": ["Dagger","Leather Tunic"]
+    "Blacksmith Shop": ["Dagger","Sword","Leather Tunic"]
 
     
 }
