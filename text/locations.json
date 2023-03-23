@@ -1,4 +1,5 @@
 {
+"LOCATIONS": "Visitable locations are stored here",
     "Home": {
         "description": "Your home.",
         "rest": "You rest for an hour.",
@@ -9,10 +10,18 @@
         "description": "A small town.",
         "Home": "Home",
         "Merchant": "Merchant",
+        "Blacksmith":"Blacksmith",
         "exit": "overworld"
     },
     "Merchant": {
         "description": "Merchant's place.",
+        "talk": "Hello there",
+        "buy": "buy items",
+        "sell": "sell items",
+        "exit": "Westcliff"
+    },
+    "Blacksmith": {
+        "description": "Blacksmith's place.",
         "talk": "Hello there",
         "buy": "buy items",
         "sell": "sell items",
@@ -66,8 +75,10 @@
     },
     "Darkwood":{
         "description": "A surprisingly friendly town."
-    }
-
+    },
+"SHOPS":"All shops are stored here",
+    "Merchant Shop": ["Bandages","Potion"],
+    "Blacksmith Shop": ["Dagger","Leather Tunic"]
 
     
 }

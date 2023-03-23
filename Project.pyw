@@ -47,7 +47,7 @@ class PlayerCharacter(Character):
         self.gold = 5
         self.experience = 0
         self.experienceNeeded = 10
-        self.inventory = ['Club', 'Leather Tunic']
+        self.inventory = ["Old Coin","Old Coin"]
         self.points = 0
         self.tired = False
 
@@ -220,6 +220,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     overWorld = False
     inventoryOpen = False
     shopOpen = False
+    shopOp = 1
     night = False
     battleOn = False
     playerCoordinates = [5, 5]
@@ -361,6 +362,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 self.ButtonQ.setText(f'Home')
                 if self.night == False:
                     self.ButtonW.setText(f'Merchant')
+                    self.ButtonE.setText(f"Blacksmith")
         else:
             self.OverWorldButtonUpdate()
         self.ButtonEnabled()
@@ -478,6 +480,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     def ButtonQPressed(self):
         b = self.ButtonQ.text()
         pL = self.playerLocation
+        if self.shopOpen == True:
+            if self.shopOp == 1:
+                self.BuyItem(b)
+            else: 
+                self.SellItem(b)
         if self.battleOn == True:
             self.BattleFunction(b)
             return
@@ -498,9 +505,16 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     def ButtonWPressed(self):
         b = self.ButtonW.text()
         pL = self.playerLocation
+        if self.shopOpen == True:
+            if self.shopOp == 1:
+                self.BuyItem(b)
+            else: 
+                self.SellItem(b)
         if b == 'Sleep':
             self.RestFunction(b)
             return
+        if b == "Buy Items":
+            self.OpenShopBuy() 
         if self.battleOn == True:
             self.BattleFunction(b)
             return
@@ -515,6 +529,13 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     def ButtonEPressed(self):
         b = self.ButtonE.text()
         pL = self.playerLocation
+        if self.shopOpen == True:
+            if self.shopOp == 1:
+                self.BuyItem(b)
+            else: 
+                self.SellItem(b)
+        if b == "Sell Items":
+            self.OpenShopSell()
         if self.battleOn == True:
             self.BattleFunction(b)
             return
@@ -540,6 +561,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     def ButtonAPressed(self):
         b = self.ButtonA.text()
         pL = self.playerLocation
+        if self.shopOpen == True:
+            if self.shopOp == 1:
+                self.BuyItem(b)
+            else: 
+                self.SellItem(b)
         if self.inventoryOpen == self.shopOpen == self.battleOn == False:
             if self.overWorld != True:
                 self.EnterAreaFunction(self.locations[pL][b])
@@ -551,6 +577,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     def ButtonSPressed(self):
         b = self.ButtonS.text()
         pL = self.playerLocation
+        if self.shopOpen == True:
+            if self.shopOp == 1:
+                self.BuyItem(b)
+            else: 
+                self.SellItem(b)
         if self.inventoryOpen == self.shopOpen == self.battleOn == False:
             if self.overWorld != True:
                 self.EnterAreaFunction(self.locations[pL][b])
@@ -562,6 +593,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     def ButtonDPressed(self):
         b = self.ButtonD.text()
         pL = self.playerLocation
+        if self.shopOpen == True:
+            if self.shopOp == 1:
+                self.BuyItem(b)
+            else: 
+                self.SellItem(b)
         if self.inventoryOpen == self.shopOpen == self.battleOn == False:
             if self.overWorld != True:
                 self.EnterAreaFunction(self.locations[pL][b])
@@ -583,6 +619,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     def ButtonZPressed(self):
         b = self.ButtonZ.text()
         pL = self.playerLocation
+        if self.shopOpen == True:
+            if self.shopOp == 1:
+                self.BuyItem(b)
+            else: 
+                self.SellItem(b)
         if self.inventoryOpen == self.shopOpen == self.battleOn == False:
             if self.overWorld != True:
                 self.EnterAreaFunction(self.locations[pL][b])
@@ -595,6 +636,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     def ButtonXPressed(self):
         b = self.ButtonX.text()
         pL = self.playerLocation
+        if self.shopOpen == True:
+            if self.shopOp == 1:
+                self.BuyItem(b)
+            else: 
+                self.SellItem(b)
         if self.inventoryOpen == self.shopOpen == self.battleOn == False:
             if self.overWorld != True:
                 self.EnterAreaFunction(self.locations[pL][b])
@@ -607,6 +653,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     def ButtonCPressed(self):
         b = self.ButtonC.text()
         pL = self.playerLocation
+        if self.shopOpen == True:
+            if self.shopOp == 1:
+                self.BuyItem(b)
+            else: 
+                self.SellItem(b)
         if self.inventoryOpen == self.shopOpen == False:
             self.SetUpInventory()
             return
@@ -619,12 +670,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             pL = self.playerLocation
             self.LeaveAreaFunction(self.locations[pL]["exit"])
         if b == 'Close':
-            if self.shopOpen == self.inventoryOpen == True:
-                self.inventoryOpen = False
-                # function here for setting up shop inventory
-            else:
-                self.shopOpen = False
-                self.inventoryOpen = False
+            self.shopOpen = False
+            self.inventoryOpen = False
             if self.battleOn == False:
                 self.ButtonUpdate()
             else:
@@ -774,6 +821,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
 
     # Inventory Functions ##########
     def SetUpInventory(self): # Sets up inventory buttons and puts item info into text window
+        self.mainTextBox.clear()
         self.inventoryOpen = True
         buttonList = ['Q', 'W', 'E', 'A',
                       'S', 'D', 'Z', 'X', 'C']
@@ -795,7 +843,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 itemType = 'Damage:'
             elif self.items[i[0]]['type'] == 'armor':
                 itemType = 'Armor:'
-            elif self.items[i[0]]['type'] == 'item':
+            elif self.items[i[0]]['type'] == 'item' or self.items[i[0]]['type'] == 'healing':
                 itemType = self.items[i[0]]['use']
             elif self.items[i[0]]['type'] == 'misc item':
                 itemType = 'Misc Item'
@@ -828,8 +876,67 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             else:
                 self.Text(
                     f'You remove the {player.armor.lower()} and don the {itemformated}.')
+        if itemType == 'healing':
+            self.Text(f'You use the {item} and restore {self.items[item]["modifier"]} hit points.')
+            player.HealFunction(self.items[item]["modifier"])
+            player.inventory.remove(item)
         if self.battleOn == True:
             self.EnemyAction()
+
+    # Shop Functions ######
+    def OpenShopBuy(self):
+        self.shopOpen = True
+        self.shopOp = 1
+        self.mainTextBox.clear()
+        self.ButtonV.setText("Close")
+        thisShop = self.locations[self.playerLocation + ' ' + "Shop"]
+        buttonList = ['Q', 'W', 'E', 'A',
+                      'S', 'D', 'Z', 'X', 'C']
+        for x in buttonList:
+            buttontoupdate = 'self.Button' + \
+                x+f'.setText("")'
+            eval(buttontoupdate)
+        x = 0
+        for i in thisShop:
+            buttontoupdate = 'self.Button' + \
+                buttonList[x]+f'.setText("{i}")'
+            eval(buttontoupdate)
+            if self.items[i]['type'] == 'weapon':
+                itemType = 'Damage:'
+            elif self.items[i]['type'] == 'armor':
+                itemType = 'Armor:'
+            elif self.items[i]['type'] == 'item' or self.items[i]['type'] == 'healing':
+                itemType = self.items[i]['use']
+            elif self.items[i]['type'] == 'misc item':
+                itemType = 'Misc Item'
+            self.Text(
+                f"{self.items[i]['description']} - {itemType} {self.items[i]['modifier']} - Cost: {self.items[i]['value']} gold")
+            x+=1
+        self.ButtonEnabled()
+        pass
+
+    def BuyItem(self,item):
+        value = self.items[item]["value"]
+        if player.gold < value:
+            self.Text(f"You do not have enough gold to buy the {item}!")
+        else:
+            self.Text(f"You buy the {item}.")
+            player.gold -= value
+            player.inventory.append(item)
+        self.UpdateInformation()
+
+    def OpenShopSell(self):
+        self.shopOpen = True
+        self.shopOp = 2
+        self.SetUpInventory()
+        
+    def SellItem(self,item):
+        value = self.items[item]["value"]
+        self.Text(f"You sell the {item} and get {value} gold in return.")
+        player.inventory.remove(item)
+        player.gold += value
+        self.UpdateInformation()
+        self.SetUpInventory()
 
     # Action Functions ##########
     def QuestFinished(self,gold=0,item='none'):
@@ -915,7 +1022,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if self.battleOn != True and self.overWorld != True:
             if self.time < 360 or self.time > 1200:
                 self.night = True
-
                 self.ButtonUpdate()
             else:
                 self.night = False

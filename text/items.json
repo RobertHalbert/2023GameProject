@@ -34,12 +34,19 @@
         },
 
         "ITEMS": "These are where items go",
-        "Potion":{
-            "description": "a simple healing potion",
-            "type": "item",
-            "modifier": 5,
+        "Bandages":{
+            "description": "A roll of bandages",
+            "type": "healing",
+            "modifier": 4,
             "use": "Hitpoints:",
-            "value": 10
+            "value": 5
+        },
+        "Potion":{
+            "description": "A simple healing potion",
+            "type": "healing",
+            "modifier": 10,
+            "use": "Hitpoints:",
+            "value": 20
         },
         "Rat Tail":{
             "description": "A tail from a rat",
