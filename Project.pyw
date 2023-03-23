@@ -257,8 +257,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.frameEnemyInfo.setVisible(False)
         self.labelSlots.setVisible(False)
         self.ButtonZ.setText('Inventory')
-        self.mainTextBox.appendPlainText(
-            "Welcome to (My Game)!\n\nStart a new game by selecting 'New game' in the Menu or by pressing 'F3'.")
+        self.Text(self.dialogue["General"]["intro"])
         self.playerLocation = 'Home'
 
     # Allows keyboard keys to be pressed for inputs
@@ -709,6 +708,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonEnabled()
 
     def BattleFunction(self, action):  # Function to handle battle actions
+        roll = random.randint(1,100)
         if player.weapon == 'none':
             damage = 0
         else:
@@ -718,10 +718,13 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         else:
             enemyArmor = self.items[thisEnemy.armor]["modifier"]
         if action == 'Attack':
-            damageDelt = player.AttackAction(
-                player, damage, thisEnemy, enemyArmor)
-            self.Text(
-                f"You attack the {thisEnemy.name}, dealing {damageDelt} damage.")
+            if roll > 20 * thisEnemy.dexterity/player.dexterity:
+                damageDelt = player.AttackAction(
+                    player, damage, thisEnemy, enemyArmor)
+                self.Text(
+                    f"You attack the {thisEnemy.name}, dealing {damageDelt} damage.")
+            else:
+                self.Text(f"You try to attack the {thisEnemy.name}, but miss.")
         if action == 'Run':
             self.Text("You run away.")
             self.BattleEnd()
@@ -755,6 +758,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.progressBarEnemyHp.setValue(bar)
 
     def EnemyAction(self):  # Function for enemy attack
+        roll = random.randint(1,100)
         if thisEnemy.weapon == 'none':
             damage = 0
         else:
@@ -763,12 +767,15 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             playerArmor = 0
         else:
             playerArmor = self.items[player.armor]["modifier"]
-        damageDelt = thisEnemy.AttackAction(
-            thisEnemy, damage, player, playerArmor)
-        self.Text(
-            f'The {thisEnemy.name} attacks you, dealing {damageDelt} damage.')
-        if player.hitPoints <= 0:
-            self.BattleLoss()
+        if roll > 20 * player.dexterity/thisEnemy.dexterity:
+            damageDelt = thisEnemy.AttackAction(
+                thisEnemy, damage, player, playerArmor)
+            self.Text(
+                f'The {thisEnemy.name} attacks you, dealing {damageDelt} damage.')
+            if player.hitPoints <= 0:
+                self.BattleLoss()
+        else:
+            self.Text(f"The {thisEnemy.name} tries to attack you, but you manage to evade it.")
 
     def BattleEnd(self):  # function to end battle state
         self.battleOn = False
@@ -990,8 +997,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 self.flags[1][1] = 1
             else:
                 self.Text(f"G'day {player.name}.")
+        if pL == 'Guardhouse':
+            if self.flags[2][1] == 1:
+                self.Text(self.dialogue[pL]["quest1"])
 
-    def RestFunction(self, type): # passes time heals %20 of hitpoints
+    def RestFunction(self, type): # passes time and heals hitpoints
         if type == 'Rest':
             self.Text(f'{self.locations[self.playerLocation]["rest"]}')
             healAmount = round(player.maxHP*0.2)
