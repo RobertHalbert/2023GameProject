@@ -13,7 +13,8 @@
         "intro2":"If you manage to earn some coin, come back and buy some proper weapons and armor!"
     },
     "Guardhouse":{
-        "quest1":"",
-        "quest2":""
+        "quest1":"I've heard that you've been clearing out some creatures from the surrounding area and I could use some extra muscle around here.\nLately there have been more and more attacks in the surrounding area, what few guards that are available have to stay within the town to fend off any stray creatures. I'd like you to go out and cull some wolves from the nearby plains. Ten should be enough to keep the number of incedents down.\n Of course, you'll be paid for your work.",
+        "quest2":"I imagine there's little left to be done around here. If you insist on your adventuring lifestyle, I suggest going to Carrier City to the east. The Buckroot inn usually has jobs for people looking for busywork.",
+        "questDone":"Remember to keep your gear up to date, the difference could be life or death."
     }
 }
