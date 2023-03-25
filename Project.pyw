@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget
 from PyQt5.QtCore import Qt, pyqtSignal
 from uiFiles import Ui_Game, Ui_CCWindow
 
+
 class Battle:
     def __init__(self):
         self.damage = 0
@@ -19,11 +20,13 @@ class Battle:
         defender.hitPoints -= totalDamage
         return totalDamage
 
+
 class Equipment:
     def __init__(self, armor, weapon, accesory):
         self.armor = armor
         self.weapon = weapon
         self.accesory = accesory
+
 
 class Character(Equipment, Battle):
     def __init__(self, hitPoints, maxHP, strength, dexterity, constitution, arcana, charisma, armor, weapon, accesory, name, sex):
@@ -38,6 +41,7 @@ class Character(Equipment, Battle):
         self.name = name
         self.sex = sex
 
+
 class PlayerCharacter(Character):
     def __init__(self, hitPoints, maxHP, strength, dexterity, constitution, arcana, charisma, armor, weapon, accesory, name, appearence, sex):
         super().__init__(hitPoints, maxHP, strength, dexterity, constitution,
@@ -47,7 +51,7 @@ class PlayerCharacter(Character):
         self.gold = 5
         self.experience = 0
         self.experienceNeeded = 10
-        self.inventory = ["Old Coin","Old Coin"]
+        self.inventory = ["Old Coin", "Old Coin"]
         self.points = 0
         self.tired = False
 
@@ -75,6 +79,7 @@ class PlayerCharacter(Character):
         if self.hitPoints > self.maxHP:
             self.hitPoints = self.maxHP
 
+
 class Enemy(Character):
     def __init__(self, hitPoints, maxHP, strength, dexterity, constitution, arcana, charisma, armor, weapon, accesory, name, sex, loot, level):
         super().__init__(hitPoints, maxHP, strength, dexterity, constitution,
@@ -82,7 +87,8 @@ class Enemy(Character):
         self.loot = loot
         self.level = level
 
-class CreationWindow(Ui_CCWindow.Ui_Form, QWidget):# Character Creation Window #####
+
+class CreationWindow(Ui_CCWindow.Ui_Form, QWidget):  # Character Creation Window #####
     signal = pyqtSignal()
     strength = 1
     dexterity = 1
@@ -205,6 +211,7 @@ class CreationWindow(Ui_CCWindow.Ui_Form, QWidget):# Character Creation Window #
         self.signal.emit()
         QWidget.close(self)
 
+
 class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     # These are used to access the json files
     with open("text/dialogue.json", "r") as d:
@@ -230,7 +237,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     dayNames = ('Starday', 'Runesday', 'Midsday', 'Terrday', 'Ornsday')
     monthNames = ('First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth',
                   'Seventh', 'Eighth', 'Nineth', 'Tenth', 'Eleventh', 'Twelfth')
-    flags = [['Merchant', 0],['Blacksmith',0],['Doran',0]]
+    flags = [['Merchant', 0], ['Blacksmith', 0], ['Doran', 0]]
+    monsterKills = [['Wolves', 0]]
 
     # Initialize everything
     def __init__(self, CCreate):
@@ -369,7 +377,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonEnabled()
         self.UpdateInformation()
 
-    def OverWorldButtonUpdate(self): # For 'overworld' traversal #####
+    def OverWorldButtonUpdate(self):  # For 'overworld' traversal #####
         cX = self.playerCoordinates[0]
         cY = self.playerCoordinates[1]
         buttonList = ['Q', 'W', 'E', 'R', 'A',
@@ -383,7 +391,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonS.setText('South')
         self.ButtonD.setText('East')
         self.ButtonC.setText('Inventory')
-        if cX <= 10 and cY <= 7: #Westcliff area
+        if cX <= 10 and cY <= 7:  # Westcliff area
             if cX == 5 == cY:
                 self.ButtonQ.setText(f'Westcliff')
                 self.playerLocation = 'Westcliff'
@@ -403,7 +411,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             if cX == 10 and cY < 4 and self.battleOn == False:
                 self.ButtonD.setText('')
                 self.Text('The ocean stretches out to the east.')
-        elif cX >= 11 and cY <= 8: # Carrier Area
+        elif cX >= 11 and cY <= 8:  # Carrier Area
             if cX == 11 and cY == 5:
                 self.playerLocation = 'Carrier City'
                 self.ButtonS.setText('')
@@ -415,7 +423,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 self.playerLocation = 'Carrier Road'
                 if 6 >= cY >= 5 and self.battleOn == False:
                     self.ButtonD.setText('')
-        elif 19 >= cX >= 6 and 13 >= cY >= 9: #Northcliff Area
+        elif 19 >= cX >= 6 and 13 >= cY >= 9:  # Northcliff Area
             if 10 >= cX >= 6 and cY == 9 and self.battleOn == False:
                 self.ButtonS.setText('')
             if cX == 6 and 11 >= cY >= 9 and self.battleOn == False:
@@ -430,7 +438,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 self.playerLocation = 'Northcliff'
             elif (cX == 6 and 13 >= cY >= 10):
                 self.playerLocation = 'Triad Road'
-        elif 5 >= cX >= 2 and 12 >= cY >= 10: #Clifton Area
+        elif 5 >= cX >= 2 and 12 >= cY >= 10:  # Clifton Area
             if cX == 2 and self.battleOn == False:
                 self.ButtonA.setText('')
                 if cY <= 11:
@@ -484,7 +492,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if self.shopOpen == True:
             if self.shopOp == 1:
                 self.BuyItem(b)
-            else: 
+            else:
                 self.SellItem(b)
         if self.battleOn == True:
             self.BattleFunction(b)
@@ -509,13 +517,13 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if self.shopOpen == True:
             if self.shopOp == 1:
                 self.BuyItem(b)
-            else: 
+            else:
                 self.SellItem(b)
         if b == 'Sleep':
             self.RestFunction(b)
             return
         if b == "Buy Items":
-            self.OpenShopBuy() 
+            self.OpenShopBuy()
         if self.battleOn == True:
             self.BattleFunction(b)
             return
@@ -533,7 +541,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if self.shopOpen == True:
             if self.shopOp == 1:
                 self.BuyItem(b)
-            else: 
+            else:
                 self.SellItem(b)
         if b == "Sell Items":
             self.OpenShopSell()
@@ -565,7 +573,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if self.shopOpen == True:
             if self.shopOp == 1:
                 self.BuyItem(b)
-            else: 
+            else:
                 self.SellItem(b)
         if self.inventoryOpen == self.shopOpen == self.battleOn == False:
             if self.overWorld != True:
@@ -581,7 +589,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if self.shopOpen == True:
             if self.shopOp == 1:
                 self.BuyItem(b)
-            else: 
+            else:
                 self.SellItem(b)
         if self.inventoryOpen == self.shopOpen == self.battleOn == False:
             if self.overWorld != True:
@@ -597,7 +605,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if self.shopOpen == True:
             if self.shopOp == 1:
                 self.BuyItem(b)
-            else: 
+            else:
                 self.SellItem(b)
         if self.inventoryOpen == self.shopOpen == self.battleOn == False:
             if self.overWorld != True:
@@ -623,7 +631,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if self.shopOpen == True:
             if self.shopOp == 1:
                 self.BuyItem(b)
-            else: 
+            else:
                 self.SellItem(b)
         if self.inventoryOpen == self.shopOpen == self.battleOn == False:
             if self.overWorld != True:
@@ -640,7 +648,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if self.shopOpen == True:
             if self.shopOp == 1:
                 self.BuyItem(b)
-            else: 
+            else:
                 self.SellItem(b)
         if self.inventoryOpen == self.shopOpen == self.battleOn == False:
             if self.overWorld != True:
@@ -657,7 +665,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if self.shopOpen == True:
             if self.shopOp == 1:
                 self.BuyItem(b)
-            else: 
+            else:
                 self.SellItem(b)
         if self.inventoryOpen == self.shopOpen == False:
             self.SetUpInventory()
@@ -708,7 +716,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonEnabled()
 
     def BattleFunction(self, action):  # Function to handle battle actions
-        roll = random.randint(1,100)
+        roll = random.randint(1, 100)
         if player.weapon == 'none':
             damage = 0
         else:
@@ -738,8 +746,13 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.UpdateEnemyInformation()
         self.UpdateInformation()
 
+    def MonsterKillCheck(self):
+        if self.flags[2][1] == 2 and thisEnemy.name == 'Wolf' and self.monsterKills[0][1] < 10:
+            self.monsterKills[0][1] += 1
+
     def BattleWin(self):  # Function if player wins battle
         xpGain = round(thisEnemy.level/player.level) + 1
+        self.MonsterKillCheck()
         goldGain = thisEnemy.level
         self.Text(
             f'You killed the {thisEnemy.name}. You gained {xpGain} xp and found {goldGain} gold.')
@@ -749,7 +762,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         player.CheckXP()
         self.BattleEnd()
 
-
     def UpdateEnemyInformation(self):  # Function to update enemy info for UI
         self.labelEnemy.setText(thisEnemy.name)
         self.labelHPEnemy.setText(
@@ -758,7 +770,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.progressBarEnemyHp.setValue(bar)
 
     def EnemyAction(self):  # Function for enemy attack
-        roll = random.randint(1,100)
+        roll = random.randint(1, 100)
         if thisEnemy.weapon == 'none':
             damage = 0
         else:
@@ -775,7 +787,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             if player.hitPoints <= 0:
                 self.BattleLoss()
         else:
-            self.Text(f"The {thisEnemy.name} tries to attack you, but you manage to evade it.")
+            self.Text(
+                f"The {thisEnemy.name} tries to attack you, but you manage to evade it.")
 
     def BattleEnd(self):  # function to end battle state
         self.battleOn = False
@@ -798,13 +811,13 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.BattleEnd()
 
     # Location Functions ##########
-    def EncounterFunction(self, chance): # Function To determine random encounter
+    def EncounterFunction(self, chance):  # Function To determine random encounter
         pL = self.playerLocation
         roll = random.randint(1, 100)
         if roll * chance > 40:
             self.EnemySetup()
 
-    def OverWorldMovement(self, direction): # Function to move player in overworld
+    def OverWorldMovement(self, direction):  # Function to move player in overworld
         if direction == 'North':
             self.playerCoordinates[1] += 1
         if direction == 'East':
@@ -832,7 +845,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonUpdate()
 
     # Inventory Functions ##########
-    def SetUpInventory(self): # Sets up inventory buttons and puts item info into text window
+    def SetUpInventory(self):  # Sets up inventory buttons and puts item info into text window
         self.mainTextBox.clear()
         self.inventoryOpen = True
         buttonList = ['Q', 'W', 'E', 'A',
@@ -889,7 +902,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 self.Text(
                     f'You remove the {player.armor.lower()} and don the {itemformated}.')
         if itemType == 'healing':
-            self.Text(f'You use the {item} and restore {self.items[item]["modifier"]} hit points.')
+            self.Text(
+                f'You use the {item} and restore {self.items[item]["modifier"]} hit points.')
             player.HealFunction(self.items[item]["modifier"])
             player.inventory.remove(item)
         if self.battleOn == True:
@@ -923,11 +937,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 itemType = 'Misc Item'
             self.Text(
                 f"{self.items[i]['description']} - {itemType} {self.items[i]['modifier']} - Cost: {self.items[i]['value']} gold")
-            x+=1
+            x += 1
         self.ButtonEnabled()
         pass
 
-    def BuyItem(self,item):
+    def BuyItem(self, item):
         value = self.items[item]["value"]
         if player.gold < value:
             self.Text(f"You do not have enough gold to buy the {item}!")
@@ -941,8 +955,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.shopOpen = True
         self.shopOp = 2
         self.SetUpInventory()
-        
-    def SellItem(self,item):
+
+    def SellItem(self, item):
         value = self.items[item]["value"]
         self.Text(f"You sell the {item} and get {value} gold in return.")
         player.inventory.remove(item)
@@ -951,7 +965,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.SetUpInventory()
 
     # Action Functions ##########
-    def QuestFinished(self,gold=0,item='none'):
+    def QuestFinished(self, gold=0, item='none'):
         text = ''
         if item != 'none':
             text += f'You place the {item} in your bag.'
@@ -960,7 +974,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             text += f'You put the {gold} gold in your pouch.'
         self.Text(f'{text}')
 
-    def TalkFunction(self): # function to talk to npcs, using flags and the dialogue.json
+    def TalkFunction(self):  # function to talk to npcs, using flags and the dialogue.json
         pL = self.playerLocation
         count = 0
         compiledList = set(player.inventory)
@@ -977,7 +991,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             elif self.flags[0][1] == 1:
                 self.Text(self.dialogue[pL]['quest2'])
             elif self.flags[0][1] == 1 and ratTails[0][1] == 5 == greenCrystal[0][1]:
-                self.Text(f'Thank you {player.name}. Here is some gold for your trouble.')
+                self.Text(
+                    f'Thank you {player.name}. Here is some gold for your trouble.')
                 self.Text(self.dialogue[pL]['lead'])
                 self.flags[2][1] = 1
                 self.QuestFinished(15)
@@ -990,18 +1005,31 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                           f"{player.name}. How can I help you?")
         if pL == 'Blacksmith':
             if self.flags[1][1] == 0:
-                self.Text(f"Ah, {player.name}. Good of you to drop by, heard you were going out to make a name for youself!")
+                self.Text(
+                    f"Ah, {player.name}. Good of you to drop by, heard you were going out to make a name for youself!")
                 self.Text(self.dialogue[pL]["intro1"])
-                self.QuestFinished(0,"Club")
+                self.QuestFinished(0, "Club")
                 self.Text(self.dialogue[pL]["intro2"])
                 self.flags[1][1] = 1
             else:
                 self.Text(f"G'day {player.name}.")
         if pL == 'Guardhouse':
             if self.flags[2][1] == 1:
+                self.Text(f"{player.name}, glad you're here.")
                 self.Text(self.dialogue[pL]["quest1"])
+                self.flags[2][1] = 2
+            elif self.flags[2][1] == 2 and self.monsterKills[0][1] == 10:
+                self.Text(
+                    f"You've done a good service {player.name}, you've made this town a safer place. Here, your payment.")
+                self.QuestFinished(30)
+                self.Text(self.dialogue[pL]["quest2"])
+                self.flags[2][1] = 3
+            elif self.flags[2][1] == 3:
+                self.Text(self.dialogue[pL]["questDone"])
+            else:
+                self.Text(f"Hello, {player.name}")
 
-    def RestFunction(self, type): # passes time and heals hitpoints
+    def RestFunction(self, type):  # passes time and heals hitpoints
         if type == 'Rest':
             self.Text(f'{self.locations[self.playerLocation]["rest"]}')
             healAmount = round(player.maxHP*0.2)
@@ -1015,8 +1043,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.UpdateInformation()
 
     # Time Functions ##########
-   
-    def FormatDate(self):  # Used to get month, current day of the month, and the prefex of the day for the UI
+
+    # Used to get month, current day of the month, and the prefex of the day for the UI
+    def FormatDate(self):
         if self.day > 30:
             today = self.day % 30
             month = self.monthNames[(self.day//30)-1]
@@ -1030,14 +1059,15 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             add = 'th'
         return f"{today}{add} of the {month}, Year: {self.year}"
 
-    def FormatTime(self):# Used to get the day name, and current time properly formatted for the UI
+    def FormatTime(self):  # Used to get the day name, and current time properly formatted for the UI
         if self.day > 5:
             day = self.day % 5
         hour = self.time // 60
         minute = self.time % 60
         return f"{self.dayNames[day-1]} - {hour}:{minute:02d}"
 
-    def TimeFunction(self, minutes): # Will take added minutes, add to time and change the day and/or year accordingly
+    # Will take added minutes, add to time and change the day and/or year accordingly
+    def TimeFunction(self, minutes):
         self.time += minutes
         while self.time >= 1440:
             self.time -= 1440
