@@ -232,14 +232,18 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     shopOp = 1
     night = False
     battleOn = False
+    roomPaid = False
+    roomTimeLeft = 0
     playerCoordinates = [5, 5]
     time = 480
     day = 162
     year = 344
+    defeatArea = 0
+    defeatLocations = ('Home','Doctor')
     dayNames = ('Starday', 'Runesday', 'Midsday', 'Terrday', 'Ornsday')
     monthNames = ('First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth',
                   'Seventh', 'Eighth', 'Nineth', 'Tenth', 'Eleventh', 'Twelfth')
-    flags = [['Merchant', 0], ['Blacksmith', 0], ['Doran', 0]]
+    flags = [['Varren', 0], ['Orrin', 0], ['Doran', 0],['Mage',0]]
     monsterKills = [['Wolves', 0]]
 
     # Initialize everything
@@ -367,14 +371,24 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             self.ButtonE.setText('Sell Items')
         self.ButtonC.setText(f'Inventory')
         if self.overWorld != True:
-            self.ButtonV.setText(f'Leave')
+            self.ButtonV.setText('Leave')
             if pL == "Westcliff":
-                self.ButtonQ.setText(f'Home')
+                self.ButtonQ.setText('Home')
                 if self.night == False:
-                    self.ButtonW.setText(f'Merchant')
-                    self.ButtonE.setText(f"Blacksmith")
+                    self.ButtonW.setText("Varren's")
+                    self.ButtonE.setText("Orrin's")
                 if self.flags[2][1] != 0:
                     self.ButtonA.setText('Guardhouse')
+            if pL == "Carrier City":
+                self.ButtonQ.setText('Buckroot')
+                if self.night == False:
+                    self.ButtonW.setText('Blacksmith')
+                    self.ButtonE.setText('Merchant')
+            if pL == 'Buckroot':
+                if self.roomPaid == False:
+                    self.ButtonW.setText('Pay for Room')
+                elif self.roomPaid == True:
+                    self.ButtonW.setText('Enter Room')
         else:
             self.OverWorldButtonUpdate()
         if self.inventoryOpen == self.shopOpen == self.battleOn != True:
@@ -398,6 +412,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonD.setText('East')
         self.ButtonC.setText('Inventory')
         if cX <= 10 and cY <= 7:  # Westcliff area
+            self.defeatArea = 0
             if cX == 5 == cY:
                 self.ButtonQ.setText(f'Westcliff')
                 self.playerLocation = 'Westcliff'
@@ -418,9 +433,12 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 self.ButtonD.setText('')
                 self.Text('The ocean stretches out to the east.')
         elif cX >= 11 and cY <= 8:  # Carrier Area
+            self.defeatArea = 1
             if cX == 11 and cY == 5:
                 self.playerLocation = 'Carrier City'
+                self.ButtonQ.setText('Carrier City')
                 self.ButtonS.setText('')
+                self.ButtonD.setText('')
             elif 19 >= cX >= 12 and 8 >= cY >= 7:
                 if cY == 7 and self.battleOn == False:
                     self.ButtonS.setText('')
@@ -529,6 +547,9 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 self.BuyItem(b)
             else:
                 self.SellItem(b)
+        elif b == "Pay for Room":
+            self.PayForRoom()
+            return
         elif b == 'Sleep':
             self.RestFunction(b)
             return
@@ -818,7 +839,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     def BattleLoss(self):  # Function if player loses
         self.TimeFunction(360)
         self.overWorld = False
-        self.playerLocation = 'Home'
+        self.playerLocation = self.defeatLocations[self.defeatArea]
         self.playerCoordinates = [5, 5]
         player.hitPoints = 1
         xpLoss = round(thisEnemy.level/player.level) + 1
@@ -988,6 +1009,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.SetUpInventory()
 
     # Action Functions ##########
+    def PayForRoom(self):
+        player.gold -= 5
+        self.roomPaid = True
+        self.roomTimeLeft = 1440
+
     def LevelUpFunction(self):
         self.levelUp = True
         buttonList = ['Q', 'W', 'E', 'A', 'R',
@@ -1036,7 +1062,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         for i in compiledList:
             numberedList[count] = [i, player.inventory.count(i)]
             count += 1
-        if pL == 'Merchant':
+        if pL == "Varren's":
             ratTails = [t for t in numberedList if 'Rat Tail' in t]
             greenCrystal = [c for c in numberedList if 'Green Crystal' in c]
             if self.flags[0][1] == 0:
@@ -1057,7 +1083,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             else:
                 self.Text(self.locations[pL]['talk'] +
                           f"{player.name}. How can I help you?")
-        if pL == 'Blacksmith':
+        if pL == "Orrin's":
             if self.flags[1][1] == 0:
                 self.Text(
                     f"Ah, {player.name}. Good of you to drop by, heard you were going out to make a name for youself!")
@@ -1123,6 +1149,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     # Will take added minutes, add to time and change the day and/or year accordingly
     def TimeFunction(self, minutes):
         self.time += minutes
+        if self.roomPaid == True:
+            self.roomTimeLeft -= minutes
+            if self.roomTimeLeft <= 0:
+                self.roomPaid = False
         while self.time >= 1440:
             self.time -= 1440
             self.day += 1

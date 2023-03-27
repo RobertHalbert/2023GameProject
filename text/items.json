@@ -18,6 +18,12 @@
             "modifier": 5,
             "value": 20
         },
+        "Longsword":{
+            "description": "A well made sword",
+            "type": "weapon",
+            "modifier": 7,
+            "value": 50
+        },
 
     "ENEMY WEAPONS": "This is where enemy weapons are stored",
         "Acid":{
@@ -38,6 +44,18 @@
             "modifier": 1,
             "value": 6
         },
+        "Chainmail":{
+            "description": "A set of chainmail armor",
+            "type": "armor",
+            "modifier": 3,
+            "value": 40
+        },
+        "Plate Armor":{
+            "description": "A well-made set of plate armor",
+            "type": "armor",
+            "modifier": 5,
+            "value": 80
+        },
 
         "ITEMS": "These are where items go",
         "Bandages":{
@@ -54,6 +72,15 @@
             "use": "Hitpoints:",
             "value": 20
         },
+        "Elixir":{
+            "description": "A strong healing potion",
+            "type": "healing",
+            "modifier": 30,
+            "use": "Hitpoints:",
+            "value": 60
+        },
+
+
         "Rat Tail":{
             "description": "A tail from a rat",
             "type":"misc item",

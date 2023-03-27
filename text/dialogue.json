@@ -8,7 +8,7 @@
         "quest2": "You can find some rats in the farms north of Westcliff, and you can get the crystals by killing some slimes in the forest to the west. I need five of each.",
         "lead":"Oh! By the way, Doran came by looking for you. Said he wanted to put you to work, and to come by the guardhouse when you are ready."
     },
-    "Blacksmith":{
+    "Orrin's":{
         "intro1":"It's not much but I've got something for you. Here, something to hit those critters with.",
         "intro2":"If you manage to earn some coin, come back and buy some proper weapons and armor!"
     },
@@ -16,5 +16,8 @@
         "quest1":"I've heard that you've been clearing out some creatures from the surrounding area and I could use some extra muscle around here.\nLately there have been more and more attacks in the surrounding area, what few guards that are available have to stay within the town to fend off any stray creatures. I'd like you to go out and cull some wolves from the nearby plains. Ten should be enough to keep the number of incedents down.\n Of course, you'll be paid for your work.",
         "quest2":"I imagine there's little left to be done around here. If you insist on your adventuring lifestyle, I suggest going to Carrier City to the east. The Buckroot inn usually has jobs for people looking for busywork.",
         "questDone":"Remember to keep your gear up to date, the difference could be life or death."
+    },
+    "Buckroot":{
+        "intro1":"Welcome to the Buckroot in traveler. A room is 5 gold a night, jobs are posted on the board overe there."
     }
 }

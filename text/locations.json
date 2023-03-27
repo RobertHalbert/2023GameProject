@@ -9,20 +9,20 @@
     "Westcliff": {
         "description": "A small town.",
         "Home": "Home",
-        "Merchant": "Merchant",
-        "Blacksmith":"Blacksmith",
+        "Merchant": "Varren's",
+        "Orrin's":"Orrin's",
         "Guardhouse":"Guardhouse",
         "exit": "overworld"
     },
-    "Merchant": {
-        "description": "Merchant's place.",
+    "Varren's": {
+        "description": "Varren's place.",
         "talk": "Hello there",
         "buy": "buy items",
         "sell": "sell items",
         "exit": "Westcliff"
     },
-    "Blacksmith": {
-        "description": "Blacksmith's place.",
+    "Orrin's": {
+        "description": "Orrin's place.",
         "talk": "Hello there",
         "buy": "buy items",
         "sell": "sell items",
@@ -33,6 +33,8 @@
         "talk": "Hello there",
         "exit": "Westcliff"
     },
+
+
     "Westcliff Farms": {
         "description": "A decent sized field of various crops.",
         "enemy": "Rat"
@@ -48,9 +50,41 @@
     "Westcliff Road":{
         "description": "The road connecting Westcliff to the city."
     },
+
+
     "Carrier City":{
-        "description": "A city with a port"
+        "description": "A city with a port",
+        "Buckroot":"Buckroot",
+        "Blacksmith":"Blacksmith",
+        "Merchant": "Merchant",
+        "Doctor": "Doctor",
+        "exit": "overworld"
     },
+    "Buckroot":{
+        "description": "A busy inn",
+        "Inn Room":"Inn Room",
+        "exit": "Carrier City"
+    },
+    "Inn Room":{
+        "description": "a decent inn room",
+        "rest": "You rest for an hour.",
+        "sleep": "You sleep for the night.",
+        "exit": "Buckroot"
+    },
+    "Blacksmith":{
+        "description": "the blacksmith for carrier city",
+        "exit": "Carrier City"
+    },
+    "Merchant":{
+        "description": "the merchant for carrier city",
+        "exit": "Carrier City"
+    },
+    "Doctor":{
+        "description": "go here wehn you lose battle or need healing",
+        "exit":"Carrier City"
+    },
+
+
     "Carrier Beach":{
         "description": "A sandy beach",
         "enemy": "Rat"
@@ -82,9 +116,11 @@
     "Darkwood":{
         "description": "A surprisingly friendly town."
     },
-"SHOPS":"All shops are stored here",
-    "Merchant Shop": ["Bandages","Potion"],
-    "Blacksmith Shop": ["Dagger","Sword","Leather Tunic"]
 
+"SHOPS":"All shops are stored here",
+    "Varren's Shop": ["Bandages","Potion"],
+    "Orrin's Shop": ["Dagger","Sword","Leather Tunic"],
+    "Blacksmith Shop": ["Longsword", "Chainmail", "Plate Armor"],
+    "Merchant Shop": ["Bandages","Potion","Elixir"]
     
 }
