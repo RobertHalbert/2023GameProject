@@ -1,0 +1,44 @@
+---Stats---
+4
+4
+1
+1
+1
+1
+1
+1
+5
+0
+10
+0
+---Other---
+none
+none
+none
+Blue
+Blonde
+Short
+Pale
+TEST
+False
+---Inventory---
+Old Coin
+Old Coin
+---Equipment---
+---Flags---
+0
+0
+0
+0
+---Kills---
+0
+---Info---Home
+False
+False
+False
+0
+[5, 5]
+480
+162
+344
+0

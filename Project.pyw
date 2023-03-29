@@ -1,4 +1,5 @@
 import sys
+import os
 import random
 import json
 
@@ -52,6 +53,7 @@ class PlayerCharacter(Character):
         self.experience = 0
         self.experienceNeeded = 10
         self.inventory = ["Old Coin", "Old Coin"]
+        self.equipped = []
         self.points = 0
         self.tired = False
 
@@ -223,7 +225,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         enemies = json.load(e)
     with open("text/locations.json", "r") as l:
         locations = json.load(l)
-
     playerLocation = ''
     overWorld = False
     inventoryOpen = False
@@ -337,10 +338,72 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.frameInfo.setVisible(True)
 
     def SaveGame(self):
-        pass
+        fileSave = open("SaveFile.txt",'w')
+        p = player
+        x = 0
+        playerStats = [p.hitPoints,p.maxHP,p.strength,p.dexterity,p.consitution,p.arcana,
+                       p.charisma,p.level,p.gold,p.experience,p.experienceNeeded,p.points]
+        for i in playerStats:
+            playerStats[x] = str(i)+"\n"
+            x += 1
+        playerOther = [p.armor+"\n", p.weapon+"\n",p.accesory+"\n",p.appearence[0]+"\n",p.appearence[1]+"\n",
+                       p.appearence[2]+"\n",p.appearence[3]+"\n",p.name+"\n",str(p.tired)+"\n"]
+        x = 0
+        playerInventory = []
+        for i in p.inventory:
+            playerInventory.append(str(i)+'\n')
+            x += 1
+
+        playerEqupment = p.equipped
+        x = 0
+        for i in playerEqupment:
+            playerEqupment[x] = i + '\n'
+            x += 1
+
+        gameFlags = [str(self.flags[0][1])+'\n',str(self.flags[1][1])+'\n',str(self.flags[2][1])+'\n',
+                     str(self.flags[3][1])+'\n']
+        gameKills = str(self.monsterKills[0][1])+'\n'
+
+        gameInfo = [self.playerLocation,self.overWorld,self.night,self.roomPaid,self.roomTimeLeft,
+                    self.playerCoordinates,self.time,self.day,self.year,self.defeatArea]
+        x = 0
+        for i in gameInfo:
+            gameInfo[x] = str(i) + '\n'
+            x += 1
+
+        saveList = ["---Stats---\n",playerStats,"---Other---\n",playerOther,"---Inventory---\n",playerInventory,"---Equipment---\n",
+                    playerEqupment,"---Flags---\n",gameFlags,"---Kills---\n",gameKills,"---Info---",gameInfo]
+        for i in saveList:
+            fileSave.writelines(i)
     
     def LoadGame(self):
-        pass
+        p = player
+        oldplayerStats = [p.hitPoints,p.maxHP,p.strength,p.dexterity,p.consitution,p.arcana,p.charisma,p.level,
+                          p.gold,p.experience,p.experienceNeeded,p.points,p.armor,p.weapon,p.accesory,
+                          p.appearence[0],p.appearence[1],p.appearence[2],p.appearence[3],p.name,p.tired]
+        fileLoad = open("SaveFile.txt",'r')
+        if os.path.getsize('SaveFile.txt') == 0:
+            return
+        playerStats =fileLoad.readlines()
+        for i in range(len(playerStats)):
+            playerStats[i] = playerStats[i].replace('\n','')
+        print(playerStats)
+        x = 0
+        z = False
+        while z != True:
+            try:
+                oldplayerStats[x] = int(playerStats[x+1])
+                x+=1
+            except:
+                z = True      
+        for i in range(1,8):
+            oldplayerStats[i+11] = playerStats[i+13]
+        oldplayerStats[20] = bool(playerStats[22].replace('False',''))
+        print(p.consitution)
+        print(oldplayerStats)  
+        fileLoad.close()
+
+            
  
 ##### Helper Functions #####
     def UpdateInformation(self):  # UPDATE INFO FOR UI ####
@@ -942,21 +1005,29 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             if player.weapon == 'none':
                 self.Text(f'You wield the {itemformated}.')
                 player.weapon = item
+                player.equipped.append(item)
             elif player.weapon == item:
                 self.Text('You already have that equipped.')
             else:
                 self.Text(
                     f'You put away the {player.weapon.lower()} and equip the {itemformated}.')
+                player.equipped.remove(player.weapon)
                 player.weapon = item
+                player.equipped.append(item)
         if itemType == 'armor':
             if player.armor == 'none':
                 self.Text(f'You don the {itemformated}')
                 player.armor = item
+                player.equipped.append(item)
             elif player.armor == item:
                 self.Text('You already have that equipped.')
             else:
                 self.Text(
                     f'You remove the {player.armor.lower()} and don the {itemformated}.')
+                player.equipped.remove(player.armor)
+                player.armor = itemformated
+                player.equipped.append(item)
+                
         if itemType == 'healing':
             self.Text(
                 f'You use the {item} and restore {self.items[item]["modifier"]} hit points.')
@@ -964,6 +1035,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             player.inventory.remove(item)
         if self.battleOn == True:
             self.EnemyAction()
+        self.UpdateInformation()
 
     # Shop Functions ######
     def OpenShopBuy(self):
@@ -1013,12 +1085,15 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.SetUpInventory()
 
     def SellItem(self, item):
-        value = self.items[item]["value"]
-        self.Text(f"You sell the {item} and get {value} gold in return.")
-        player.inventory.remove(item)
-        player.gold += value
-        self.UpdateInformation()
-        self.SetUpInventory()
+        if item in player.equipped and player.inventory.count(item) < 2:
+            self.Text("You currently have that equipped.")
+        else:
+            value = self.items[item]["value"]
+            self.Text(f"You sell the {item} and get {value} gold in return.")
+            player.inventory.remove(item)
+            player.gold += value
+            self.UpdateInformation()
+            self.SetUpInventory()
 
     # Action Functions ##########
     def PayForRoom(self):
