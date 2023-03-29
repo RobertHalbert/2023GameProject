@@ -9,7 +9,7 @@
     "Westcliff": {
         "description": "A small town.",
         "Home": "Home",
-        "Merchant": "Varren's",
+        "Varren's": "Varren's",
         "Orrin's":"Orrin's",
         "Guardhouse":"Guardhouse",
         "exit": "overworld"

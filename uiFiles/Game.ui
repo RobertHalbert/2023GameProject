@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1010</width>
+    <width>1089</width>
     <height>711</height>
    </rect>
   </property>
@@ -19,7 +19,7 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1011</width>
+      <width>1081</width>
       <height>651</height>
      </rect>
     </property>
@@ -37,8 +37,8 @@
     <widget class="QPlainTextEdit" name="mainTextBox">
      <property name="geometry">
       <rect>
-       <x>230</x>
-       <y>10</y>
+       <x>270</x>
+       <y>0</y>
        <width>581</width>
        <height>381</height>
       </rect>
@@ -52,7 +52,7 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>231</width>
+       <width>271</width>
        <height>611</height>
       </rect>
      </property>
@@ -67,7 +67,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>221</width>
+        <width>251</width>
         <height>571</height>
        </rect>
       </property>
@@ -275,7 +275,7 @@
     <widget class="QFrame" name="frameButtons">
      <property name="geometry">
       <rect>
-       <x>250</x>
+       <x>290</x>
        <y>390</y>
        <width>541</width>
        <height>261</height>
@@ -475,7 +475,7 @@
     <widget class="QFrame" name="frameEnemyInfo">
      <property name="geometry">
       <rect>
-       <x>810</x>
+       <x>880</x>
        <y>0</y>
        <width>201</width>
        <height>461</height>
@@ -528,8 +528,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1010</width>
-     <height>21</height>
+     <width>1089</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu">
@@ -537,6 +537,9 @@
      <string>Menu</string>
     </property>
     <addaction name="actionNew_Game"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_Game_2"/>
+    <addaction name="actionLoad_Game_2"/>
     <addaction name="separator"/>
     <addaction name="actionExit_Game"/>
    </widget>
@@ -561,6 +564,16 @@
   <action name="actionExit_Game">
    <property name="text">
     <string>Exit Game (F4)</string>
+   </property>
+  </action>
+  <action name="actionSave_Game_2">
+   <property name="text">
+    <string>Save Game (F5)</string>
+   </property>
+  </action>
+  <action name="actionLoad_Game_2">
+   <property name="text">
+    <string>Load Game (F6)</string>
    </property>
   </action>
  </widget>

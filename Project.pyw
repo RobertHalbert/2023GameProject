@@ -266,6 +266,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonX.clicked.connect(lambda: self.GridButtonPressed('X'))
         self.ButtonZ.clicked.connect(lambda: self.GridButtonPressed('Z'))
         self.actionExit_Game.triggered.connect(self.EndGame)
+        self.actionSave_Game_2.triggered.connect(self.SaveGame)
+        self.actionLoad_Game_2.triggered.connect(self.LoadGame)
         self.frameButtons.setVisible(False)
         self.frameInfo.setVisible(False)
         self.frameEnemyInfo.setVisible(False)
@@ -304,6 +306,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             self.StartGame()
         if event.key() == Qt.Key_F4:
             self.EndGame()
+        if event.key() == Qt.Key_F5:
+            self.SaveGame()
+        if event.key() == Qt.Key_F6:
+            self.LoadGame()
 
 # Main Functions
 
@@ -330,6 +336,12 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.frameButtons.setVisible(True)
         self.frameInfo.setVisible(True)
 
+    def SaveGame(self):
+        pass
+    
+    def LoadGame(self):
+        pass
+ 
 ##### Helper Functions #####
     def UpdateInformation(self):  # UPDATE INFO FOR UI ####
         self.labelStrength.setText(f'Strength: {player.strength}')

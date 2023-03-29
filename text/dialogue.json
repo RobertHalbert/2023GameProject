@@ -3,7 +3,7 @@
         "intro":"Welcome to (My Game)!\n\nStart a new game by selecting 'New game' in the Menu or by pressing 'F3'.",
         "defeat":"You wake up in your home."
     },
-    "Merchant":{
+    "Varren's":{
         "quest1":"Oh, good. You're finally here. I've got a bit of a job for you since you're going to be heading out of Westcliff.\n I need some materials for our local alchemists, you can get them from some local monsters, 5 green crystals and 5 rat tails.",
         "quest2": "You can find some rats in the farms north of Westcliff, and you can get the crystals by killing some slimes in the forest to the west. I need five of each.",
         "lead":"Oh! By the way, Doran came by looking for you. Said he wanted to put you to work, and to come by the guardhouse when you are ready."
