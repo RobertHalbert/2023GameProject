@@ -269,6 +269,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.actionExit_Game.triggered.connect(self.EndGame)
         self.actionSave_Game_2.triggered.connect(self.SaveGame)
         self.actionLoad_Game_2.triggered.connect(self.LoadGame)
+        self.actionSave_Game_2.setEnabled(False)
         self.frameButtons.setVisible(False)
         self.frameInfo.setVisible(False)
         self.frameEnemyInfo.setVisible(False)
@@ -308,9 +309,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if event.key() == Qt.Key_F4:
             self.EndGame()
         if event.key() == Qt.Key_F5:
-            self.SaveGame()
+            if self.battleOn == False:
+                self.SaveGame()
         if event.key() == Qt.Key_F6:
-            self.LoadGame()
+            if self.battleOn == False:
+                self.LoadGame()
 
 # Main Functions
 
@@ -336,6 +339,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonUpdate()
         self.frameButtons.setVisible(True)
         self.frameInfo.setVisible(True)
+        self.actionSave_Game_2.setEnabled(True)
 
     def SaveGame(self):
         fileSave = open("SaveFile.txt",'w')
@@ -377,6 +381,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             fileSave.writelines(i)
     
     def LoadGame(self):
+        global player
+        player = PlayerCharacter(5,5,1,1,1,1,1,'none','none','none','Default Danny',['a','b','c','d'],'?')
         p = player
         playerStatsList = [p.hitPoints,p.maxHP,p.strength,p.dexterity,p.consitution,p.arcana,p.charisma,p.level,
                           p.gold,p.experience,p.experienceNeeded,p.points,p.armor,p.weapon,p.accesory,
@@ -390,7 +396,6 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         playerStats = fileLoad.readlines()
         for i in range(len(playerStats)):
             playerStats[i] = playerStats[i].replace('\n','')
-        print(playerStats) 
         statIndex = playerStats.index('---Stats---')
         otherIndex = playerStats.index('---Other---')
         inventoryIndex = playerStats.index('---Inventory---')
@@ -440,10 +445,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.day = int(playerStats[infoIndex+8])
         self.year = int(playerStats[infoIndex+9])
         self.defeatArea = int(playerStats[infoIndex+10])
-        print(self.playerCoordinates)
         fileLoad.close()
+        self.mainTextBox.clear()
+        self.BeginGame()
         self.UpdateInformation()
-        self.ButtonUpdate()
 
             
  
@@ -870,6 +875,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonC.setText('Inventory')
         self.ButtonQ.setText('Attack')
         self.ButtonW.setText('Run')
+        self.actionSave_Game_2.setEnabled(False)
         self.ButtonEnabled()
 
     def BattleFunction(self, action):  # Function to handle battle actions
@@ -952,6 +958,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.ButtonUpdate()
         self.frameEnemyInfo.setVisible(False)
         self.UpdateInformation()
+        self.actionSave_Game_2.setEnabled(True)
 
     def BattleLoss(self):  # Function if player loses
         self.TimeFunction(360)
