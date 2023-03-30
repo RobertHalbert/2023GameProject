@@ -1,7 +1,8 @@
 {
     "General":{
         "intro":"Welcome to (My Game)!\n\nStart a new game by selecting 'New game' in the Menu or by pressing 'F3'.",
-        "defeat":"You wake up in your home."
+        "defeat":"You wake up in your home.",
+        "help":"help text"
     },
     "Varren's":{
         "quest1":"Oh, good. You're finally here. I've got a bit of a job for you since you're going to be heading out of Westcliff.\n I need some materials for our local alchemists, you can get them from some local monsters, 5 green crystals and 5 rat tails.",
@@ -18,6 +19,6 @@
         "questDone":"Remember to keep your gear up to date, the difference could be life or death."
     },
     "Buckroot":{
-        "intro1":"Welcome to the Buckroot in traveler. A room is 5 gold a night, jobs are posted on the board overe there."
+        "intro1":"Welcome to the Buckroot in traveler. A room is 5 gold a night, jobs are posted on the board over there."
     }
 }

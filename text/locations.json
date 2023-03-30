@@ -45,7 +45,7 @@
     },
     "Westcliff Plains":{
         "description": "A large open field of grass.",
-        "enemy": "Rat"
+        "enemy": "Wolf"
     },
     "Westcliff Road":{
         "description": "The road connecting Westcliff to the city."
@@ -58,7 +58,8 @@
         "Blacksmith":"Blacksmith",
         "Merchant": "Merchant",
         "Doctor": "Doctor",
-        "exit": "overworld"
+        "exit": "overworld",
+        "enemy": "Thief"
     },
     "Buckroot":{
         "description": "A busy inn",

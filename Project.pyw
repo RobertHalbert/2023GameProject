@@ -270,6 +270,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.actionSave_Game_2.triggered.connect(self.SaveGame)
         self.actionLoad_Game_2.triggered.connect(self.LoadGame)
         self.actionSave_Game_2.setEnabled(False)
+        self.actionHelp.triggered.connect(self.Help)
         self.frameButtons.setVisible(False)
         self.frameInfo.setVisible(False)
         self.frameEnemyInfo.setVisible(False)
@@ -314,7 +315,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if event.key() == Qt.Key_F6:
             if self.battleOn == False:
                 self.LoadGame()
-
+        if event.key() == Qt.Key_F7:
+            self.Help()
 # Main Functions
 
     # If a button is pressed (key or by mouse) will trigger the self.Button{letter}.Pressed() function
@@ -390,7 +392,10 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         statsList = []
         p.inventory.clear()
         p.equipped.clear()
-        fileLoad = open("SaveFile.txt",'r')
+        try:
+            fileLoad = open("SaveFile.txt",'r')
+        except:
+            return
         if os.path.getsize('SaveFile.txt') == 0:
             return
         playerStats = fileLoad.readlines()
@@ -449,8 +454,11 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         self.mainTextBox.clear()
         self.BeginGame()
         self.UpdateInformation()
+        self.label.setText(f"{self.playerCoordinates}")
 
-            
+    def Help(self):
+        self.mainTextBox.clear()
+        self.Text(self.dialogue['General']['help'])
  
 ##### Helper Functions #####
     def UpdateInformation(self):  # UPDATE INFO FOR UI ####
@@ -502,6 +510,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                 if self.flags[2][1] != 0:
                     self.ButtonA.setText('Guardhouse')
             if pL == "Carrier City":
+                self.ButtonZ.setText('Wander Around')
                 self.ButtonQ.setText('Buckroot')
                 if self.night == False:
                     self.ButtonW.setText('Blacksmith')
@@ -789,6 +798,8 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     def ButtonZPressed(self):
         b = self.ButtonZ.text()
         pL = self.playerLocation
+        if b == 'Wander Around':
+            self.Explore()
         if self.shopOpen == True:
             if self.shopOp == 1:
                 self.BuyItem(b)
@@ -1113,13 +1124,13 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             elif self.items[i]['type'] == 'misc item':
                 itemType = 'Misc Item'
             self.Text(
-                f"{self.items[i]['description']} - {itemType} {self.items[i]['modifier']} - Cost: {self.items[i]['value']} gold")
+                f"{self.items[i]['description']} - {itemType} {self.items[i]['modifier']} - Cost: {round(self.items[i]['value']*(1-.04*(player.charisma-5)))} gold")
             x += 1
         self.ButtonEnabled()
         pass
 
     def BuyItem(self, item):
-        value = self.items[item]["value"]
+        value = round(self.items[i]['value']*(1-.04*(player.charisma-5)))
         if player.gold < value:
             self.Text(f"You do not have enough gold to buy the {item}!")
         else:
@@ -1137,7 +1148,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         if item in player.equipped and player.inventory.count(item) < 2:
             self.Text("You currently have that equipped.")
         else:
-            value = self.items[item]["value"]
+            value = round(self.items[item]["value"] * (1+.04*(player.charisma-5)))
             self.Text(f"You sell the {item} and get {value} gold in return.")
             player.inventory.remove(item)
             player.gold += value
@@ -1145,6 +1156,12 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             self.SetUpInventory()
 
     # Action Functions ##########
+    def Explore(self):
+        self.Text(f'You wander around {self.playerLocation}.')
+        roll = random.randint(1,100)
+        if roll > 50:
+            self.EncounterFunction(10)
+
     def PayForRoom(self):
         player.gold -= 5
         self.roomPaid = True

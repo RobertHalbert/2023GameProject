@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Progamming\Repository\GameProject\uiFiles\Game.ui'
+# Form implementation generated from reading ui file 'e:\Project\GameProject\uiFiles\Game.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.7
 #
@@ -192,7 +192,7 @@ class Ui_MainWindow(object):
         self.formLayoutEnemy.setWidget(2, QtWidgets.QFormLayout.SpanningRole, self.progressBarEnemyHp)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1089, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1089, 29))
         self.menubar.setObjectName("menubar")
         self.menuMenu = QtWidgets.QMenu(self.menubar)
         self.menuMenu.setObjectName("menuMenu")
@@ -212,10 +212,14 @@ class Ui_MainWindow(object):
         self.actionSave_Game_2.setObjectName("actionSave_Game_2")
         self.actionLoad_Game_2 = QtWidgets.QAction(MainWindow)
         self.actionLoad_Game_2.setObjectName("actionLoad_Game_2")
+        self.actionHelp = QtWidgets.QAction(MainWindow)
+        self.actionHelp.setObjectName("actionHelp")
         self.menuMenu.addAction(self.actionNew_Game)
         self.menuMenu.addSeparator()
         self.menuMenu.addAction(self.actionSave_Game_2)
         self.menuMenu.addAction(self.actionLoad_Game_2)
+        self.menuMenu.addSeparator()
+        self.menuMenu.addAction(self.actionHelp)
         self.menuMenu.addSeparator()
         self.menuMenu.addAction(self.actionExit_Game)
         self.menubar.addAction(self.menuMenu.menuAction())
@@ -266,3 +270,4 @@ class Ui_MainWindow(object):
         self.actionExit_Game.setText(_translate("MainWindow", "Exit Game (F4)"))
         self.actionSave_Game_2.setText(_translate("MainWindow", "Save Game (F5)"))
         self.actionLoad_Game_2.setText(_translate("MainWindow", "Load Game (F6)"))
+        self.actionHelp.setText(_translate("MainWindow", "Help"))
