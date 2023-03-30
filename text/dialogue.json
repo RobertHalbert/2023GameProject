@@ -1,7 +1,6 @@
 {
     "General":{
         "intro":"Welcome to (My Game)!\n\nStart a new game by selecting 'New game' in the Menu or by pressing 'F3'.",
-        "defeat":"You wake up in your home.",
         "help":"help text"
     },
     "Varren's":{
