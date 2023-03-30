@@ -52,7 +52,7 @@ class PlayerCharacter(Character):
         self.gold = 5
         self.experience = 0
         self.experienceNeeded = 10
-        self.inventory = ["Old Coin", "Old Coin"]
+        self.inventory = []
         self.equipped = []
         self.points = 0
         self.tired = False
@@ -240,7 +240,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
     day = 162
     year = 344
     defeatArea = 0
-    defeatLocations = ('Home','Doctor')
+    defeatLocations = ('Home','Clinic')
     dayNames = ('Starday', 'Runesday', 'Midsday', 'Terrday', 'Ornsday')
     monthNames = ('First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth',
                   'Seventh', 'Eighth', 'Nineth', 'Tenth', 'Eleventh', 'Twelfth')
@@ -800,18 +800,18 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         pL = self.playerLocation
         if b == 'Wander Around':
             self.Explore()
-        if self.shopOpen == True:
+        elif self.shopOpen == True:
             if self.shopOp == 1:
                 self.BuyItem(b)
             else:
                 self.SellItem(b)
-        if self.inventoryOpen == self.shopOpen == self.battleOn == False:
+        elif self.inventoryOpen == self.shopOpen == self.battleOn == False:
             if self.overWorld != True:
                 self.EnterAreaFunction(self.locations[pL][b])
             else:
                 self.EnterAreaFunction(b)
                 self.overWorld = False
-        if self.shopOpen == False and self.inventoryOpen == True:
+        elif self.shopOpen == False and self.inventoryOpen == True:
             self.InventoryFunction(b)
 
     def ButtonXPressed(self):
@@ -985,7 +985,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
             player.gold = 0
         self.UpdateInformation()
         self.Text(f"The {thisEnemy.name} has struck you down.\nYou lose {xpLoss} xp and {goldLoss} gold.\
-                  \n{self.dialogue['General']['defeat']}")
+                  \nYou wake up at {self.playerLocation}")
         self.BattleEnd()
 
     # Location Functions ##########
@@ -1130,7 +1130,7 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
         pass
 
     def BuyItem(self, item):
-        value = round(self.items[i]['value']*(1-.04*(player.charisma-5)))
+        value = round(self.items[item]['value']*(1-.04*(player.charisma-5)))
         if player.gold < value:
             self.Text(f"You do not have enough gold to buy the {item}!")
         else:

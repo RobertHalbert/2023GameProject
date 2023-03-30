@@ -4,6 +4,7 @@
         "description": "Your home.",
         "rest": "You rest for an hour.",
         "sleep": "You sleep for the night.",
+        "defeat":"You wake up in your home.",
         "exit": "Westcliff"
     },
     "Westcliff": {
@@ -57,7 +58,7 @@
         "Buckroot":"Buckroot",
         "Blacksmith":"Blacksmith",
         "Merchant": "Merchant",
-        "Doctor": "Doctor",
+        "Clinic": "Clinic",
         "exit": "overworld",
         "enemy": "Thief"
     },
@@ -80,9 +81,10 @@
         "description": "the merchant for carrier city",
         "exit": "Carrier City"
     },
-    "Doctor":{
+    "Clinic":{
         "description": "go here wehn you lose battle or need healing",
-        "exit":"Carrier City"
+        "exit":"Carrier City",
+        "defeat":"You wake up at the clinic."
     },
 
 
