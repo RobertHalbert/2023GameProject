@@ -364,44 +364,86 @@ class MyForm(Ui_Game.Ui_MainWindow, QMainWindow):  # Main Game Window #######
                      str(self.flags[3][1])+'\n']
         gameKills = str(self.monsterKills[0][1])+'\n'
 
-        gameInfo = [self.playerLocation,self.overWorld,self.night,self.roomPaid,self.roomTimeLeft,
-                    self.playerCoordinates,self.time,self.day,self.year,self.defeatArea]
+        gameInfo = [self.playerLocation,self.overWorld,self.night,self.roomPaid,self.playerCoordinates,
+                    self.roomTimeLeft,self.time,self.day,self.year,self.defeatArea]
         x = 0
         for i in gameInfo:
             gameInfo[x] = str(i) + '\n'
             x += 1
 
         saveList = ["---Stats---\n",playerStats,"---Other---\n",playerOther,"---Inventory---\n",playerInventory,"---Equipment---\n",
-                    playerEqupment,"---Flags---\n",gameFlags,"---Kills---\n",gameKills,"---Info---",gameInfo]
+                    playerEqupment,"---Flags---\n",gameFlags,"---Kills---\n",gameKills,"---Info---\n",gameInfo]
         for i in saveList:
             fileSave.writelines(i)
     
     def LoadGame(self):
         p = player
-        oldplayerStats = [p.hitPoints,p.maxHP,p.strength,p.dexterity,p.consitution,p.arcana,p.charisma,p.level,
+        playerStatsList = [p.hitPoints,p.maxHP,p.strength,p.dexterity,p.consitution,p.arcana,p.charisma,p.level,
                           p.gold,p.experience,p.experienceNeeded,p.points,p.armor,p.weapon,p.accesory,
                           p.appearence[0],p.appearence[1],p.appearence[2],p.appearence[3],p.name,p.tired]
+        statsList = []
+        p.inventory.clear()
+        p.equipped.clear()
         fileLoad = open("SaveFile.txt",'r')
         if os.path.getsize('SaveFile.txt') == 0:
             return
-        playerStats =fileLoad.readlines()
+        playerStats = fileLoad.readlines()
         for i in range(len(playerStats)):
             playerStats[i] = playerStats[i].replace('\n','')
-        print(playerStats)
-        x = 0
-        z = False
-        while z != True:
-            try:
-                oldplayerStats[x] = int(playerStats[x+1])
-                x+=1
-            except:
-                z = True      
-        for i in range(1,8):
-            oldplayerStats[i+11] = playerStats[i+13]
-        oldplayerStats[20] = bool(playerStats[22].replace('False',''))
-        print(p.consitution)
-        print(oldplayerStats)  
+        print(playerStats) 
+        statIndex = playerStats.index('---Stats---')
+        otherIndex = playerStats.index('---Other---')
+        inventoryIndex = playerStats.index('---Inventory---')
+        equipmentIndex = playerStats.index('---Equipment---')
+        flagsIndex = playerStats.index('---Flags---')
+        killsIndex = playerStats.index('---Kills---')
+        infoIndex = playerStats.index('---Info---')
+        for i in range(otherIndex - statIndex):
+            if playerStats[statIndex+i+1] == '---Other---':
+                continue
+            statsList.append(int(playerStats[i+1]))
+        for i in range(inventoryIndex - otherIndex):
+            if playerStats[otherIndex+i+1] == '---Inventory---':
+                continue
+            statsList.append(playerStats[i+otherIndex+1])
+        statsList.append(bool(playerStats[22].replace('False','')))
+        x=0
+        for i in playerStatsList:
+            i = statsList[x]
+            x +=1
+        for i in range(equipmentIndex - inventoryIndex):
+            if playerStats[inventoryIndex+i+1] == '---Equipment---':
+                continue
+            p.inventory.append(playerStats[inventoryIndex+i+1])
+        for i in range(flagsIndex-equipmentIndex):
+            if playerStats[equipmentIndex+i+1] == '---Flags---':
+                continue
+            p.equipped.append(playerStats[equipmentIndex+i+1])
+        for i in range(killsIndex - flagsIndex):
+            if playerStats[flagsIndex+i+1] == '---Kills---':
+                continue
+            self.flags[i][1] = playerStats[flagsIndex+i+1]
+        for i in range(infoIndex - killsIndex):
+            if playerStats[killsIndex+1+i] == '---Info---':
+                continue
+            self.monsterKills[i][1] = playerStats[killsIndex+1+i]
+        # remainder
+        self.playerLocation = playerStats[infoIndex+1]
+        self.overWorld = bool(playerStats[infoIndex+2].replace('False',''))
+        self.night = bool(playerStats[infoIndex+3].replace('False',''))
+        self.roomPaid = bool(playerStats[infoIndex+4].replace('False',''))
+        self.playerCoordinates = playerStats[infoIndex+5].replace('[','').replace(']','').replace(' ','').split(",")
+        for i in range(2):
+            self.playerCoordinates[i] = int(self.playerCoordinates[i])
+        self.roomTimeLeft = int(playerStats[infoIndex+6])
+        self.time = int(playerStats[infoIndex+7])
+        self.day = int(playerStats[infoIndex+8])
+        self.year = int(playerStats[infoIndex+9])
+        self.defeatArea = int(playerStats[infoIndex+10])
+        print(self.playerCoordinates)
         fileLoad.close()
+        self.UpdateInformation()
+        self.ButtonUpdate()
 
             
  

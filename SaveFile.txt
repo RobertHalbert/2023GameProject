@@ -32,12 +32,13 @@ Old Coin
 0
 ---Kills---
 0
----Info---Home
+---Info---
+Orrin's
 False
 False
 False
-0
 [5, 5]
+0
 480
 162
 344
